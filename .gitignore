@@ -1,0 +1,46 @@
+node_modules
+# React Native
+# Build artifacts
+android/.gradle/
+android/app/build/
+android/app/src/main/res/mipmap-*/ic_launcher.png
+android/app/src/main/res/mipmap-*/ic_launcher_round.png
+ios/build/
+ios/Pods/
+ios/Podfile.lock
+# React Native packager
+*.jsbundle
+*.jsc
+# Logs
+*.log
+# Temporary files
+*.tmp
+*.temp
+# Misc
+.DS_Store
+.env
+# Metro bundler cache
+.expo/
+.expo-shared/
+# Yarn integrity file
+.yarn-integrity
+# npm package lock
+package-lock.json
+# React Native CLI
+react-native-debugger/
+# Android Studio
+.idea/
+# Xcode
+xcuserdata/
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+# Build directories
+build/
+# Other
+*.swp
+# Coverage
+coverage/
+# Storybook
+storybook-static/
