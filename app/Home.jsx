@@ -1,7 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import SideMenu from './Components/SideMenu';
+import SideMenu from '../Components/SideMenu';
+import { useNavigation } from '@react-navigation/native';
+
 const RestaurantCard = ({ name, rating, address, imageUrl }) => (
   <View style={styles.restaurantCard}>
     <Image source={{ uri: imageUrl }} style={styles.restaurantImage} />
@@ -19,10 +21,15 @@ const RestaurantCard = ({ name, rating, address, imageUrl }) => (
 
 export default function HomeScreen() {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const navigation = useNavigation();
 
   const toggleSideMenu = useCallback(() => {
     setIsSideMenuOpen(prevState => !prevState);
   }, []);
+
+  const handleDetail = () => {
+    navigation.navigate('Detail');
+  };
 
   return (
     <View style={styles.container}>
@@ -32,12 +39,12 @@ export default function HomeScreen() {
           <Text style={styles.menuButtonText}>☰</Text>
         </TouchableOpacity>
         <Image
-          source={require('./assets/logo.png')}
+          source={require('../assets/logo.png')}
           style={styles.logo}
         />
         <TouchableOpacity style={styles.accountButton}>
           <Image
-            source={require('./assets/user.svg')}
+            source={require('../assets/user.svg')}
             style={styles.accountIcon}
           />
         </TouchableOpacity>
@@ -55,30 +62,38 @@ export default function HomeScreen() {
       </View>
       <ScrollView style={styles.resultsContainer}>
         <Text style={styles.sectionTitle}>Search Results</Text>
+        <TouchableOpacity onPress={handleDetail}>
         <RestaurantCard
           name="The Bistro"
           rating="4.5"
           address="123 Fake Street, Vancouver, BC"
           imageUrl="https://www.upmenu.com/wp-content/uploads/2022/07/4-what-is-a-bistro-example-of-a-bistro.jpg"
         />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleDetail}>
         <RestaurantCard
           name="The Corner Cafe"
           rating="4.5"
           address="456 Dummy Avenue, Toronto, ON"
           imageUrl="https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
-        />
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleDetail}>
         <RestaurantCard
           name="The Italian Kitchen"
           rating="4.5"
           address="789 Fictitious Road, Montreal, QC"
           imageUrl="https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
         />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleDetail}>
         <RestaurantCard
           name="The Sushi Bar"
           rating="4.5"
           address="1011 Make-Believe Street, Calgary, AB"
           imageUrl="https://media-cdn.tripadvisor.com/media/photo-s/1b/01/24/ef/catering.jpg"
         />
+        </TouchableOpacity>
       </ScrollView>
       <Text style={styles.featuredTitle}>Featured Restaurants</Text>
       {isSideMenuOpen && (

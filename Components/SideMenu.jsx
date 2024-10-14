@@ -1,9 +1,16 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Animated, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const SideMenu = ({ isOpen, onClose }) => {
+  const navigation = useNavigation();
   const slideAnim = useRef(new Animated.Value(-250)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+ 
+  const handleLogout = () => {
+    navigation.navigate('Login');
+    onClose();
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -58,7 +65,7 @@ const SideMenu = ({ isOpen, onClose }) => {
             <Text style={styles.menuItem}>About</Text>
             <Text style={styles.menuItem}>Past Orders</Text>
   
-            <TouchableOpacity style={styles.logoutButton}>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
               <Text style={styles.logoutText}>Logout</Text>
             </TouchableOpacity>
           </Animated.View>

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
+import React, { useState } from 'react';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -18,7 +18,7 @@ export default function LoginScreen() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <Image
-        source={require('./assets/logo.png')}
+        source={require('../assets/logo.png')}
         style={styles.logo}
       />
       <Text style={styles.tagline}>Discover new flavors, save your wallet.</Text>
@@ -120,14 +120,14 @@ const styles = StyleSheet.create({
   forgotPassword: {
     fontFamily: 'Gilroy',
     fontSize: 12,
-    color: '#F3B13C',
+    color: '#B75A4B',
     alignSelf: 'flex-end',
     marginBottom: 20,
   },
   loginButton: {
     width: '100%',
     height: 56,
-    backgroundColor: '#F3B13C',
+    backgroundColor: '#F04647',
     borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   socialButtonText: {
     fontFamily: 'Gilroy-Bold',
     fontSize: 14,
-    color: '#222222',
+    color: '#B75A4B',
   },
   signUpContainer: {
     flexDirection: 'row',
@@ -186,6 +186,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy',
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#F3B13C',
+    color: '#F04647',
   },
 });
