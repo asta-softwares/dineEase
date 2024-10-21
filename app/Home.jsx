@@ -69,7 +69,7 @@ export default function HomeScreen() {
           style={styles.searchIcon}
         />
       </View>
-      <ScrollView style={styles.resultsContainer}>
+      <ScrollView style={styles.resultsContainer} showsVerticalScrollIndicator={false}>
 
         <Text style={styles.sectionTitle}>FEATURED OFFERS</Text>
         <ScrollView
@@ -316,6 +316,6 @@ const styles = StyleSheet.create({
   },
   cuisinesCardWrapper: {
     marginRight: 1,
-    width: 120,
+    width: 100,
   },
 });
