@@ -1,25 +1,38 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useRef } from 'react';
+import { Animated, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function DetailScreen() {
   const navigation = useNavigation();
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   const handleGoBack = () => {
     navigation.goBack();
   };
+
+  const imageHeight = scrollY.interpolate({
+    inputRange: [-200, 0, 200],
+    outputRange: [552, 352, 352],
+    extrapolate: 'clamp',
+  });
 
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
         <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
       </TouchableOpacity>
-      <ScrollView>
-        <Image
-          source={{ uri: 'https://www.upmenu.com/wp-content/uploads/2022/07/4-what-is-a-bistro-example-of-a-bistro.jpg' }}
-          style={styles.image}
-        />
+      <Animated.Image
+        source={{ uri: 'https://www.upmenu.com/wp-content/uploads/2022/07/4-what-is-a-bistro-example-of-a-bistro.jpg' }}
+        style={[styles.image, { height: imageHeight }]}
+      />
+      <ScrollView
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+      >
         <View style={styles.content}>
           <View style={styles.header}>
             <Text style={styles.title}>The Flavorful Fork</Text>
@@ -85,9 +98,15 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 352,
     borderRadius: 16,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
   },
   content: {
+    marginTop: 352,
     padding: 20,
+    backgroundColor: '#F3FBFF',
   },
   header: {
     flexDirection: 'row',

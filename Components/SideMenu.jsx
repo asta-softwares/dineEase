@@ -1,11 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 
 const SideMenu = ({ isOpen, onClose }) => {
   const navigation = useNavigation();
   const slideAnim = useRef(new Animated.Value(-250)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [isVisible, setIsVisible] = useState(isOpen);
  
   const handleLogout = () => {
     navigation.navigate('Login');
@@ -14,6 +15,7 @@ const SideMenu = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
+      setIsVisible(true);
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
@@ -38,11 +40,13 @@ const SideMenu = ({ isOpen, onClose }) => {
           duration: 300,
           useNativeDriver: false,
         })
-      ]).start();
+      ]).start(() => {
+        setIsVisible(false);
+      });
     }
   }, [isOpen]);
 
-  if (!isOpen && fadeAnim._value === 0) return null;
+  if (!isVisible) return null;
 
   return (
     <TouchableWithoutFeedback onPress={onClose}>

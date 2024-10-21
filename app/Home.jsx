@@ -9,7 +9,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import CuisinesCard from "../Components/CuisinesCard";
 import FeatureCard from "../Components/FeatureCard";
@@ -17,10 +17,24 @@ import RestaurantCard from "../Components/RestaurantCard";
 import SideMenu from "../Components/SideMenu";
 export default function HomeScreen() {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [isSideMenuVisible, setIsSideMenuVisible] = useState(false);
   const navigation = useNavigation();
 
   const toggleSideMenu = useCallback(() => {
-    setIsSideMenuOpen((prevState) => !prevState);
+    if (isSideMenuOpen) {
+      closeSideMenu();
+    } else {
+      setIsSideMenuOpen(true);
+      setIsSideMenuVisible(true);
+    }
+  }, [isSideMenuOpen]);
+
+  const closeSideMenu = useCallback(() => {
+    setIsSideMenuOpen(false);
+    const onAnimationComplete = () => {
+      setIsSideMenuVisible(false);
+    };
+    return onAnimationComplete;
   }, []);
 
   const handleDetail = () => {
@@ -136,6 +150,7 @@ export default function HomeScreen() {
             rating="4.5"
             address="123 Fake Street, Vancouver, BC"
             imageUrl="https://www.upmenu.com/wp-content/uploads/2022/07/4-what-is-a-bistro-example-of-a-bistro.jpg"
+            price="$ 100"
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleDetail}>
@@ -144,6 +159,7 @@ export default function HomeScreen() {
             rating="4.5"
             address="456 Dummy Avenue, Toronto, ON"
             imageUrl="https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
+            price="$ 100"
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleDetail}>
@@ -152,6 +168,7 @@ export default function HomeScreen() {
             rating="4.5"
             address="789 Fictitious Road, Montreal, QC"
             imageUrl="https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
+            price="$ 100"
           />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleDetail}>
@@ -160,13 +177,14 @@ export default function HomeScreen() {
             rating="4.5"
             address="1011 Make-Believe Street, Calgary, AB"
             imageUrl="https://media-cdn.tripadvisor.com/media/photo-s/1b/01/24/ef/catering.jpg"
+            price="$ 100"
           />
         </TouchableOpacity>
       </ScrollView>
-      {isSideMenuOpen && (
+      {isSideMenuVisible && (
         <SideMenu
           isOpen={isSideMenuOpen}
-          onClose={() => setIsSideMenuOpen(false)}
+          onClose={closeSideMenu}
         />
       )}
     </View>
@@ -214,7 +232,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: "100%",
     height: 44,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F3FBFF",
     borderWidth: 1,
     borderColor: "rgba(31, 38, 44, 0.14)",
     borderRadius: 40,
@@ -226,7 +244,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
     fontFamily: "Plus Jakarta Sans",
-    fontSize: 11,
+    fontSize: 14,
     color: "#888888",
     opacity: 0.75,
   },
