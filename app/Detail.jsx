@@ -73,7 +73,7 @@ export default function DetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F3FBFF',
   },
   backButton: {
     position: 'absolute',

@@ -1,6 +1,6 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 
 const SideMenu = ({ isOpen, onClose }) => {
   const navigation = useNavigation();
@@ -89,15 +89,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     bottom: 0,
-    width: 250, // Adjust width as necessary
-    backgroundColor: '#FFFAEF',
+    width: 250,
+    backgroundColor: '#F3FBFF',
     padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
-    borderRadius: 20, // Matches the sidebar border-radius in your CSS
+    borderRadius: 20,
     zIndex: 1001,
   },
   closeButton: {
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 65,
     alignSelf: 'center',
-    marginVertical: 20, // Spacing for avatar image
+    marginVertical: 20,
   },
   name: {
     fontSize: 14,
@@ -124,12 +124,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1F262C',
     textAlign: 'center',
-    marginBottom: 40, // Add spacing before menu items
+    marginBottom: 40,
   },
   menuItem: {
     fontSize: 14,
     color: '#1F262C',
-    marginBottom: 20, // Space between menu items
+    marginBottom: 20,
   },
   logoutButton: {
     backgroundColor: '#F04647',
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 40,
     alignSelf: 'center',
-    marginTop: 50, // Space above the logout button
+    marginTop: 50,
   },
   logoutText: {
     color: '#FFFFFF',
