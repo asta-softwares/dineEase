@@ -22,7 +22,6 @@ export default function SplashScreen() {
         />
         <Text style={styles.title}>Save More,</Text>
         <Text style={styles.title}>Spend Less</Text>
-        <Text style={styles.subtitle}>Welcome to Dine Ease!</Text>
       </View>
     
       

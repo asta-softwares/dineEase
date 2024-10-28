@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useRef } from 'react';
-import { Animated, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function DetailScreen() {
   const navigation = useNavigation();
@@ -23,7 +23,7 @@ export default function DetailScreen() {
         <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
       </TouchableOpacity>
       <Animated.Image
-        source={{ uri: 'https://www.upmenu.com/wp-content/uploads/2022/07/4-what-is-a-bistro-example-of-a-bistro.jpg' }}
+        source={{ uri: 'https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg' }}
         style={[styles.image, { height: imageHeight }]}
       />
       <ScrollView

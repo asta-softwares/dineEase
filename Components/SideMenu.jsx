@@ -53,9 +53,6 @@ const SideMenu = ({ isOpen, onClose }) => {
       <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
         <TouchableWithoutFeedback>
           <Animated.View style={[styles.sideMenu, { left: slideAnim }]}>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
             <Image
               source={require('../assets/profile.png')} 
               style={styles.avatar}
@@ -103,14 +100,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderRadius: 20,
     zIndex: 1001,
-  },
-  closeButton: {
-    alignSelf: 'flex-end',
-    padding: 10,
-  },
-  closeButtonText: {
-    fontSize: 20,
-    color: '#1F262C',
   },
   avatar: {
     width: 50,
