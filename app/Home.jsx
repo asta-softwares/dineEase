@@ -56,18 +56,20 @@ export default function HomeScreen() {
           />
         </TouchableOpacity>
       </View>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search Restaurant, Cuisine, Location ..."
-          placeholderTextColor="#888888"
-        />
-        <Ionicons
-          name="search-outline"
-          size={15}
-          color="#C4C4C4"
-          style={styles.searchIcon}
-        />
+      <View style={styles.searchWrapper}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search Restaurant, Cuisine, Location ..."
+            placeholderTextColor="#888888"
+          />
+          <Ionicons
+            name="search-outline"
+            size={15}
+            color="#C4C4C4"
+            style={styles.searchIcon}
+          />
+        </View>
       </View>
       <ScrollView 
         style={styles.resultsContainer} 
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 60,
     marginBottom: 10,
     paddingHorizontal: 20,
   },
@@ -228,20 +230,21 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "#1F262C",
   },
+  searchWrapper: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
     padding: 5,
     paddingLeft: 12,
     paddingRight: 12,
-    marginBottom: 20,
-    width: "100%",
     height: 44,
     backgroundColor: "#F3FBFF",
     borderWidth: 1,
     borderColor: "rgba(31, 38, 44, 0.14)",
     borderRadius: 40,
-    marginHorizontal: 20,
   },
   searchIcon: {
     marginRight: 10,
