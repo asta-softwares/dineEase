@@ -14,10 +14,31 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRoPuteName="SplashScreen" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="SplashScreen" component={SplashScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Navigator 
+        initialRouteName="SplashScreen" 
+        screenOptions={{ headerShown: false }}>
+        <Stack.Screen 
+          name="SplashScreen" 
+          component={SplashScreen} 
+          options={{
+            gestureEnabled: false,
+            headerBackVisible: false
+          }}
+        />
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen} 
+          options={{
+            gestureEnabled: false,
+            headerBackVisible: false
+          }}
+        />
+        <Stack.Screen name="Home" component={HomeScreen} 
+         options={{
+          gestureEnabled: false,
+            headerBackVisible: false
+          }}
+        />
         <Stack.Screen name="Detail" component={DetailScreen} />
         <Stack.Screen name="Checkout" component={CheckoutScreen} />
       </Stack.Navigator>
