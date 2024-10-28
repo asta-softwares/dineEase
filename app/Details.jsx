@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import ImageView from "react-native-image-viewing";
- 
+
 const CustomHeader = ({ onClose }) => (
   <View style={[styles.topNav, { backgroundColor: "transparent" }]}>
     <TouchableOpacity
@@ -29,6 +29,7 @@ export default function DetailScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [showFullImage, setShowFullImage] = useState(false);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -119,7 +120,24 @@ export default function DetailScreen() {
           </Text>
           <Text style={styles.sectionTitle}>Menu</Text>
           <TouchableOpacity onPress={() => setImageViewerVisible(true)}>
-            <Image source={{ uri: images[0].uri }} style={styles.menuImage} />
+            {imageLoading && (
+              <View 
+                style={{
+                  width: '100%',
+                  height: 200,
+                  borderRadius: 16,
+                  backgroundColor: '#E1E9EE',
+                  marginTop: 16,
+                  position: 'absolute'
+                }}
+              />
+            )}
+            <Image 
+              source={{ uri: images[0].uri }} 
+              style={styles.menuImage}
+              onLoadStart={() => setImageLoading(true)}
+              onLoadEnd={() => setImageLoading(false)}
+            />
           </TouchableOpacity>
           <ImageView
             images={images}
