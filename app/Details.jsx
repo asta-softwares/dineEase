@@ -27,7 +27,6 @@ const CustomHeader = ({ onClose }) => (
 export default function DetailScreen() {
   const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
-  const [showFullImage, setShowFullImage] = useState(false);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
@@ -37,7 +36,7 @@ export default function DetailScreen() {
 
   const imageHeight = scrollY.interpolate({
     inputRange: [-200, 0, 200],
-    outputRange: [552, 352, 352],
+    outputRange: [452, 252, 252],
     extrapolate: "clamp",
   });
 
@@ -191,7 +190,7 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     width: "100%",
-    height: 352,
+    height: 252,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     position: "absolute",
@@ -206,7 +205,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   content: {
-    marginTop: 352,
+    marginTop: 252,
     padding: 20,
     backgroundColor: "#F3FBFF",
   },

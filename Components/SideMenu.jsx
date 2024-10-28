@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     bottom: 0,
-    width: 250,
+    width: 280,
     backgroundColor: '#F3FBFF',
     padding: 20,
     shadowColor: '#000',
@@ -98,7 +98,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
-    borderRadius: 20,
     zIndex: 1001,
   },
   avatar: {
@@ -106,6 +105,7 @@ const styles = StyleSheet.create({
     height: 65,
     alignSelf: 'center',
     marginVertical: 20,
+    marginTop: 60,
   },
   name: {
     fontSize: 14,
