@@ -46,9 +46,11 @@ export default function HomeScreen() {
       <StatusBar style="auto" />
       <View style={styles.header}>
         <TouchableOpacity style={styles.menuButton} onPress={toggleSideMenu}>
-          <Text style={styles.menuButtonText}>☰</Text>
+          <Ionicons name="menu" size={24} color="#1F262C" />
         </TouchableOpacity>
-        <Image source={require("../assets/logo.png")} style={styles.logo} />
+        <View style={styles.logoContainer}>
+          <Image source={require("../assets/logo.png")} style={styles.logo} />
+        </View>
         <TouchableOpacity style={styles.accountButton}>
           <Image
             source={require("../assets/user.svg")}
@@ -218,6 +220,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "#1F262C",
   },
+  logoContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
   logo: {
     width: 100,
     height: 50,
@@ -225,10 +231,11 @@ const styles = StyleSheet.create({
   },
   menuButton: {
     padding: 10,
+    width: 44,
   },
-  menuButtonText: {
-    fontSize: 24,
-    color: "#1F262C",
+  accountButton: {
+    width: 44,
+    alignItems: "center",
   },
   searchWrapper: {
     paddingHorizontal: 20,
