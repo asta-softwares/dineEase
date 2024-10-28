@@ -1,11 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useRef } from 'react';
-import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Animated, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ImageView from 'react-native-image-viewing';
 
 export default function DetailScreen() {
   const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [showFullImage, setShowFullImage] = useState(false);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -21,6 +24,15 @@ export default function DetailScreen() {
     navigation.navigate("Checkout");
   };
 
+  const toggleFullImage = () => {
+    setShowFullImage(!showFullImage);
+  };
+
+  const images = [
+    {
+      uri: 'https://s3-alpha-sig.figma.com/img/20fc/e656/8ae7b68095a4d524fbca4ccea6841645?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=DTbgg-21pPIWn9tGhAkaJGMKxy7l3gO8FzhR3szV1d349RSkaJCTW9SqpT1aAHL34weL53QaADuxnD1DgAqEqmLhHJytGI9I6z~BEJSofaWkJxva53nIAaSZa5odGsQpsAlWVVnEm9neDihqdormNgSRmdgWz1g0dSY1EVYL6XXjKUUdQ0ILm53LELAkLw4qF2OTQLOXQq6szLD6iwiZJqFgQuoeB5V9jQ5hrucsrKfgof382~R6Qtjo14dbne0nE-Y4BxODnppMI84o7thkQ-jUB1i-k~Ojs7eEoKimMBKjZJ9mdOmxoKnkot8QSExAxpVQYNTjVwhH-AjBPqVZVA__'
+    }
+  ];
 
   return (
     <View style={styles.container}>
@@ -32,7 +44,7 @@ export default function DetailScreen() {
       </View>
       <Animated.Image
         source={{ uri: 'https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg' }}
-        style={[styles.image, { height: imageHeight }]}
+        style={[styles.headerImage, { height: imageHeight }]}
       />
       <ScrollView
         scrollEventThrottle={16}
@@ -71,6 +83,21 @@ export default function DetailScreen() {
           <Text style={styles.description}>
             Discover the perfect blend of traditional Filipino flavors with a modern twist at The Flavorful Fork. Our menu features innovative dishes that will tantalize your taste buds. From sizzling sisig to mouthwatering adobo, we offer a variety of options to satisfy every craving.
           </Text>
+          <Text style={styles.sectionTitle}>Menu</Text>
+          <TouchableOpacity onPress={() => setImageViewerVisible(true)}>
+            <Image 
+              source={{ uri: images[0].uri }} 
+              style={styles.menuImage} 
+            />
+          </TouchableOpacity>
+          <ImageView
+            images={images}
+            imageIndex={0}
+            visible={imageViewerVisible}
+            onRequestClose={() => setImageViewerVisible(false)}
+            swipeToCloseEnabled={true}
+            doubleTapToZoomEnabled={true}
+          />
         </View>
       </ScrollView>
       <View style={styles.footer}>
@@ -114,7 +141,7 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 40,
   },
-  image: {
+  headerImage: {
     width: '100%',
     height: 352,
     borderRadius: 16,
@@ -122,6 +149,12 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+  },
+  menuImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 16,
+    marginTop: 16,
   },
   content: {
     marginTop: 352,
@@ -139,6 +172,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 24,
     color: '#1F262C',
+  },
+  sectionTitle: {
+    fontFamily: "Plus Jakarta Sans",
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1F262C",
+    marginTop: 20,
   },
   rating: {
     flexDirection: 'row',
