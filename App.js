@@ -3,7 +3,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
-import DetailScreen from './app/Detail';
+import CheckoutScreen from './app/Checkout';
+import DetailScreen from './app/Details';
 import HomeScreen from './app/Home';
 import LoginScreen from './app/Login';
 import SplashScreen from './app/SplashScreen';
@@ -18,6 +19,7 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Detail" component={DetailScreen} />
+        <Stack.Screen name="Checkout" component={CheckoutScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

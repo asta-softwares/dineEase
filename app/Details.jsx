@@ -17,11 +17,19 @@ export default function DetailScreen() {
     extrapolate: 'clamp',
   });
 
+  const handleCheckout = () => {
+    navigation.navigate("Checkout");
+  };
+
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-        <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-      </TouchableOpacity>
+      <View style={styles.topNav}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+        <View style={styles.placeholder} />
+      </View>
       <Animated.Image
         source={{ uri: 'https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg' }}
         style={[styles.image, { height: imageHeight }]}
@@ -48,7 +56,7 @@ export default function DetailScreen() {
             </View>
             <View style={styles.infoItem}>
               <Ionicons name="location-outline" size={14} color="#B75A4B" />
-              <Text style={styles.infoText}>123 Main Street, Toronto, CA</Text>
+              <Text styxxle={styles.infoText}>123 Main Street, Toronto, CA</Text>
               <Text style={styles.viewMap}>view map</Text>
             </View>
             <View style={styles.infoItem}>
@@ -75,7 +83,7 @@ export default function DetailScreen() {
             <Ionicons name="add" size={24} color="#1F262C" />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.bookNowButton}>
+        <TouchableOpacity style={styles.bookNowButton} onPress={handleCheckout}>
           <Text style={styles.bookNowText}>Book Now</Text>
         </TouchableOpacity>
       </View>
@@ -88,11 +96,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F3FBFF',
   },
-  backButton: {
+  topNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 60,
     position: 'absolute',
-    top: 40,
-    left: 20,
+    top: 0,
+    left: 0,
+    right: 0,
     zIndex: 1,
+  },
+  backButton: {
+    padding: 8,
+  },
+  placeholder: {
+    width: 40,
   },
   image: {
     width: '100%',
