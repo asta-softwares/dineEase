@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { colors } from '../styles/colors';
 
 export default function SplashScreen() {
   const navigation = useNavigation();
@@ -17,7 +18,7 @@ export default function SplashScreen() {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Image
-          source={require('../assets/logo-white.png')}
+          source={require('../assets/logo-splashscreen.png')}
           style={styles.logo}
         />
         <Text style={styles.title}>Save More,</Text>
@@ -48,7 +49,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F04647',
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -58,8 +59,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    width: 114,
-    height: 48,
+    width: 200,
+    height: 84,
     resizeMode: 'contain',
   },
   title: {
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy',
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#F04647',
+    color: colors.primary,
   },
   browseContainer: {
     alignItems: 'center',

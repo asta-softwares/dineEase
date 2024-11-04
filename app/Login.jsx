@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
+import { colors } from '../styles/colors';
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,7 +21,6 @@ export default function LoginScreen() {
         source={require('../assets/logo.png')}
         style={styles.logo}
       />
-      <Text style={styles.tagline}>Discover new flavors, save your wallet.</Text>
       
       <View style={styles.inputContainer}>
         <Text style={styles.inputLabel}>Email Address</Text>
@@ -87,8 +86,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   logo: {
-    width: 200,
-    height: 100,
+    width: 300,
+    height: 150,
     resizeMode: 'contain',
     marginBottom: 20,
   },
@@ -120,14 +119,14 @@ const styles = StyleSheet.create({
   forgotPassword: {
     fontFamily: 'Gilroy',
     fontSize: 12,
-    color: '#B75A4B',
+    color: colors.primaryText,
     alignSelf: 'flex-end',
     marginBottom: 20,
   },
   loginButton: {
     width: '100%',
     height: 56,
-    backgroundColor: '#F04647',
+    backgroundColor: colors.primary,
     borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
@@ -172,7 +171,7 @@ const styles = StyleSheet.create({
   socialButtonText: {
     fontFamily: 'Gilroy-Bold',
     fontSize: 14,
-    color: '#B75A4B',
+    color: colors.primaryText,
   },
   signUpContainer: {
     flexDirection: 'row',
@@ -186,6 +185,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Gilroy',
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#F04647',
+    color: colors.primaryText,
   },
 });

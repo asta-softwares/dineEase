@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
-
+import { colors } from '../styles/colors';
 const SideMenu = ({ isOpen, onClose }) => {
   const navigation = useNavigation();
   const slideAnim = useRef(new Animated.Value(-250)).current;
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logoutButton: {
-    backgroundColor: '#F04647',
+    backgroundColor: colors.primary,
     borderRadius: 32,
     paddingVertical: 15,
     paddingHorizontal: 40,

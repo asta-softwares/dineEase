@@ -2,14 +2,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-
+import { colors } from '../styles/colors';
 export default function CheckoutScreen() {
   const navigation = useNavigation();
 
@@ -68,7 +68,7 @@ export default function CheckoutScreen() {
             <Text style={[styles.detailLabel, styles.totalPrice]}>
               Total Price
             </Text>
-            <Text style={[styles.detailValue, styles.totalPriceValue]}>
+            <Text style={[styles.detailValue, styles.price]}>
               $ 100.00
             </Text>
           </View>
@@ -115,7 +115,7 @@ export default function CheckoutScreen() {
             />
             <Text style={styles.cardNumber}>**** **** **** 1234</Text>
           </View>
-          <Text style={styles.paymentAmount}>$ 100.00</Text>
+          <Text style={styles.price}>$ 100.00</Text>
         </View>
         <TouchableOpacity style={styles.payNowButton}>
           <Text style={styles.payNowText}>Pay Now</Text>
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     fontFamily: "Plus Jakarta Sans",
     fontSize: 14,
     fontWeight: "700",
-    color: "#B75A4B",
+    color: colors.primaryText,
   },
   detailsList: {
     margin: 20,
@@ -213,10 +213,6 @@ const styles = StyleSheet.create({
     color: "#1F262C",
   },
   totalPrice: {
-    fontWeight: "600",
-  },
-  totalPriceValue: {
-    color: "#B75A4B",
     fontWeight: "600",
   },
   guestInfo: {
@@ -251,12 +247,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#878787",
   },
-  paymentAmount: {
-    fontFamily: "Plus Jakarta Sans",
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#B75A4B",
-  },
   footer: {
     padding: 20,
     borderTopWidth: 1,
@@ -282,7 +272,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   payNowButton: {
-    backgroundColor: "#F04647",
+    backgroundColor: colors.primary,
     borderRadius: 32,
     paddingVertical: 12,
     alignItems: "center",

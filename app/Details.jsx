@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import ImageView from "react-native-image-viewing";
+import { colors } from '../styles/colors';
 
 const CustomHeader = ({ onClose }) => (
   <View style={[styles.topNav, { backgroundColor: "transparent" }]}>
@@ -85,24 +86,24 @@ export default function DetailScreen() {
           </View>
           <View style={styles.infoContainer}>
             <View style={styles.infoItem}>
-              <Ionicons name="restaurant-outline" size={14} color="#B75A4B" />
+              <Ionicons name="restaurant-outline" size={14} color={colors.primaryText}  />
               <Text style={styles.infoText}>Filipino-Fusion</Text>
             </View>
             <View style={styles.infoItem}>
-              <Ionicons name="location-outline" size={14} color="#B75A4B" />
+              <Ionicons name="location-outline" size={14} color={colors.primaryText} />
               <Text styxxle={styles.infoText}>
                 123 Main Street, Toronto, CA
               </Text>
               <Text style={styles.viewMap}>view map</Text>
             </View>
             <View style={styles.infoItem}>
-              <Ionicons name="time-outline" size={14} color="#B75A4B" />
+              <Ionicons name="time-outline" size={14} color={colors.primaryText} />
               <Text style={styles.infoText}>
                 Monday-Friday: 11 AM - 9 PM, Saturday-Sunday: 9 AM - 10 PM
               </Text>
             </View>
             <View style={styles.infoItem}>
-              <Ionicons name="call-outline" size={14} color="#B75A4B" />
+              <Ionicons name="call-outline" size={14} color={colors.primaryText} />
               <Text style={styles.infoText}>1-800-555-1234</Text>
             </View>
           </View>
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
   viewMap: {
     fontFamily: "Plus Jakarta Sans",
     fontSize: 12,
-    color: "#B75A4B",
+    color: colors.primaryText,
     marginLeft: 8,
     textDecorationLine: "underline",
   },
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
   },
   quantityButton: {
     padding: 8,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#FFEEE4",
     borderRadius: 8,
   },
   quantity: {
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   bookNowButton: {
-    backgroundColor: "#F04647",
+    backgroundColor: colors.primary,
     borderRadius: 32,
     paddingVertical: 12,
     paddingHorizontal: 24,
