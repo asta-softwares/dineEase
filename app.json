@@ -1,13 +1,13 @@
 {
   "expo": {
     "name": "DineEase",
-    "slug": "DineEase",
-    "version": "1.0.0",
+    "slug": "dineease",
+    "version": "0.0.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon-new.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash-new.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,13 +17,19 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/icon-new.png",
+        "backgroundColor": "#FE6E1B"
       },
       "package": "com.anonymous.DineEase"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "bb93df51-05e6-4f7e-b143-45bac0194bb7"
+      }
+    },
+    "owner": "mendozarain"
   }
 }

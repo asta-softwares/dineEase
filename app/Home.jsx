@@ -122,31 +122,31 @@ export default function HomeScreen() {
             <View style={styles.cuisinesCardWrapper}>
               <CuisinesCard
                 name="Indian"
-                imageUrl="https://s3-alpha-sig.figma.com/img/cfe8/f85b/00be0c7c8ad7d7076e528af6d65ffe04?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=KUBoMFJ7uTga4aM4QdHGc9z7iERtdWRUtFtdL6LOmDo9GaoMdcxcVg3A0r35K4jQjIRn8-PH94Db973OVJUNv4e7JseZ9ujWoMGqlNZcERB~zFf5UK351MoUMtGJRusEyku-6dkgT8dFOBUlNrMEN-mg9GZPDlO83q8-iU8Dqkk352T03Qhwpqkm~tU4X6~kDYicYXqYFN9IZ1AIYni7h~a9MAejfNZbGOoiX6ycKgIYdOMHoEEs4bm3yihcPq~so4RS69WP2xc8ZoVvFa6eScuoFOGGdk9hHek4niiOlw3m0mB8MPkTQu7N7gyXLfkvjAS7zlBjzpOMJPzaKYNRMQ__"
+                imageUrl="https://s3-alpha-sig.figma.com/img/cfe8/f85b/00be0c7c8ad7d7076e528af6d65ffe04?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=WvVHOF2OsTVRRsa7lOp2uqyLHvrmvqF6gg9FARaS4sPKRXG77UeIP-knCf0z~gJ1Ps9bFoFg7VVzSOPQsg5-u2pIfTpqCYbW~Me3LqDfomXp2KR-4O-PeDbgKWNN41e9R0I5YH4K~yCrLRQMgb2HyXa1cUJuHW1pbuSuqP5F-DgcvqnebNyLLDI2p1SRiIqoVE8r4hbZRn68T81rzwxEhDWPAqe-tKYtBQVJCNh0TBG5p7sJ3QD7LsICCHnpfNGe71OcqG3cXizpXrHSM3SSz3Q8tCvK80xFVNSrKCPsxdW3nh1pNzZVLHaqOVtkg7boPxvDeAHG8RJiQoXJp~Zwkg__"
               />
             </View>
             <View style={styles.cuisinesCardWrapper}>
               <CuisinesCard
                 name="Chinese"
-                imageUrl="https://s3-alpha-sig.figma.com/img/67c7/b553/a25e7a55735ed7c98d2ca2c8b67a0703?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=SbOwuXgrImIpyFag0V5PirxIp-q6QIvMyQrUQPnDyZwsktCP6ygiviQckIclL1mrCA-mS9LFoXY84fkMQ3e2onHjphx79IPqrNgtnmrSDEzNrpQqWCLmvp5deNMCwV6wOiQExXqDOOhwo2BD3Y1Hud4jTVAxWNLBHqpxpCj9ngYoBK2HuJkkagdjATRyCgYB6D6aKukSmVUXbeJ0CRjDtbhshEHwYzuHH-DkFidjGqY1EV3SxjXP2fFr4tdHmAcD8eDcg2YGI2ULg~0W51WszI3GRkFfXMRb7AMzY8Wpb1R80cVBXoTcHMSssi41Q87bt7aDgmC6OOCBUq1gS0-wyg__"
+                imageUrl="https://s3-alpha-sig.figma.com/img/67c7/b553/a25e7a55735ed7c98d2ca2c8b67a0703?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=Odzbp-uSaSGztF1O9kFqgM1MV7pJz9dSVBcg2Sm1M3svSTppSyJPKIx~LLalUulkppGXEjBxDno-pYO1BvdXyK3X7Gpz-JujPoGgTUfINAO0bwOv1l2JyDXAXqJM-lvUXX2kMNpJn6A0Dv33HMndhJpMN5gsqRcuVXQehJezdVVzVoHgKw7sLf9mHWPdsAAK~k9hZlGzgLmtWXfIoDPxicOiCmaEyITZm-TOr8EAHqCuPIB5q7PskyONJ8m13qistDmISfdTTUM4DmFhLEKrBC-YKv~Aw8KQgCA5yXSYCKXXzO5HKRTcXsZ3wspaM6WB9QM4mxVMLeeGq9JyhyAlOA__"
               />
             </View>
             <View style={styles.cuisinesCardWrapper}>
               <CuisinesCard
                 name="American"
-                imageUrl="https://s3-alpha-sig.figma.com/img/38c2/6b1e/2cdced7bc539af586ed5d633368589b5?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=U5vOS0lrM31nPi1HpftQTgO7-9MEX5zKg0UJYU3ur5BcDh~YIFtvAz-kFt-AN7z~ccmPl5hPYeci2RB2e5badrYBJvUqKYnrUuZiBoVDSzfnkYumuYUwXB5tnRUM9flgiD3hzGLKRM4wDI9gOs3AHpUip3TzrVrihPjEigIcEb53C6HsPtzn-YH3qkjR9b2fZdSyHMs-~3zKBIvadHRqLi-YdjfuY5T6D7RLzjMmmO9C6z~~rdCm08fovmFnBTU5qrBNisxxH86qriBAN7mlpvKAiGscl6oqxQHK9sAXJpBjxL6K3qSBk5LfJtjl1V1js3SQOYIHmG8UZfLNDNNaSA__"
+                imageUrl="https://s3-alpha-sig.figma.com/img/38c2/6b1e/2cdced7bc539af586ed5d633368589b5?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=ca2P3J1d2QOVg-8LEv4nn3b34pphEhW68SqqQW7fNuQGa4G6iK~SeCLSo8gYxSOxq7bANXX94lklSXpkssank-wJ93w0AYEpKjrE9LxBiikRe8Mvo7S~hHKX1uz1N2haxGm9torFH1OTrBeTR4cqgrwUyPdKppY7oO6FWE0I7Hevto0CWh~KXF2NIkoQvlgAnoUyhm0vxLbLXmwwmhveEaagD5QaZA3j--lSsHiHaTDbfZ0ZQWlvMWMGdNNxunXfZVSTx4jasML2NexjgcHyCsKtXBA-dR-NbRn0oRZ1pbB19daTyrhbhl1gZWJC~jCEHScuwfMwWmcnGGJWBFhvgg__"
               />
             </View>
             <View style={styles.cuisinesCardWrapper}>
               <CuisinesCard
                 name="Filipino"
-                imageUrl="https://s3-alpha-sig.figma.com/img/c9ae/a660/3824cdce919e8d5b705938992bd15f8e?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=G8QcLyOIedSPN-4b3RQj7Yl2ANSTNX~hq8r12jZaSJl8x~lKJgGxiw-xOk9WseSkjZKLoRiK-2isEkXvVN~ZcTi0RXz5~RsN2OfrEwYSjTFst0EKShMviPUU0tDZrrvtjvmHirvvXUe4ZHdrqro6AgMtXoTbHKUk-~n1JWTOoGa90MSWXkBu4JUMjAPEb-1uusJbiJyWVCiQT2YPFqUe30yNQYtqX59qx~5t03K3mDFQmtXt-FJqBehC64VNQYptt7qT5V7nmDd~N8XCCTeiNe2CD5HS-JNHw8PE3JOgX7-Y61aVfyl9CUHvJCQ6ExgLKbYgtaju8L2tuT7m6WbB~g__"
+                imageUrl="https://s3-alpha-sig.figma.com/img/c9ae/a660/3824cdce919e8d5b705938992bd15f8e?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=HT0HhBJHc2F5bKTTYzhwKNnJ~7SbF8IelONEWEdP7vCGKTkyOslN0CJLUl4GdlhgQJ6IMlKwl~y8jv93UAUHDR3WhxZDd2utuFEV~ooP0CS~DS1MguACEs3BElAAjTTwRPzBOTnMDVQ2jVxSbE-MhiRNsKsKraSJQhpSbobB02bt6yea6FRXOTs9E4e0bZbRT9MpZTkNBxVwfotQzvzAYo5gnO-Hdu9jOfffZ61sSRQflCYSb6YUbBM5Pg6LWFnNZo8CQwupAfJHt8qA-ksLSFeKsbFrrku8JsPD5TusXMzkgyqvHaitmV9U~lE1aGPkeCN0RDFj9CDeGAJPqMEhTw__"
               />
             </View>
             <View style={styles.cuisinesCardWrapper}>
               <CuisinesCard
                 name="Mediterranean"
-                imageUrl="https://s3-alpha-sig.figma.com/img/1ebc/686d/2d1fe8c3b5246f1ef58af7165a970e27?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=iW1M6H0c0BrbUqNR2mu1sPNLIFMdFFDH-TJO07cSelMWrLBezlPiC5mgRFnVp8d906dE0mZR96Prtjh80hy8-AJRyIxomxXau0NJBhZSVETEsOoxDlSxTW2HuWZ5DBVJ6B-glIQ~YZbakABNQrJEHwW25o5CHfHy3oT6vPuOAZ0Tj1NoCJIg3TaV6GlTwCA0VTKnPiutdoZOL3QIgFyDDlUw75xJZeEc~fJZcdp~EN4P1zQRB7Aw7NmqURJQVGXYgz9LQ5AAZwXEW4pHo~xhZQjtClM3czbnI~fT64EgYZxsoO2mSRvfVnFHpdEl1NVkF6HriBaQ2~iiV7UtuOz8ew__"
+                imageUrl="https://s3-alpha-sig.figma.com/img/1ebc/686d/2d1fe8c3b5246f1ef58af7165a970e27?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hbC14ruU6DULBE6RmT~RnSebPToVPmV80duItJKSOK9D~CwzVyxG9OG5Z-QHTPnr0ejBFaz9JpBXwwURRQJpES7KWfBtjONClz7fQg9uJtD7sVLuybws9~LSNSo4Paj1Y85HlZ-aHZXdhiLRihWnRFhW8Bgj-PWm~lxcrntPSOk40JilZqYsVTYTTAXFUayM0GtG5Ba7aGCSgYt2wHjbhyfEBSKIXD5NpTMFLjJVVKMFQpT0nZ-0PpSD-pnLFnUsXhLlhdZFgM8skU29VKGM9fLSudPC564nv8zaBboryBG5wdz7-2aPUUtNn2fydO-oyCCM1CEGxiI6TRRmSUollg__"
               />
             </View>
           </ScrollView>

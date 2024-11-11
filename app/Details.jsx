@@ -129,14 +129,16 @@ export default function DetailScreen() {
               />
             )}
             <Image 
-              source={{ uri: images[0].uri }} 
+              source={{ uri: "https://img.freepik.com/free-vector/organic-flat-rustic-restaurant-menu-template-with-photo_23-2148957873.jpg?semt=ais_hybrid" }} 
               style={styles.menuImage}
               onLoadStart={() => setImageLoading(true)}
               onLoadEnd={() => setImageLoading(false)}
             />
           </TouchableOpacity>
           <ImageView
-            images={images}
+            images={[{
+              uri: "https://img.freepik.com/free-vector/organic-flat-rustic-restaurant-menu-template-with-photo_23-2148957873.jpg?semt=ais_hybrid"
+            }]}
             imageIndex={0}
             visible={imageViewerVisible}
             swipeToCloseEnabled={true}

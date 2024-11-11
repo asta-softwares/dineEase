@@ -26,7 +26,7 @@ export default function LoginScreen() {
         <Text style={styles.inputLabel}>Email Address</Text>
         <TextInput
           style={styles.input}
-          placeholder="helloteja@gmail.com"
+          placeholder="hello@gmail.com"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
