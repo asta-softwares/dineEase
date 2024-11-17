@@ -2,7 +2,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import 'react-native-gesture-handler';
-import 'react-native-reanimated';
 import CheckoutScreen from './app/Checkout';
 import DetailScreen from './app/Details';
 import HomeScreen from './app/Home';

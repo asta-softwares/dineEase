@@ -11,7 +11,6 @@ import {
   View,
 } from "react-native";
 import ImageView from "react-native-image-viewing";
-import TopNav from "../Components/TopNav";
 import { colors } from '../styles/colors';
 
 const CustomHeader = ({ onClose }) => (
@@ -58,7 +57,12 @@ export default function DetailScreen() {
 
   return (
     <View style={styles.container}>
-      <TopNav handleGoBack={handleGoBack} scrollY={scrollY} />
+      <View style={styles.topNav}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+        <View style={styles.placeholder} />
+      </View>
       <Animated.Image
         source={{
           uri: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg",
@@ -104,31 +108,6 @@ export default function DetailScreen() {
             </View>
           </View>
           <Text style={styles.description}>
-            Discover the perfect blend of traditional Filipino flavors with a
-            modern twist at The Flavorful Fork. Our menu features innovative
-            dishes that will tantalize your taste buds. From sizzling sisig to
-            mouthwatering adobo, we offer a variety of options to satisfy every
-            craving.
-
-            Discover the perfect blend of traditional Filipino flavors with a
-            modern twist at The Flavorful Fork. Our menu features innovative
-            dishes that will tantalize your taste buds. From sizzling sisig to
-            mouthwatering adobo, we offer a variety of options to satisfy every
-            craving.
-
-
-            Discover the perfect blend of traditional Filipino flavors with a
-            modern twist at The Flavorful Fork. Our menu features innovative
-            dishes that will tantalize your taste buds. From sizzling sisig to
-            mouthwatering adobo, we offer a variety of options to satisfy every
-            craving.
-
-            Discover the perfect blend of traditional Filipino flavors with a
-            modern twist at The Flavorful Fork. Our menu features innovative
-            dishes that will tantalize your taste buds. From sizzling sisig to
-            mouthwatering adobo, we offer a variety of options to satisfy every
-            craving.
-
             Discover the perfect blend of traditional Filipino flavors with a
             modern twist at The Flavorful Fork. Our menu features innovative
             dishes that will tantalize your taste buds. From sizzling sisig to

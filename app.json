@@ -30,6 +30,9 @@
         "projectId": "bb93df51-05e6-4f7e-b143-45bac0194bb7"
       }
     },
-    "owner": "mendozarain"
+    "owner": "mendozarain",
+    "experiments": {
+      "newArchEnabled": true
+    }
   }
 }
