@@ -9,4 +9,4 @@ export const colors = {
       light: '#FFFAEF',
     },
     border: 'rgba(31, 38, 44, 0.14)',
-  };
+  }
