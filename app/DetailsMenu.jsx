@@ -171,7 +171,7 @@ export default function DetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3FBFF",
+    backgroundColor: colors.background,
   },
   topNav: {
     flexDirection: "row",
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   content: {
     marginTop: 252,
     padding: 20,
-    backgroundColor: "#F3FBFF",
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",

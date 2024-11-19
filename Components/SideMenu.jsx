@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 280,
-    backgroundColor: '#F3FBFF',
+    backgroundColor: colors.background,
     padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 0 },

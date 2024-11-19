@@ -15,6 +15,7 @@ import CuisinesCard from "../Components/CuisinesCard";
 import FeatureCard from "../Components/FeatureCard";
 import RestaurantCard from "../Components/RestaurantCard";
 import SideMenu from "../Components/SideMenu";
+import { colors } from '../styles/colors';
 export default function HomeScreen() {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [isSideMenuVisible, setIsSideMenuVisible] = useState(false);
@@ -203,7 +204,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3FBFF",
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
@@ -248,10 +249,10 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 12,
     height: 44,
-    backgroundColor: "#F3FBFF",
+    backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: "rgba(31, 38, 44, 0.14)",
-    borderRadius: 40,
+    borderRadius: 10,
   },
   searchIcon: {
     marginRight: 10,

@@ -9,8 +9,10 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions
 } from "react-native";
 import ImageView from "react-native-image-viewing";
+import { TabBar, TabView } from 'react-native-tab-view';
 import TopNav from "../Components/TopNav";
 import { colors } from '../styles/colors';
 
@@ -31,6 +33,13 @@ export default function DetailScreen() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'popular', title: 'Popular' },
+    { key: 'appetizers', title: 'Appetizers' },
+    { key: 'main', title: 'Main' },
+  ]);
+  const { width } = useWindowDimensions();
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -55,6 +64,41 @@ export default function DetailScreen() {
   const handleImageViewerClose = () => {
     setImageViewerVisible(false);
   };
+
+  const renderScene = ({ route }) => {
+    switch (route.key) {
+      case 'popular':
+        return (
+          <View style={styles.tabContent}>
+            <Text>Popular</Text>
+          </View>
+        );
+      case 'appetizers':
+        return (
+          <View style={styles.tabContent}>
+            <Text>Appetizers</Text>
+          </View>
+        );
+      case 'main':
+        return (
+          <View style={styles.tabContent}>
+            <Text>Main</Text>
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderTabBar = props => (
+    <TabBar
+      {...props}
+      indicatorStyle={{ backgroundColor: '#your-primary-color' }}
+      style={{ backgroundColor: 'white' }}
+      labelStyle={{ color: 'black' }}
+      activeColor={colors.primary}
+    />
+  );
 
   return (
     <View style={styles.container}>
@@ -135,6 +179,15 @@ export default function DetailScreen() {
             mouthwatering adobo, we offer a variety of options to satisfy every
             craving.
           </Text>
+
+          <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            renderTabBar={renderTabBar}
+            onIndexChange={setIndex}
+            initialLayout={{ width: width }}
+          />
+
           <Text style={styles.sectionTitle}>Menu</Text>
           <TouchableOpacity onPress={() => setImageViewerVisible(true)}>
             {imageLoading && (
@@ -192,7 +245,7 @@ export default function DetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3FBFF",
+    backgroundColor: colors.background,
   },
   topNav: {
     flexDirection: "row",
@@ -231,7 +284,7 @@ const styles = StyleSheet.create({
   content: {
     marginTop: 252,
     padding: 20,
-    backgroundColor: "#F3FBFF",
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
@@ -330,5 +383,33 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
     color: "#FFFFFF",
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    marginBottom: 16,
+  },
+  tab: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginRight: 12,
+    borderRadius: 20,
+    backgroundColor: '#F5F5F5',
+  },
+  activeTab: {
+    backgroundColor: colors.primary,
+  },
+  tabText: {
+    fontFamily: 'Plus Jakarta Sans',
+    fontSize: 14,
+    color: '#1F262C',
+  },
+  activeTabText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  tabContent: {
+    height: 200,
+    padding: 16,
   },
 });
