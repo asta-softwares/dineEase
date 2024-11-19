@@ -240,7 +240,7 @@ export default function DetailScreen() {
             <View style={styles.cartCount}>
               <Text style={styles.cartCountText}>2</Text>
             </View>
-            <Text style={styles.bookNowText}>Add to Cart</Text>
+            <Text style={styles.bookNowText}>View Cart</Text>
             <Text style={styles.priceText}>$25.99</Text>
           </View>
         </TouchableOpacity>

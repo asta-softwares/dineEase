@@ -24,7 +24,7 @@ export default function CheckoutScreen() {
         <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
           <Ionicons name="arrow-back" size={24} color="#1F262C" />
         </TouchableOpacity>
-        <Text style={styles.topBarTitle}>Payment</Text>
+        <Text style={styles.topBarTitle}>Cart</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -143,8 +143,8 @@ const styles = StyleSheet.create({
   },
   topBarTitle: {
     fontFamily: "Plus Jakarta Sans",
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: '500',
     color: "#1F262C",
   },
   placeholder: {

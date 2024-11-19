@@ -9,17 +9,30 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
+  useWindowDimensions
 } from "react-native";
+import { TabBar, TabView } from 'react-native-tab-view';
 import CuisinesCard from "../Components/CuisinesCard";
 import FeatureCard from "../Components/FeatureCard";
 import RestaurantCard from "../Components/RestaurantCard";
 import SideMenu from "../Components/SideMenu";
 import { colors } from '../styles/colors';
+
 export default function HomeScreen() {
+  const { width } = useWindowDimensions();
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [isSideMenuVisible, setIsSideMenuVisible] = useState(false);
   const navigation = useNavigation();
+  const [index, setIndex] = React.useState(0);
+  const [routes] = React.useState([
+    { key: 'dineIn', title: 'Dine in' },
+    { key: 'grabNGo', title: 'Grab n Go' },
+  ]);
+
+  const renderScene = ({ route }) => {
+    return null;
+  };
 
   const toggleSideMenu = useCallback(() => {
     if (isSideMenuOpen) {
@@ -46,39 +59,59 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton} onPress={toggleSideMenu}>
-          <Ionicons name="menu" size={24} color="#1F262C" />
-        </TouchableOpacity>
-        <View style={styles.logoContainer}>
-          <Image source={require("../assets/logo.png")} style={styles.logo} />
+        <View style={styles.topHeader}>
+          <TouchableOpacity style={styles.menuButton} onPress={toggleSideMenu}>
+            <Ionicons name="menu" size={24} color="#1F262C" />
+          </TouchableOpacity>
+          <View style={styles.logoContainer}>
+            <Image source={require("../assets/logo-text-orange.png")} style={styles.logo} />
+          </View>
+          <TouchableOpacity style={styles.menuButton}>
+            <View style={{ width: 24, height: 24 }} />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.accountButton}>
-          <Image
-            source={require("../assets/user.svg")}
-            style={styles.accountIcon}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.searchWrapper}>
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search Restaurant, Cuisine, Location ..."
-            placeholderTextColor="#888888"
+            placeholder="Search for restaurants"
+            placeholderTextColor="#C4C4C4"
           />
           <Ionicons
-            name="search-outline"
+            name="search"
             size={15}
             color="#C4C4C4"
             style={styles.searchIcon}
           />
         </View>
+
+        <View style={styles.tabContainer}>
+          <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{ width: width }}
+            style={styles.tabView}
+            renderTabBar={props => (
+              <TabBar
+                {...props}
+                indicatorStyle={{ backgroundColor: colors.primary }}
+                style={styles.tabBar}
+                labelStyle={{ color: colors.text.primary, textTransform: 'none' }}
+                activeColor={colors.primary}
+                inactiveColor={colors.text.secondary}
+              />
+            )}
+            swipeEnabled={false}
+          />
+        </View>
       </View>
+
       <ScrollView 
         style={styles.resultsContainer} 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.resultsContentContainer}
       >
+        
         <View style={styles.scrollContent}>
           <Text style={styles.sectionTitle}>FEATURED OFFERS</Text>
           <ScrollView
@@ -92,7 +125,7 @@ export default function HomeScreen() {
                 title="11 best microbreweriesfor beer lovers"
                 description="Free delivery on orders over $30"
                 imageUrl="https://images.squarespace-cdn.com/content/v1/58e705a1ebbd1a4ffd5b30c7/1498183161728-JE354SHTNX7RV6KHSO8J/drink.jpg?format=2500w"
-                price="$ 200"
+                price="$ x"
               />
             </View>
             <View style={styles.featureCardWrapper}>
@@ -207,40 +240,35 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 60,
-    marginBottom: 10,
     paddingHorizontal: 20,
+    paddingTop: 60,
+    backgroundColor: colors.background,
+    gap: 16,
   },
-  backButton: {
-    padding: 10,
-  },
-  backButtonText: {
-    fontSize: 24,
-    color: "#1F262C",
-  },
-  logoContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-  logo: {
-    width: 100,
-    height: 50,
-    resizeMode: "contain",
+  topHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 10,
   },
   menuButton: {
-    padding: 10,
-    width: 44,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  accountButton: {
-    width: 44,
-    alignItems: "center",
+  logoContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: -1,
   },
-  searchWrapper: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+  logo: {
+    height: 30,
+    width: 120,
+    resizeMode: 'contain',
   },
   searchContainer: {
     flexDirection: "row",
@@ -265,15 +293,27 @@ const styles = StyleSheet.create({
     color: "#888888",
     opacity: 0.75,
   },
-  filterButton: {
-    marginLeft: 10,
-    padding: 10,
+  tabContainer: {
+    marginHorizontal: -20,
+    height: 40,
   },
-  filterButtonText: {
-    fontSize: 20,
+  tabView: {
+    height: 40,
+  },
+  tabBar: {
+    backgroundColor: colors.background,
+    height: 40,
+    elevation: 0,
+    shadowOpacity: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
   },
   resultsContainer: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  resultsContentContainer: {
+    paddingTop: 16,
   },
   sectionTitle: {
     fontFamily: "Plus Jakarta Sans",
@@ -290,62 +330,37 @@ const styles = StyleSheet.create({
     color: "#1F262C",
     marginTop: 20,
   },
-  sideMenu: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    width: 250,
-    backgroundColor: "#FFFFFF",
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  closeButton: {
-    alignSelf: "flex-end",
-    padding: 10,
-  },
-  closeButtonText: {
-    fontSize: 20,
-    color: "#1F262C",
-  },
-  menuItem: {
-    fontFamily: "Plus Jakarta Sans",
-    fontSize: 16,
-    color: "#1F262C",
-    marginBottom: 20,
-  },
   featuresContainer: {
     marginLeft: -20,
-    marginRight: -20, // Add negative margin on the right
+    marginRight: -20, 
   },
   featuresContentContainer: {
     paddingLeft: 20,
-    paddingRight: 0, // Remove right padding
+    paddingRight: 0, 
   },
   featureCardWrapper: {
-    marginRight: 5, // Add margin to create space between cards
+    marginRight: 5, 
     width: 160,
   },
 
   cuisinesContainer: {
     marginLeft: -20,
-    marginRight: -20, // Add negative margin on the right
+    marginRight: -20, 
   },
   cuisinesContentContainer: {
     paddingLeft: 20,
-    paddingRight: 0, // Remove right padding
+    paddingRight: 0, 
   },
   cuisinesCardWrapper: {
-    marginRight: 5, // Add margin to create space between cards
+    marginRight: 5, 
     width: 100,
-  },
-  resultsContentContainer: {
-    paddingBottom: 20,
   },
   scrollContent: {
     paddingHorizontal: 20,
+  },
+  tabContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
