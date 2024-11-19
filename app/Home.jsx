@@ -3,14 +3,15 @@ import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useState } from "react";
 import {
-  Image,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  useWindowDimensions
+  useWindowDimensions,
+  Image,
+  ScrollView,
+  Animated,
 } from "react-native";
 import { TabBar, TabView } from 'react-native-tab-view';
 import CuisinesCard from "../Components/CuisinesCard";
@@ -29,6 +30,27 @@ export default function HomeScreen() {
     { key: 'dineIn', title: 'Dine in' },
     { key: 'grabNGo', title: 'Grab n Go' },
   ]);
+  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const searchHeight = scrollY.interpolate({
+    inputRange: [0, 50],
+    outputRange: [50, 0],
+    extrapolate: 'clamp'
+  });
+  const searchOpacity = scrollY.interpolate({
+    inputRange: [0, 50],
+    outputRange: [1, 0],
+    extrapolate: 'clamp'
+  });
+  const searchMargin = scrollY.interpolate({
+    inputRange: [0, 50],
+    outputRange: [16, 0],
+    extrapolate: 'clamp'
+  });
+  const headerGap = scrollY.interpolate({
+    inputRange: [0, 50],
+    outputRange: [16, 0],
+    extrapolate: 'clamp'
+  });
 
   const renderScene = ({ route }) => {
     return null;
@@ -58,7 +80,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <View style={styles.header}>
+      <Animated.View style={[styles.header, { gap: headerGap }]}>
         <View style={styles.topHeader}>
           <TouchableOpacity style={styles.menuButton} onPress={toggleSideMenu}>
             <Ionicons name="menu" size={24} color="#1F262C" />
@@ -70,7 +92,15 @@ export default function HomeScreen() {
             <View style={{ width: 24, height: 24 }} />
           </TouchableOpacity>
         </View>
-        <View style={styles.searchContainer}>
+
+        <Animated.View style={[
+          styles.searchContainer,
+          {
+            height: searchHeight,
+            opacity: searchOpacity,
+            marginBottom: 0
+          }
+        ]}>
           <TextInput
             style={styles.searchInput}
             placeholder="Search for restaurants"
@@ -82,14 +112,14 @@ export default function HomeScreen() {
             color="#C4C4C4"
             style={styles.searchIcon}
           />
-        </View>
+        </Animated.View>
 
         <View style={styles.tabContainer}>
           <TabView
             navigationState={{ index, routes }}
             renderScene={renderScene}
             onIndexChange={setIndex}
-            initialLayout={{ width: width }}
+            initialLayout={{ width }}
             style={styles.tabView}
             renderTabBar={props => (
               <TabBar
@@ -101,15 +131,19 @@ export default function HomeScreen() {
                 inactiveColor={colors.text.secondary}
               />
             )}
-            swipeEnabled={false}
           />
         </View>
-      </View>
+      </Animated.View>
 
-      <ScrollView 
+      <Animated.ScrollView 
         style={styles.resultsContainer} 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.resultsContentContainer}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
       >
         
         <View style={styles.scrollContent}>
@@ -223,7 +257,7 @@ export default function HomeScreen() {
             />
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
       {isSideMenuVisible && (
         <SideMenu
           isOpen={isSideMenuOpen}
@@ -243,7 +277,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
     backgroundColor: colors.background,
-    gap: 16,
   },
   topHeader: {
     flexDirection: 'row',
@@ -275,12 +308,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 5,
     paddingLeft: 12,
-    paddingRight: 12,
-    height: 44,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: "rgba(31, 38, 44, 0.14)",
-    borderRadius: 10,
+    backgroundColor: "#F5F5F5",
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   searchIcon: {
     marginRight: 10,
