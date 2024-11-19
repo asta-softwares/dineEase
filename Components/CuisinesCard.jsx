@@ -15,7 +15,7 @@ const CuisinesCard = ({ name, imageUrl }) => {
 
 CuisinesCard.propTypes = {
   name: PropTypes.string.isRequired,
-  imgUrl: PropTypes.string.isRequired,
+  imageUrl: PropTypes.string.isRequired,
 };
 const styles = StyleSheet.create({
   card: {

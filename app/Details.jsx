@@ -14,7 +14,9 @@ import {
 import ImageView from "react-native-image-viewing";
 import { TabBar, TabView } from 'react-native-tab-view';
 import TopNav from "../Components/TopNav";
+import MenuItems from '../Components/MenuItems';
 import { colors } from '../styles/colors';
+import PagerView from 'react-native-pager-view';
 
 const CustomHeader = ({ onClose }) => (
   <View style={[styles.topNav, { backgroundColor: "transparent" }]}>
@@ -65,26 +67,83 @@ export default function DetailScreen() {
     setImageViewerVisible(false);
   };
 
+  const popularItems = [
+    {
+      name: "Siomai",
+      price: "$8.99",
+      imageUrl: "https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
+    },
+    {
+      name: "Lumpia",
+      price: "$7.99",
+      imageUrl: "https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
+    },
+    {
+      name: "Pancit",
+      price: "$12.99",
+      imageUrl: "https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
+    },
+    {
+      name: "Adobo",
+      price: "$14.99",
+      imageUrl: "https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
+    }
+  ];
+
+  const appetizerItems = [
+    {
+      name: "Calamari",
+      price: "$10.99",
+      imageUrl: "https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
+    },
+    {
+      name: "Bruschetta",
+      price: "$8.99",
+      imageUrl: "https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
+    },
+    {
+      name: "Garlic Bread",
+      price: "$6.99",
+      imageUrl: "https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
+    },
+    {
+      name: "Mozzarella Sticks",
+      price: "$9.99",
+      imageUrl: "https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
+    }
+  ];
+
+  const mainItems = [
+    {
+      name: "Margherita Pizza",
+      price: "$16.99",
+      imageUrl: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg"
+    },
+    {
+      name: "Pasta Carbonara",
+      price: "$15.99",
+      imageUrl: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg"
+    },
+    {
+      name: "Lasagna",
+      price: "$17.99",
+      imageUrl: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg"
+    },
+    {
+      name: "Risotto",
+      price: "$18.99",
+      imageUrl: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg"
+    }
+  ];
+
   const renderScene = ({ route }) => {
     switch (route.key) {
       case 'popular':
-        return (
-          <View style={styles.tabContent}>
-            <Text>Popular</Text>
-          </View>
-        );
+        return <MenuItems items={popularItems} />;
       case 'appetizers':
-        return (
-          <View style={styles.tabContent}>
-            <Text>Appetizers</Text>
-          </View>
-        );
+        return <MenuItems items={appetizerItems} />;
       case 'main':
-        return (
-          <View style={styles.tabContent}>
-            <Text>Main</Text>
-          </View>
-        );
+        return <MenuItems items={mainItems} />;
       default:
         return null;
     }
@@ -93,10 +152,15 @@ export default function DetailScreen() {
   const renderTabBar = props => (
     <TabBar
       {...props}
-      indicatorStyle={{ backgroundColor: '#your-primary-color' }}
-      style={{ backgroundColor: 'white' }}
-      labelStyle={{ color: 'black' }}
+      indicatorStyle={{ backgroundColor: colors.primary }}
+      style={{ 
+        backgroundColor: colors.background,
+        elevation: 0,
+        shadowOpacity: 0,
+      }}
+      labelStyle={{ color: colors.text.black }}
       activeColor={colors.primary}
+      inactiveColor={colors.text.secondary}
     />
   );
 
@@ -110,11 +174,13 @@ export default function DetailScreen() {
         style={[styles.headerImage, { height: imageHeight }]}
       />
       <ScrollView
+        style={styles.scrollView}
         scrollEventThrottle={16}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
+        pointerEvents="box-none"
       >
         <View style={styles.content}>
           <View style={styles.header}>
@@ -131,7 +197,7 @@ export default function DetailScreen() {
             </View>
             <View style={styles.infoItem}>
               <Ionicons name="location-outline" size={14} color={colors.primaryText} />
-              <Text styxxle={styles.infoText}>
+              <Text style={styles.infoText}>
                 123 Main Street, Toronto, CA
               </Text>
               <Text style={styles.viewMap}>view map</Text>
@@ -154,88 +220,29 @@ export default function DetailScreen() {
             mouthwatering adobo, we offer a variety of options to satisfy every
             craving.
 
-            Discover the perfect blend of traditional Filipino flavors with a
-            modern twist at The Flavorful Fork. Our menu features innovative
-            dishes that will tantalize your taste buds. From sizzling sisig to
-            mouthwatering adobo, we offer a variety of options to satisfy every
-            craving.
-
-
-            Discover the perfect blend of traditional Filipino flavors with a
-            modern twist at The Flavorful Fork. Our menu features innovative
-            dishes that will tantalize your taste buds. From sizzling sisig to
-            mouthwatering adobo, we offer a variety of options to satisfy every
-            craving.
-
-            Discover the perfect blend of traditional Filipino flavors with a
-            modern twist at The Flavorful Fork. Our menu features innovative
-            dishes that will tantalize your taste buds. From sizzling sisig to
-            mouthwatering adobo, we offer a variety of options to satisfy every
-            craving.
-
-            Discover the perfect blend of traditional Filipino flavors with a
-            modern twist at The Flavorful Fork. Our menu features innovative
-            dishes that will tantalize your taste buds. From sizzling sisig to
-            mouthwatering adobo, we offer a variety of options to satisfy every
-            craving.
           </Text>
 
-          <TabView
-            navigationState={{ index, routes }}
-            renderScene={renderScene}
-            renderTabBar={renderTabBar}
-            onIndexChange={setIndex}
-            initialLayout={{ width: width }}
-          />
-
-          <Text style={styles.sectionTitle}>Menu</Text>
-          <TouchableOpacity onPress={() => setImageViewerVisible(true)}>
-            {imageLoading && (
-              <View 
-                style={{
-                  width: '100%',
-                  height: 200,
-                  borderRadius: 16,
-                  backgroundColor: '#E1E9EE',
-                  marginTop: 16,
-                  position: 'absolute'
-                }}
-              />
-            )}
-            <Image 
-              source={{ uri: "https://img.freepik.com/free-vector/organic-flat-rustic-restaurant-menu-template-with-photo_23-2148957873.jpg?semt=ais_hybrid" }} 
-              style={styles.menuImage}
-              onLoadStart={() => setImageLoading(true)}
-              onLoadEnd={() => setImageLoading(false)}
+          <View style={styles.tabViewContainer}>
+            <TabView
+              navigationState={{ index, routes }}
+              renderScene={renderScene}
+              renderTabBar={renderTabBar}
+              onIndexChange={setIndex}
+              initialLayout={{ width }}
+              style={styles.tabView}
             />
-          </TouchableOpacity>
-          <ImageView
-            images={[{
-              uri: "https://img.freepik.com/free-vector/organic-flat-rustic-restaurant-menu-template-with-photo_23-2148957873.jpg?semt=ais_hybrid"
-            }]}
-            imageIndex={0}
-            visible={imageViewerVisible}
-            swipeToCloseEnabled={true}
-            doubleTapToZoomEnabled={true}
-            onRequestClose={handleImageViewerClose}
-            HeaderComponent={() => (
-              <CustomHeader onClose={handleImageViewerClose} />
-            )}
-          />
+          </View> 
         </View>
       </ScrollView>
       <View style={styles.footer}>
-        <View style={styles.quantityContainer}>
-          <TouchableOpacity style={styles.quantityButton}>
-            <Ionicons name="remove" size={24} color="#1F262C" />
-          </TouchableOpacity>
-          <Text style={styles.quantity}>4</Text>
-          <TouchableOpacity style={styles.quantityButton}>
-            <Ionicons name="add" size={24} color="#1F262C" />
-          </TouchableOpacity>
-        </View>
         <TouchableOpacity style={styles.bookNowButton} onPress={handleCheckout}>
-          <Text style={styles.bookNowText}>Book Now</Text>
+          <View style={styles.buttonContent}>
+            <View style={styles.cartCount}>
+              <Text style={styles.cartCountText}>2</Text>
+            </View>
+            <Text style={styles.bookNowText}>Add to Cart</Text>
+            <Text style={styles.priceText}>$25.99</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -348,68 +355,78 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
+    backgroundColor: colors.background,
+    padding: 16,
     borderTopWidth: 1,
-    borderTopColor: "rgba(31, 38, 44, 0.14)",
-    marginBottom: 20,
-  },
-  quantityContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  quantityButton: {
-    padding: 8,
-    backgroundColor: "#FFEEE4",
-    borderRadius: 8,
-  },
-  quantity: {
-    fontFamily: "Plus Jakarta Sans",
-    fontWeight: "600",
-    fontSize: 16,
-    color: "#1F262C",
-    marginHorizontal: 16,
+    borderTopColor: "rgba(0, 0, 0, 0.1)",
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   bookNowButton: {
     backgroundColor: colors.primary,
     borderRadius: 32,
-    paddingVertical: 12,
+    paddingVertical: 16,
+    marginBottom: 12,
+    width: '100%',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 24,
   },
-  bookNowText: {
-    fontFamily: "Plus Jakarta Sans",
-    fontWeight: "600",
-    fontSize: 16,
-    color: "#FFFFFF",
+  cartCount: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 16,
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  tabContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
-    marginBottom: 16,
-  },
-  tab: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginRight: 12,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
-  },
-  activeTab: {
-    backgroundColor: colors.primary,
-  },
-  tabText: {
-    fontFamily: 'Plus Jakarta Sans',
+  cartCountText: {
+    color: colors.white,
     fontSize: 14,
-    color: '#1F262C',
-  },
-  activeTabText: {
-    color: '#FFFFFF',
     fontWeight: '600',
   },
+  bookNowText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  priceText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  tabViewContainer: {
+    marginVertical: 16,
+    height: 600,
+    pointerEvents: 'box-none',
+  },
+  tabView: {
+    height: '100%',
+    pointerEvents: 'box-none',
+  },
+  tabScrollView: {
+    flex: 1,
+  },
   tabContent: {
-    height: 200,
+    flex: 1,
     padding: 16,
+    backgroundColor: colors.background,
+  },
+  tabContentText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+    color: colors.text.primary,
+  },
+  menuItemContainer: {
+    gap: 8,
+  },
+  scrollView: {
+    flex: 1,
   },
 });
