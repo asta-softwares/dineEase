@@ -1,11 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Animated, StyleSheet, TouchableOpacity, View } from "react-native";
-
+import { colors } from '../styles/colors';
 const TopNav = ({ handleGoBack, scrollY }) => {
     const animatedStyle = {
         backgroundColor: scrollY.interpolate({
             inputRange: [0, 100],
-            outputRange: ['transparent', '#F3FBFF'],
+            outputRange: ['transparent', colors.background],
             extrapolate: 'clamp'
         })
     };
