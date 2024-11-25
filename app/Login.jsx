@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   socialButton: {
     width: '48%',
     height: 48,
-    backgroundColor: 'rgba(137, 135, 135, 0.06)',
+    backgroundColor: colors.secondary,
     borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',

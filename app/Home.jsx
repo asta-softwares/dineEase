@@ -13,7 +13,6 @@ import {
   ScrollView,
   Animated,
 } from "react-native";
-import { TabBar, TabView } from 'react-native-tab-view';
 import CuisinesCard from "../Components/CuisinesCard";
 import FeatureCard from "../Components/FeatureCard";
 import RestaurantCard from "../Components/RestaurantCard";
@@ -25,12 +24,8 @@ export default function HomeScreen() {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [isSideMenuVisible, setIsSideMenuVisible] = useState(false);
   const navigation = useNavigation();
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    { key: 'dineIn', title: 'Dine in' },
-    { key: 'grabNGo', title: 'Grab n Go' },
-  ]);
   const scrollY = React.useRef(new Animated.Value(0)).current;
+  const [isDineIn, setIsDineIn] = useState(true);
   const searchHeight = scrollY.interpolate({
     inputRange: [0, 50],
     outputRange: [50, 0],
@@ -52,10 +47,6 @@ export default function HomeScreen() {
     extrapolate: 'clamp'
   });
 
-  const renderScene = ({ route }) => {
-    return null;
-  };
-
   const toggleSideMenu = useCallback(() => {
     if (isSideMenuOpen) {
       closeSideMenu();
@@ -67,14 +58,16 @@ export default function HomeScreen() {
 
   const closeSideMenu = useCallback(() => {
     setIsSideMenuOpen(false);
-    const onAnimationComplete = () => {
+    setTimeout(() => {
       setIsSideMenuVisible(false);
-    };
-    return onAnimationComplete;
+    }, 500);
   }, []);
 
   const handleDetail = () => {
     navigation.navigate("Detail");
+  };
+  const handleGrabAndGo = () => {
+    setIsDineIn(!isDineIn);
   };
 
   return (
@@ -113,25 +106,19 @@ export default function HomeScreen() {
             style={styles.searchIcon}
           />
         </Animated.View>
-
-        <View style={styles.tabContainer}>
-          <TabView
-            navigationState={{ index, routes }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            initialLayout={{ width }}
-            style={styles.tabView}
-            renderTabBar={props => (
-              <TabBar
-                {...props}
-                indicatorStyle={{ backgroundColor: colors.primary }}
-                style={styles.tabBar}
-                labelStyle={{ color: colors.text.primary, textTransform: 'none' }}
-                activeColor={colors.primary}
-                inactiveColor={colors.text.secondary}
-              />
-            )}
-          />
+        <View style={styles.switchContainer}>
+          <TouchableOpacity 
+            style={isDineIn ? styles.switchButtonActive : styles.switchButton}
+            onPress={handleGrabAndGo}
+          >
+            <Text style={isDineIn ? styles.switchButtonTextActive : styles.switchButtonText}>Dine In</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={!isDineIn ? styles.switchButtonActive : styles.switchButton}
+            onPress={handleGrabAndGo}
+          >
+            <Text style={!isDineIn ? styles.switchButtonTextActive : styles.switchButtonText}>Grab & Go</Text>
+          </TouchableOpacity>
         </View>
       </Animated.View>
 
@@ -145,7 +132,6 @@ export default function HomeScreen() {
         )}
         scrollEventThrottle={16}
       >
-        
         <View style={styles.scrollContent}>
           <Text style={styles.sectionTitle}>FEATURED OFFERS</Text>
           <ScrollView
@@ -323,21 +309,6 @@ const styles = StyleSheet.create({
     color: "#888888",
     opacity: 0.75,
   },
-  tabContainer: {
-    marginHorizontal: -20,
-    height: 40,
-  },
-  tabView: {
-    height: 40,
-  },
-  tabBar: {
-    backgroundColor: colors.background,
-    height: 40,
-    elevation: 0,
-    shadowOpacity: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
-  },
   resultsContainer: {
     flex: 1,
     backgroundColor: colors.background,
@@ -388,9 +359,39 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
   },
-  tabContent: {
-    flex: 1,
-    alignItems: 'center',
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  switchButton: {
+    width: '48%',
+    height: 40,
+    backgroundColor: colors.secondary,
+    borderRadius: 10,
     justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: '1%',
+  },
+  switchButtonText: {
+    fontFamily: 'Plus Jakarta Sans',
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primaryText,
+  },
+  switchButtonActive: {
+    width: '48%',
+    height: 40,
+    backgroundColor: colors.primary,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: '1%',
+  },
+  switchButtonTextActive: {
+    fontFamily: 'Plus Jakarta Sans',
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.white,
   },
 });
