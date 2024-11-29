@@ -23,8 +23,8 @@ export default function SplashScreen() {
           source={require('../assets/logo-splashscreen.png')}
           style={styles.logo}
         />
-        <Text style={[typography.titleLarge, {color: colors.text.white}]}>Save More,</Text>
-        <Text style={[typography.titleLarge, {color: colors.text.white}]}>Spend Less</Text>
+        <Text style={[typography.titleLarge, { color: colors.text.white }]}>Save More,</Text>
+        <Text style={[typography.titleLarge, { color: colors.text.white }]}>Spend Less</Text>
       </View>
     
       <Image

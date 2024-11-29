@@ -187,36 +187,36 @@ export default function DetailScreen() {
       >
         <View style={styles.content}>
           <View style={styles.header}>
-            <Text style={[typography.h2, styles.title]}>The Flavorful Fork</Text>
+            <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>The Flavorful Fork</Text>
             <View style={styles.rating}>
-              <Ionicons name="star" size={14} color="#FFFFFF" />
-              <Text style={[typography.labelMedium, styles.ratingText]}>4.5</Text>
+              <Ionicons name="star" size={14} color={colors.text.white} />
+              <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>4.5</Text>
             </View>
           </View>
           <View style={styles.infoContainer}>
             <View style={styles.infoItem}>
               <Ionicons name="restaurant-outline" size={14} color={colors.text.primary}  />
-              <Text style={[typography.bodyMedium, styles.infoText]}>Filipino-Fusion</Text>
+              <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>Filipino-Fusion</Text>
             </View>
             <View style={styles.infoItem}>
               <Ionicons name="location-outline" size={14} color={colors.text.primary} />
-              <Text style={[typography.bodyMedium, styles.infoText]}>
+              <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
                 123 Main Street, Toronto, CA
               </Text>
-              <Text style={[typography.bodyMedium, styles.viewMap]}>view map</Text>
+              <Text style={[typography.bodyMedium, styles.viewMap, { color: colors.text.primary }]}>view map</Text>
             </View>
             <View style={styles.infoItem}>
               <Ionicons name="time-outline" size={14} color={colors.text.primary} />
-              <Text style={[typography.bodyMedium, styles.infoText]}>
+              <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
                 Monday-Friday: 11 AM - 9 PM, Saturday-Sunday: 9 AM - 10 PM
               </Text>
             </View>
             <View style={styles.infoItem}>
               <Ionicons name="call-outline" size={14} color={colors.text.primary} />
-              <Text style={[typography.bodyMedium, styles.infoText]}>1-800-555-1234</Text>
+              <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>1-800-555-1234</Text>
             </View>
           </View>
-          <Text style={[typography.bodyMedium, styles.description]}>
+          <Text style={[typography.bodyMedium, styles.description, { color: colors.text.black }]}>
             Discover the perfect blend of traditional Filipino flavors with a
             modern twist at The Flavorful Fork. Our menu features innovative
             dishes that will tantalize your taste buds. From sizzling sisig to
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   rating: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F3B13C",
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,

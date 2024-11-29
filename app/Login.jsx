@@ -1,79 +1,71 @@
-import { useNavigation } from '@react-navigation/native';
-import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import LargeButton from '../Components/Buttons/LargeButton';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigation = useNavigation();
-
-  const handleLogin = () => {
-    navigation.navigate('Home');
-  };
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
-      <Image
-        source={require('../assets/logo.png')}
-        style={styles.logo}
-      />
-      
-      <View style={styles.inputContainer}>
-        <Text style={[typography.labelMedium, styles.inputLabel]}>Email Address</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="hello@gmail.com"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-      </View>
-      
-      <View style={styles.inputContainer}>
-        <Text style={[typography.labelMedium, styles.inputLabel]}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="••••••••••••"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-      </View>
-      
-      <TouchableOpacity>
-        <Text style={[typography.bodyMedium, styles.forgotPassword]}>Forgot Password?</Text>
-      </TouchableOpacity>
+      <View style={styles.content}>
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../assets/logo.png')}
+            style={styles.logo}
+          />
+          <Image
+            source={require('../assets/logo-text-orange.png')}
+            style={styles.logoText}
+          />
+        </View>
 
-      <LargeButton
-        title="Login"
-        onPress={handleLogin}
-      />
+        <View style={styles.form}>
+          <View style={styles.inputContainer}>
+            <Text style={[typography.labelMedium, { color: colors.text.secondary }]}>Email</Text>
+            <TextInput
+              style={[styles.input, typography.bodyLarge]}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
 
-      <View style={styles.signInOptions}>
-        <View style={styles.line} />
-        <Text style={styles.signInText}>Or Sign In With</Text>
-        <View style={styles.line} />
-      </View>
-      
-      <View style={styles.socialButtons}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text style={styles.socialButtonText}>Google</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text style={styles.socialButtonText}>Facebook</Text>
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.signUpContainer}>
-        <Text style={[typography.bodyMedium, styles.signUpText]}>Don't have an account? </Text>
-        <TouchableOpacity>
-          <Text style={[typography.labelMedium, styles.signUpLink]}>Join Us</Text>
-        </TouchableOpacity>
+          <View style={styles.inputContainer}>
+            <Text style={[typography.labelMedium, { color: colors.text.secondary }]}>Password</Text>
+            <TextInput
+              style={[styles.input, typography.bodyLarge]}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Enter your password"
+              secureTextEntry
+            />
+          </View>
+
+          <TouchableOpacity style={styles.forgotPassword}>
+            <Text style={[typography.labelMedium, { color: colors.text.primary }]}>
+              Forgot Password?
+            </Text>
+          </TouchableOpacity>
+
+          <LargeButton
+            title="Sign In"
+            onPress={() => navigation.navigate('Home')}
+          />
+
+          <View style={styles.signUpContainer}>
+            <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
+              Don't have an account?{' '}
+            </Text>
+            <TouchableOpacity>
+              <Text style={[typography.buttonMedium, { color: colors.text.primary }]}>Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -83,103 +75,48 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    alignItems: 'center',
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
     padding: 20,
   },
-  logo: {
-    width: 300,
-    height: 150,
-    resizeMode: 'contain',
-    marginBottom: 20,
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
   },
-  tagline: {
-    fontFamily: 'SF Pro Rounded',
-    fontSize: 15,
-    color: '#842000',
-    marginBottom: 30,
+  logo: {
+    width: 120,
+    height: 120,
+    resizeMode: 'contain',
+  },
+  logoText: {
+    width: 200,
+    height: 40,
+    resizeMode: 'contain',
+    marginTop: 16,
+  },
+  form: {
+    width: '100%',
   },
   inputContainer: {
-    width: '100%',
     marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 12,
-    color: '#888888',
-    marginBottom: 5,
   },
   input: {
-    width: '100%',
-    height: 48,
     borderWidth: 1,
-    borderColor: 'rgba(34, 34, 34, 0.2)',
-    borderRadius: 32,
-    paddingHorizontal: 15,
-    fontSize: 14,
+    borderColor: colors.border,
+    borderRadius: 12,
+    padding: 15,
+    marginTop: 8,
   },
   forgotPassword: {
-    fontSize: 12,
-    color: colors.text.primary,
     alignSelf: 'flex-end',
-    marginBottom: 20,
-  },
-  loginButton: {
-    width: '100%',
-    height: 56,
-    backgroundColor: colors.primary,
-    borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  loginButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  signInOptions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#F2F2F2',
-  },
-  signInText: {
-    fontSize: 12,
-    color: '#888888',
-    marginHorizontal: 10,
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 20,
-  },
-  socialButton: {
-    width: '48%',
-    height: 48,
-    backgroundColor: colors.secondary,
-    borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  socialButtonText: {
-    fontSize: 14,
-    color: colors.text.primary,
+    marginBottom: 24,
   },
   signUpContainer: {
     flexDirection: 'row',
-  },
-  signUpText: {
-    fontSize: 12,
-    color: '#888888',
-  },
-  signUpLink: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colors.text.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
   },
 });
