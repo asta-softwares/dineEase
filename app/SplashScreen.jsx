@@ -3,6 +3,7 @@ import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
+import LargeButton from '../Components/Buttons/LargeButton';
 
 export default function SplashScreen() {
   const navigation = useNavigation();
@@ -22,8 +23,8 @@ export default function SplashScreen() {
           source={require('../assets/logo-splashscreen.png')}
           style={styles.logo}
         />
-        <Text style={typography.titleLarge}>Save More,</Text>
-        <Text style={typography.titleLarge}>Spend Less</Text>
+        <Text style={[typography.titleLarge, {color: colors.text.white}]}>Save More,</Text>
+        <Text style={[typography.titleLarge, {color: colors.text.white}]}>Spend Less</Text>
       </View>
     
       <Image
@@ -31,16 +32,17 @@ export default function SplashScreen() {
         style={styles.illustration}
       />
       
-      <TouchableOpacity style={styles.button} onPress={handleLoginSignup}>
-        <Text style={typography.buttonLarge}>Login / Signup</Text>
-      </TouchableOpacity>
+      <LargeButton
+        title="Login / Signup"
+        color={colors.white}
+        textColor={colors.text.primary}
+        onPress={handleLoginSignup}
+      />  
       
-      <View style={styles.browseContainer}>
-        <Text style={typography.bodyMedium}>Or</Text>
-      </View>
-      
+      <Text style={[typography.labelMedium, {color: colors.text.white, margin: 10}]}>Or</Text>
+
       <TouchableOpacity onPress={handleBrowse}>
-        <Text style={typography.labelLarge}>Browse Selections</Text>
+        <Text style={[typography.buttonLarge, {color: colors.text.white}]}>Browse Selections</Text>
       </TouchableOpacity>
     </View>
   );

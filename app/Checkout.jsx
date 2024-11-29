@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     fontFamily: "Plus Jakarta Sans",
     fontSize: 14,
     fontWeight: "700",
-    color: colors.primaryText,
+    color: colors.text.primary,
   },
   detailsList: {
     margin: 20,

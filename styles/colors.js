@@ -6,10 +6,11 @@ export const colors = {
     white: '#FFFFFF',
     background: '#FFFFFF',
     text: {
-      primary: '#1F262C',
+      primary: '#F29057',
       secondary: '#888888',
       light: '#FFFAEF',
       black: '#000000',
+      white: '#FFFFFF',
     },
     border: 'rgba(31, 38, 44, 0.14)',
   }

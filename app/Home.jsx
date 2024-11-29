@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Plus Jakarta Sans',
     fontSize: 14,
     fontWeight: '600',
-    color: colors.primaryText,
+    color: colors.text.primary,
   },
   switchButtonActive: {
     width: '48%',

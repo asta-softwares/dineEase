@@ -3,18 +3,18 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../../styles/colors';
 import { typography } from '../../styles/typography';
 
-const LargeButton = ({ title, price, count, onPress }) => {
+const LargeButton = ({ title, price, count, color, textColor, onPress }) => {
     const showOnlyTitle = !price && !count;
     
     return (
-        <TouchableOpacity style={styles.button} onPress={onPress}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: color || colors.primary }]} onPress={onPress}>
             <View style={[
                 styles.buttonContent,
                 showOnlyTitle && styles.centerContent
             ]}>
                 {count !== undefined ? (
                     <View style={styles.buttonCount}>
-                        <Text style={[typography.buttonMedium, styles.buttonText]}>{count}</Text>
+                        <Text style={[typography.buttonMedium, styles.buttonText, { color: textColor || colors.text.white }]}>{count}</Text>
                     </View>
                 ) : showOnlyTitle ? null : (
                     <View style={styles.placeholder} />
@@ -22,10 +22,11 @@ const LargeButton = ({ title, price, count, onPress }) => {
                 <Text style={[
                     typography.buttonLarge,
                     styles.buttonText,
+                    { color: textColor || colors.text.white },
                     showOnlyTitle ? styles.centeredTitleText : styles.titleText
                 ]}>{title}</Text>
                 {price !== undefined ? (
-                    <Text style={[typography.buttonMedium, styles.buttonText]}>{price}</Text>
+                    <Text style={[typography.buttonMedium, styles.buttonText, { color: textColor || colors.text.white }]}>{price}</Text>
                 ) : showOnlyTitle ? null : (
                     <View style={styles.placeholder} />
                 )}
@@ -36,7 +37,6 @@ const LargeButton = ({ title, price, count, onPress }) => {
 
 const styles = StyleSheet.create({
     button: {
-        backgroundColor: colors.primary,
         borderRadius: 16,
         paddingVertical: 16,
         marginBottom: 10,

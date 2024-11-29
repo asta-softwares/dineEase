@@ -195,24 +195,24 @@ export default function DetailScreen() {
           </View>
           <View style={styles.infoContainer}>
             <View style={styles.infoItem}>
-              <Ionicons name="restaurant-outline" size={14} color={colors.primaryText}  />
+              <Ionicons name="restaurant-outline" size={14} color={colors.text.primary}  />
               <Text style={[typography.bodyMedium, styles.infoText]}>Filipino-Fusion</Text>
             </View>
             <View style={styles.infoItem}>
-              <Ionicons name="location-outline" size={14} color={colors.primaryText} />
+              <Ionicons name="location-outline" size={14} color={colors.text.primary} />
               <Text style={[typography.bodyMedium, styles.infoText]}>
                 123 Main Street, Toronto, CA
               </Text>
               <Text style={[typography.bodyMedium, styles.viewMap]}>view map</Text>
             </View>
             <View style={styles.infoItem}>
-              <Ionicons name="time-outline" size={14} color={colors.primaryText} />
+              <Ionicons name="time-outline" size={14} color={colors.text.primary} />
               <Text style={[typography.bodyMedium, styles.infoText]}>
                 Monday-Friday: 11 AM - 9 PM, Saturday-Sunday: 9 AM - 10 PM
               </Text>
             </View>
             <View style={styles.infoItem}>
-              <Ionicons name="call-outline" size={14} color={colors.primaryText} />
+              <Ionicons name="call-outline" size={14} color={colors.text.primary} />
               <Text style={[typography.bodyMedium, styles.infoText]}>1-800-555-1234</Text>
             </View>
           </View>
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
   viewMap: {
     // fontFamily: "Plus Jakarta Sans",
     // fontSize: 12,
-    // color: colors.primaryText,
+    // color: colors.text.primary,
     // marginLeft: 8,
     // textDecorationLine: "underline",
   },

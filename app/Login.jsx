@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   },
   forgotPassword: {
     fontSize: 12,
-    color: colors.primaryText,
+    color: colors.text.primary,
     alignSelf: 'flex-end',
     marginBottom: 20,
   },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   },
   socialButtonText: {
     fontSize: 14,
-    color: colors.primaryText,
+    color: colors.text.primary,
   },
   signUpContainer: {
     flexDirection: 'row',
@@ -180,6 +180,6 @@ const styles = StyleSheet.create({
   signUpLink: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: colors.primaryText,
+    color: colors.text.primary,
   },
 });
