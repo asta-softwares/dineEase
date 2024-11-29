@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import LargeButton from '../Components/Buttons/LargeButton';
+import CustomInput from '../Components/CustomInput';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -24,25 +25,25 @@ export default function LoginScreen({ navigation }) {
 
         <View style={styles.form}>
           <View style={styles.inputContainer}>
-            <Text style={[typography.labelMedium, { color: colors.text.secondary }]}>Email</Text>
-            <TextInput
-              style={[styles.input, typography.bodyLarge]}
+            <CustomInput
               value={email}
               onChangeText={setEmail}
               placeholder="Enter your email"
               keyboardType="email-address"
-              autoCapitalize="none"
+              iconName="mail-outline"
+              iconPosition="left"
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={[typography.labelMedium, { color: colors.text.secondary }]}>Password</Text>
-            <TextInput
-              style={[styles.input, typography.bodyLarge]}
+
+            <CustomInput
               value={password}
               onChangeText={setPassword}
               placeholder="Enter your password"
               secureTextEntry
+              iconName="lock-closed-outline"
+              iconPosition="left"
             />
           </View>
 
@@ -57,14 +58,14 @@ export default function LoginScreen({ navigation }) {
             onPress={() => navigation.navigate('Home')}
           />
 
-          <View style={styles.signUpContainer}>
+          {/* <View style={styles.signUpContainer}>
             <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
               Don't have an account?{' '}
             </Text>
             <TouchableOpacity>
               <Text style={[typography.buttonMedium, { color: colors.text.primary }]}>Sign Up</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </View>
     </View>
@@ -101,13 +102,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    padding: 15,
-    marginTop: 8,
   },
   forgotPassword: {
     alignSelf: 'flex-end',
