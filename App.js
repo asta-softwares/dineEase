@@ -9,13 +9,18 @@ import {
 } from '@expo-google-fonts/plus-jakarta-sans';
 import React from 'react';
 import 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ActivityIndicator, View } from 'react-native';
 import CheckoutScreen from './app/Checkout';
 import DetailScreen from './app/Details';
 import HomeScreen from './app/Home';
 import LoginScreen from './app/Login';
 import SplashScreen from './app/SplashScreen';
+import ProfileScreen from './app/Profile';
 import { colors } from './styles/colors';
+
+// Initialize reanimated
+import 'react-native-reanimated';
 
 const Stack = createNativeStackNavigator(); 
 
@@ -36,37 +41,40 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName="SplashScreen" 
-        screenOptions={{ headerShown: false }}>
-        <Stack.Screen 
-          name="SplashScreen" 
-          component={SplashScreen} 
-          options={{
-            gestureEnabled: false,
-            headerBackVisible: false
-          }}
-        />
-        <Stack.Screen 
-          name="Login" 
-          component={LoginScreen} 
-          options={{
-            gestureEnabled: false,
-            headerBackVisible: false
-          }}
-        />
-        <Stack.Screen 
-          name="Home" 
-          component={HomeScreen} 
-          options={{
-            gestureEnabled: false,
-            headerBackVisible: false
-          }}
-        />
-        <Stack.Screen name="Detail" component={DetailScreen} />
-        <Stack.Screen name="Checkout" component={CheckoutScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Stack.Navigator 
+          initialRouteName="SplashScreen" 
+          screenOptions={{ headerShown: false }}>
+          <Stack.Screen 
+            name="SplashScreen" 
+            component={SplashScreen} 
+            options={{
+              gestureEnabled: false,
+              headerBackVisible: false
+            }}
+          />
+          <Stack.Screen 
+            name="Login" 
+            component={LoginScreen} 
+            options={{
+              gestureEnabled: false,
+              headerBackVisible: false
+            }}
+          />
+          <Stack.Screen 
+            name="Home" 
+            component={HomeScreen} 
+            options={{
+              gestureEnabled: false,
+              headerBackVisible: false
+            }}
+          />
+          <Stack.Screen name="Detail" component={DetailScreen} />
+          <Stack.Screen name="Checkout" component={CheckoutScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }

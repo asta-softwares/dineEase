@@ -1,44 +1,60 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Animated, StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import Animated, { 
+    useAnimatedStyle,
+    interpolateColor,
+    interpolate,
+    withTiming,
+} from 'react-native-reanimated';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 
-const TopNav = ({ handleGoBack, scrollY }) => {
-    const animatedStyle = {
-        backgroundColor: scrollY.interpolate({
-            inputRange: [0, 100],
-            outputRange: ['transparent', colors.background],
-            extrapolate: 'clamp'
-        })
-    };
+const TopNav = ({ handleGoBack, title = "The Flavorful Fork", scrollY }) => {
+    const defaultScrollY = new Animated.Value(100);
+    const animValue = scrollY || defaultScrollY;
 
-    const backbuttonStyle = {
-        color: scrollY.interpolate({
-            inputRange: [0, 100],
-            outputRange: ['#FFFFFF', '#000000'],
-            extrapolate: 'clamp'
-        })
-    };
-    const titleStyle = {
-        opacity: scrollY.interpolate({
-            inputRange: [0, 100],
-            outputRange: [0, 1],
-            extrapolate: 'clamp'
-        })
-    };
+    const containerStyle = useAnimatedStyle(() => {
+        return {
+            backgroundColor: interpolateColor(
+                animValue.value,
+                [0, 100],
+                ['transparent', colors.background]
+            ),
+        };
+    });
+
+    const backButtonStyle = useAnimatedStyle(() => {
+        return {
+            color: interpolateColor(
+                animValue.value,
+                [0, 100],
+                ['#FFFFFF', '#000000']
+            ),
+        };
+    });
+
+    const titleStyle = useAnimatedStyle(() => {
+        return {
+            opacity: interpolate(
+                animValue.value,
+                [0, 100],
+                [0, 1]
+            ),
+        };
+    });
 
     return (
-        <Animated.View style={[styles.topNav, animatedStyle]}>
+        <Animated.View style={[styles.topNav, containerStyle]}>
             <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-                <View>
-                    <Animated.Text style={backbuttonStyle}>
-                        <Ionicons name="arrow-back" size={24} />
-                    </Animated.Text>
-                </View>
+                <Animated.View style={backButtonStyle}>
+                    <Ionicons name="arrow-back" size={24} />
+                </Animated.View>
             </TouchableOpacity>
-            <View style={styles.titleContainer}>
-                <Animated.Text style={[typography.h3, styles.title, titleStyle]}>The Flavorful Fork</Animated.Text>
-            </View>
+            <Animated.View style={[styles.titleContainer, titleStyle]}>
+                <Animated.Text style={[typography.h3, styles.title]}>
+                    {title}
+                </Animated.Text>
+            </Animated.View>
             <View style={styles.placeholder} />
         </Animated.View>
     )

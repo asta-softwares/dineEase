@@ -11,22 +11,36 @@ import {
 } from "react-native";
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import Footer from './Layout/Footer';
 import LargeButton from '../Components/Buttons/LargeButton';
 import TopNav from '../Components/TopNav';
 
 export default function CheckoutScreen() {
   const navigation = useNavigation();
+  const scrollY = useSharedValue(0);
 
   const handleGoBack = () => {
     navigation.goBack();
   };
 
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
   return (
     <View style={styles.container}>
-      <TopNav title="Cart" onBackPress={handleGoBack} />
+      <View style={styles.topNav}>
+        <TopNav title="Cart" onBackPress={handleGoBack} scrollY={scrollY} />
+      </View>
       
-      <ScrollView style={styles.content}>
+      <Animated.ScrollView 
+        style={styles.content}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+      >
         <View style={styles.section}>
           <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
             Restaurant Information
@@ -113,7 +127,7 @@ export default function CheckoutScreen() {
             </View>
           </View>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
       <Footer>
         <LargeButton 
           title="Pay Now"
