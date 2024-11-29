@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../styles/colors';
+import { typography } from '../styles/typography';
 
 export default function SplashScreen() {
   const navigation = useNavigation();
@@ -21,26 +22,25 @@ export default function SplashScreen() {
           source={require('../assets/logo-splashscreen.png')}
           style={styles.logo}
         />
-        <Text style={styles.title}>Save More,</Text>
-        <Text style={styles.title}>Spend Less</Text>
+        <Text style={typography.titleLarge}>Save More,</Text>
+        <Text style={typography.titleLarge}>Spend Less</Text>
       </View>
     
-      
       <Image
         source={require('../assets/splashart.png')}
         style={styles.illustration}
       />
       
       <TouchableOpacity style={styles.button} onPress={handleLoginSignup}>
-        <Text style={styles.buttonText}>Login / Signup</Text>
+        <Text style={typography.buttonLarge}>Login / Signup</Text>
       </TouchableOpacity>
       
       <View style={styles.browseContainer}>
-        <Text style={styles.browseText}>Or</Text>
+        <Text style={typography.bodyMedium}>Or</Text>
       </View>
       
       <TouchableOpacity onPress={handleBrowse}>
-        <Text style={styles.browseLink}>Browse Selections</Text>
+        <Text style={typography.labelLarge}>Browse Selections</Text>
       </TouchableOpacity>
     </View>
   );
@@ -63,22 +63,6 @@ const styles = StyleSheet.create({
     height: 84,
     resizeMode: 'contain',
   },
-  title: {
-    fontFamily: 'Plus Jakarta Sans',
-    fontWeight: '800',
-    fontSize: 55,
-    lineHeight: 60,
-    textAlign: 'left',
-    letterSpacing: -0.03,
-    color: '#FFFAEF',
-  },
-  subtitle: {
-    fontFamily: 'Plus Jakarta Sans',
-    fontWeight: '300',
-    fontSize: 15,
-    letterSpacing: -0.03,
-    color: '#FFFAEF',
-  },
   illustration: {
     width: 350,
     height: 350,
@@ -94,26 +78,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  buttonText: {
-    fontFamily: 'Gilroy',
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.primary,
-  },
   browseContainer: {
     alignItems: 'center',
     marginBottom: 20,
     width: '100%',
-  },
-  browseText: {
-    fontFamily: 'Gilroy-Bold',
-    fontSize: 12,
-    color: '#FFFAEF',
-  },
-  browseLink: {
-    fontFamily: 'Gilroy',
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#FFFAEF',
   },
 });

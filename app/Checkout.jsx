@@ -10,6 +10,10 @@ import {
   View,
 } from "react-native";
 import { colors } from '../styles/colors';
+import { typography } from '../styles/typography';
+import Footer from './Layout/Footer';
+import LargeButton from '../Components/Buttons/LargeButton';
+
 export default function CheckoutScreen() {
   const navigation = useNavigation();
 
@@ -24,13 +28,13 @@ export default function CheckoutScreen() {
         <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
           <Ionicons name="arrow-back" size={24} color="#1F262C" />
         </TouchableOpacity>
-        <Text style={styles.topBarTitle}>Cart</Text>
+        <Text style={[typography.h3, styles.topBarTitle]}>Cart</Text>
         <View style={styles.placeholder} />
       </View>
 
       <ScrollView>
         {/* Restaurant Information */}
-        <Text style={styles.sectionTitle}>Restaurant Information</Text>
+        <Text style={[typography.h3, styles.sectionTitle]}>Restaurant Information</Text>
         <View style={styles.restaurantCard}>
           <Image
             source={{
@@ -40,17 +44,17 @@ export default function CheckoutScreen() {
           />
           <View style={styles.restaurantInfo}>
             <View style={styles.restaurantTextContainer}>
-              <Text style={styles.restaurantName}>4 x The Flavorful Fork</Text>
-              <Text style={styles.restaurantAddress}>
+              <Text style={[typography.labelLarge, styles.restaurantName]}>4 x The Flavorful Fork</Text>
+              <Text style={[typography.bodyMedium, styles.restaurantAddress]}>
                 123 Main Street, Toronto, CA
               </Text>
             </View>
-            <Text style={styles.price}>$ 25.00</Text>
+            <Text style={[typography.labelLarge, styles.price]}>$ 25.00</Text>
           </View>
         </View>
 
         {/* Details Transaction */}
-        <Text style={styles.sectionTitle}>Details Transaction</Text>
+        <Text style={[typography.h3, styles.sectionTitle]}>Details Transaction</Text>
         <View style={styles.detailsList}>
           <View style={styles.detailItem}>
             <Text style={styles.detailLabel}>Total Bill</Text>
@@ -75,7 +79,7 @@ export default function CheckoutScreen() {
         </View>
 
         {/* Guest Information */}
-        <Text style={styles.sectionTitle}>Guest Information</Text>
+        <Text style={[typography.h3, styles.sectionTitle]}>Guest Information</Text>
         <View style={styles.guestInfo}>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Name</Text>
@@ -99,29 +103,13 @@ export default function CheckoutScreen() {
           </View>
         </View>
       </ScrollView>
-
-      <View style={styles.footer}>
-        <View style={styles.footerLabels}>
-          <Text style={styles.footerLabel}>Payment Method</Text>
-          <Text style={styles.footerLabel}>Total</Text>
-        </View>
-        <View style={styles.footerPaymentMethod}>
-          <View style={styles.cardInfo}>
-            <Image
-              source={{
-                uri: "https://s3-alpha-sig.figma.com/img/6d20/f4f7/3d0e20904fc946f18c6d4bb3e68ec4b0?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=Y4sHxQmZwDGOFadJFXtBhgQ4BCK-bJJbr2Ov5Wo1OoYCtnDJP3I7bUfaSTZiiN4NKhaIA5rk0hsf2DgldAQIRJhnKIrPrzSIHwuihcnNzPPYjT83pReciMw636DFISYmsACIHSXYPmJdSKLDyyKDnepPmcgcHoZDbct9LrhUWAmlrzS-Cw81CQtwp4o3IqO6~8PzQJvoMmG0hu3uQFbIGGC9FZlE~QRKVrm1xcWFB3G6-A5c1g1XbJfWl3hNtgk~qkriQyZqdKwVECEIFCMl0dERore7vSrGQBEy9KE02x2v7jxX830KcgkKsAQdlIlMs6Z8cehltWiZYS7NyvVPaQ__",
-              }}
-              style={styles.cardIcon}
-            />
-            <Text style={styles.cardNumber}>**** **** **** 1234</Text>
-          </View>
-          <Text style={styles.price}>$ 100.00</Text>
-        </View>
-        <TouchableOpacity style={styles.payNowButton}>
-          <Text style={styles.payNowText}>Pay Now</Text>
-        </TouchableOpacity>
-      </View>
-
+      <Footer>
+        <LargeButton 
+          title="Pay Now"
+          price="25.00"
+          onPress={() => navigation.navigate('Payment')}
+        />
+      </Footer>
     </View>
   );
 }
@@ -273,10 +261,11 @@ const styles = StyleSheet.create({
   },
   payNowButton: {
     backgroundColor: colors.primary,
-    borderRadius: 32,
-    paddingVertical: 12,
-    alignItems: "center",
-    width: "100%",
+    borderRadius: 16,
+    paddingVertical: 16,
+    marginBottom: 10,
+    width: '100%',
+    alignItems: 'center',
   },
   payNowText: {
     fontFamily: "Plus Jakarta Sans",

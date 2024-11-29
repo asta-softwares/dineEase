@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { colors } from '../styles/colors';
+import { typography } from '../styles/typography';
 
 const MenuItem = ({ name, price, imageUrl }) => {
   return (
@@ -12,8 +13,8 @@ const MenuItem = ({ name, price, imageUrl }) => {
         resizeMode="cover"
       />
       <View style={styles.textContainer}>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.price}>{price}</Text>
+        <Text style={[typography.labelLarge, styles.name]}>{name}</Text>
+        <Text style={[typography.bodyMedium, styles.price]}>{price}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -63,12 +64,12 @@ const styles = StyleSheet.create({
   },
   menuItem: {
     width: '50%',
-    paddingHorizontal: 8,
-    paddingVertical: 8,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
   },
   image: {
     width: '100%',
-    height: 150,
+    height: 120,
     borderRadius: 12,
     backgroundColor: '#E1E9EE',
   },
@@ -76,13 +77,10 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   name: {
-    fontSize: 14,
-    fontWeight: '600',
     color: colors.text.primary,
     marginBottom: 4,
   },
   price: {
-    fontSize: 14,
     color: colors.text.secondary,
   },
 });

@@ -1,6 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Animated, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Animated, StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { colors } from '../styles/colors';
+import { typography } from '../styles/typography';
+
 const TopNav = ({ handleGoBack, scrollY }) => {
     const animatedStyle = {
         backgroundColor: scrollY.interpolate({
@@ -35,7 +37,7 @@ const TopNav = ({ handleGoBack, scrollY }) => {
                 </View>
             </TouchableOpacity>
             <View style={styles.titleContainer}>
-                <Animated.Text style={[styles.title, titleStyle]}>The Flavorful Fork</Animated.Text>
+                <Animated.Text style={[typography.h3, styles.title, titleStyle]}>The Flavorful Fork</Animated.Text>
             </View>
             <View style={styles.placeholder} />
         </Animated.View>

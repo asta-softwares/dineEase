@@ -2,6 +2,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { colors } from '../styles/colors';
+import { typography } from '../styles/typography';
 
 const RestaurantCard = ({ name, rating, address, imageUrl, price }) => (
   <View style={styles.restaurantCard}>
@@ -9,16 +11,16 @@ const RestaurantCard = ({ name, rating, address, imageUrl, price }) => (
       <Image source={{ uri: imageUrl }} style={styles.restaurantImage} />
       <View style={styles.rating}>
         <Ionicons name="star" size={14} color="#FFFFFF" />
-        <Text style={styles.ratingText}>{rating}</Text>
+        <Text style={[typography.labelMedium, styles.ratingText]}>{rating}</Text>
       </View>
     </View>
     <View style={styles.restaurantInfo}>
       <View style={styles.nameAndPriceContainer}>
-        <Text style={styles.restaurantName}>{name}</Text>
-        <Text style={styles.restaurantPrice}>{price} / per person</Text>
+        <Text style={[typography.labelLarge, styles.restaurantName]}>{name}</Text>
+        <Text style={[typography.bodyMedium, styles.restaurantPrice]}>{price} / per person</Text>
       </View>
       <View style={styles.addressContainer}>
-        <Text style={styles.restaurantAddress}>{address}</Text>
+        <Text style={[typography.bodyMedium, styles.restaurantAddress]}>{address}</Text>
       </View>
     </View>
   </View>
@@ -61,10 +63,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ratingText: {
-    fontFamily: 'Plus Jakarta Sans',
-    fontWeight: '600',
-    fontSize: 14,
-    color: '#FFFFFF',
     marginLeft: 4,
   },
   restaurantInfo: {
@@ -77,16 +75,16 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   restaurantName: {
-    fontFamily: 'Plus Jakarta Sans',
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#1F262C',
+    // fontFamily: 'Plus Jakarta Sans',
+    // fontSize: 14,
+    // fontWeight: '500',
+    // color: '#1F262C',
   },
   restaurantPrice: {
-    fontFamily: 'Plus Jakarta Sans',
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#1F262C',
+    // fontFamily: 'Plus Jakarta Sans',
+    // fontSize: 14,
+    // fontWeight: '500',
+    // color: '#1F262C',
   },
   addressContainer: {
     flexDirection: 'row',
@@ -94,9 +92,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   restaurantAddress: {
-    fontFamily: 'Inter',
-    fontSize: 8,
-    color: '#C4C4C4',
+    // fontFamily: 'Inter',
+    // fontSize: 8,
+    // color: '#C4C4C4',
   },
 });
 

@@ -15,7 +15,10 @@ import ImageView from "react-native-image-viewing";
 import { TabBar, TabView } from 'react-native-tab-view';
 import TopNav from "../Components/TopNav";
 import MenuItems from '../Components/MenuItems';
+import Footer from './Layout/Footer';
+import LargeButton from '../Components/Buttons/LargeButton';
 import { colors } from '../styles/colors';
+import { typography } from '../styles/typography';
 import PagerView from 'react-native-pager-view';
 
 const CustomHeader = ({ onClose }) => (
@@ -184,36 +187,36 @@ export default function DetailScreen() {
       >
         <View style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.title}>The Flavorful Fork</Text>
+            <Text style={[typography.h2, styles.title]}>The Flavorful Fork</Text>
             <View style={styles.rating}>
               <Ionicons name="star" size={14} color="#FFFFFF" />
-              <Text style={styles.ratingText}>4.5</Text>
+              <Text style={[typography.labelMedium, styles.ratingText]}>4.5</Text>
             </View>
           </View>
           <View style={styles.infoContainer}>
             <View style={styles.infoItem}>
               <Ionicons name="restaurant-outline" size={14} color={colors.primaryText}  />
-              <Text style={styles.infoText}>Filipino-Fusion</Text>
+              <Text style={[typography.bodyMedium, styles.infoText]}>Filipino-Fusion</Text>
             </View>
             <View style={styles.infoItem}>
               <Ionicons name="location-outline" size={14} color={colors.primaryText} />
-              <Text style={styles.infoText}>
+              <Text style={[typography.bodyMedium, styles.infoText]}>
                 123 Main Street, Toronto, CA
               </Text>
-              <Text style={styles.viewMap}>view map</Text>
+              <Text style={[typography.bodyMedium, styles.viewMap]}>view map</Text>
             </View>
             <View style={styles.infoItem}>
               <Ionicons name="time-outline" size={14} color={colors.primaryText} />
-              <Text style={styles.infoText}>
+              <Text style={[typography.bodyMedium, styles.infoText]}>
                 Monday-Friday: 11 AM - 9 PM, Saturday-Sunday: 9 AM - 10 PM
               </Text>
             </View>
             <View style={styles.infoItem}>
               <Ionicons name="call-outline" size={14} color={colors.primaryText} />
-              <Text style={styles.infoText}>1-800-555-1234</Text>
+              <Text style={[typography.bodyMedium, styles.infoText]}>1-800-555-1234</Text>
             </View>
           </View>
-          <Text style={styles.description}>
+          <Text style={[typography.bodyMedium, styles.description]}>
             Discover the perfect blend of traditional Filipino flavors with a
             modern twist at The Flavorful Fork. Our menu features innovative
             dishes that will tantalize your taste buds. From sizzling sisig to
@@ -234,17 +237,14 @@ export default function DetailScreen() {
           </View> 
         </View>
       </ScrollView>
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.bookNowButton} onPress={handleCheckout}>
-          <View style={styles.buttonContent}>
-            <View style={styles.cartCount}>
-              <Text style={styles.cartCountText}>2</Text>
-            </View>
-            <Text style={styles.bookNowText}>View Cart</Text>
-            <Text style={styles.priceText}>$25.99</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      <Footer>
+        <LargeButton 
+          title="View Cart"
+          count={2}
+          price="25.99"
+          onPress={() => navigation.navigate('Checkout')}
+        />
+      </Footer>
     </View>
   );
 }
@@ -300,17 +300,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontFamily: "Plus Jakarta Sans",
-    fontWeight: "700",
-    fontSize: 24,
-    color: "#1F262C",
+    // fontFamily: "Plus Jakarta Sans",
+    // fontWeight: "700",
+    // fontSize: 24,
+    // color: "#1F262C",
   },
   sectionTitle: {
-    fontFamily: "Plus Jakarta Sans",
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1F262C",
-    marginTop: 20,
+    // fontFamily: "Plus Jakarta Sans",
+    // fontSize: 18,
+    // fontWeight: "600",
+    // color: "#1F262C",
+    // marginTop: 20,
   },
   rating: {
     flexDirection: "row",
@@ -321,11 +321,11 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   ratingText: {
-    fontFamily: "Plus Jakarta Sans",
-    fontWeight: "600",
-    fontSize: 14,
-    color: "#FFFFFF",
-    marginLeft: 4,
+    // fontFamily: "Plus Jakarta Sans",
+    // fontWeight: "600",
+    // fontSize: 14,
+    // color: "#FFFFFF",
+    // marginLeft: 4,
   },
   infoContainer: {
     marginBottom: 16,
@@ -336,23 +336,23 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   infoText: {
-    fontFamily: "Plus Jakarta Sans",
-    fontSize: 14,
-    color: "#1F262C",
-    marginLeft: 8,
+    // fontFamily: "Plus Jakarta Sans",
+    // fontSize: 14,
+    // color: "#1F262C",
+    // marginLeft: 8,
   },
   viewMap: {
-    fontFamily: "Plus Jakarta Sans",
-    fontSize: 12,
-    color: colors.primaryText,
-    marginLeft: 8,
-    textDecorationLine: "underline",
+    // fontFamily: "Plus Jakarta Sans",
+    // fontSize: 12,
+    // color: colors.primaryText,
+    // marginLeft: 8,
+    // textDecorationLine: "underline",
   },
   description: {
-    fontFamily: "Plus Jakarta Sans",
-    fontSize: 14,
-    color: "#1F262C",
-    lineHeight: 20,
+    // fontFamily: "Plus Jakarta Sans",
+    // fontSize: 14,
+    // color: "#1F262C",
+    // lineHeight: 20,
   },
   footer: {
     backgroundColor: colors.background,
@@ -364,11 +364,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  bookNowButton: {
+  viewCartButton: {
     backgroundColor: colors.primary,
-    borderRadius: 32,
+    borderRadius: 16,
     paddingVertical: 16,
-    marginBottom: 12,
+    marginBottom: 10,
     width: '100%',
   },
   buttonContent: {
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  bookNowText: {
+  viewCartText: {
     color: colors.white,
     fontSize: 16,
     fontWeight: '600',

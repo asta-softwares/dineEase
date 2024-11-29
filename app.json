@@ -18,7 +18,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.png",
-        "backgroundColor": "#FE6E1B"
+        "backgroundColor": "#F29057"
       },
       "package": "com.anonymous.DineEase"
     },
@@ -33,6 +33,9 @@
     "owner": "mendozarain",
     "experiments": {
       "newArchEnabled": true
-    }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

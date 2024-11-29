@@ -3,14 +3,15 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { colors } from '../styles/colors';
+import { typography } from '../styles/typography';
+import LargeButton from '../Components/Buttons/LargeButton';
+
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
 
   const handleLogin = () => {
-    // Add your login logic here
-    // For now, we'll just navigate to the Home screen
     navigation.navigate('Home');
   };
 
@@ -23,7 +24,7 @@ export default function LoginScreen() {
       />
       
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Email Address</Text>
+        <Text style={[typography.labelMedium, styles.inputLabel]}>Email Address</Text>
         <TextInput
           style={styles.input}
           placeholder="hello@gmail.com"
@@ -34,7 +35,7 @@ export default function LoginScreen() {
       </View>
       
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Password</Text>
+        <Text style={[typography.labelMedium, styles.inputLabel]}>Password</Text>
         <TextInput
           style={styles.input}
           placeholder="••••••••••••"
@@ -45,13 +46,14 @@ export default function LoginScreen() {
       </View>
       
       <TouchableOpacity>
-        <Text style={styles.forgotPassword}>Forgot Password?</Text>
+        <Text style={[typography.bodyMedium, styles.forgotPassword]}>Forgot Password?</Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
-      
+
+      <LargeButton
+        title="Login"
+        onPress={handleLogin}
+      />
+
       <View style={styles.signInOptions}>
         <View style={styles.line} />
         <Text style={styles.signInText}>Or Sign In With</Text>
@@ -68,9 +70,9 @@ export default function LoginScreen() {
       </View>
       
       <View style={styles.signUpContainer}>
-        <Text style={styles.signUpText}>Don't have an account? </Text>
+        <Text style={[typography.bodyMedium, styles.signUpText]}>Don't have an account? </Text>
         <TouchableOpacity>
-          <Text style={styles.signUpLink}>Join Us</Text>
+          <Text style={[typography.labelMedium, styles.signUpLink]}>Join Us</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -102,7 +104,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   inputLabel: {
-    fontFamily: 'Gilroy-Bold',
     fontSize: 12,
     color: '#888888',
     marginBottom: 5,
@@ -117,7 +118,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   forgotPassword: {
-    fontFamily: 'Gilroy',
     fontSize: 12,
     color: colors.primaryText,
     alignSelf: 'flex-end',
@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   loginButtonText: {
-    fontFamily: 'Gilroy',
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF',
@@ -149,7 +148,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F2F2F2',
   },
   signInText: {
-    fontFamily: 'Gilroy-Bold',
     fontSize: 12,
     color: '#888888',
     marginHorizontal: 10,
@@ -169,7 +167,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   socialButtonText: {
-    fontFamily: 'Gilroy-Bold',
     fontSize: 14,
     color: colors.primaryText,
   },
@@ -177,12 +174,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   signUpText: {
-    fontFamily: 'Gilroy-Bold',
     fontSize: 12,
     color: '#888888',
   },
   signUpLink: {
-    fontFamily: 'Gilroy',
     fontSize: 12,
     fontWeight: 'bold',
     color: colors.primaryText,

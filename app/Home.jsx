@@ -66,8 +66,8 @@ export default function HomeScreen() {
   const handleDetail = () => {
     navigation.navigate("Detail");
   };
-  const handleGrabAndGo = () => {
-    setIsDineIn(!isDineIn);
+  const handleModeSwitch = (isDineInMode = false) => {
+    setIsDineIn(isDineInMode);
   };
 
   return (
@@ -109,13 +109,13 @@ export default function HomeScreen() {
         <View style={styles.switchContainer}>
           <TouchableOpacity 
             style={isDineIn ? styles.switchButtonActive : styles.switchButton}
-            onPress={handleGrabAndGo}
+            onPress={() => handleModeSwitch(true)}
           >
             <Text style={isDineIn ? styles.switchButtonTextActive : styles.switchButtonText}>Dine In</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={!isDineIn ? styles.switchButtonActive : styles.switchButton}
-            onPress={handleGrabAndGo}
+            onPress={() => handleModeSwitch(false)}
           >
             <Text style={!isDineIn ? styles.switchButtonTextActive : styles.switchButtonText}>Grab & Go</Text>
           </TouchableOpacity>
