@@ -9,11 +9,12 @@
     "splash": {
       "image": "./assets/splash-new.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFFF"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.DineEase"
+      "bundleIdentifier": "com.anonymous.DineEase",
+      "icon": "./assets/logo.png"
     },
     "android": {
       "adaptiveIcon": {

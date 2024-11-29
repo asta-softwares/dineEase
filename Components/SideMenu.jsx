@@ -1,7 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import PropTypes from 'prop-types';
 import { colors } from '../styles/colors';
+
 const SideMenu = ({ isOpen, onClose }) => {
   const navigation = useNavigation();
   const slideAnim = useRef(new Animated.Value(-250)).current;
@@ -74,6 +76,11 @@ const SideMenu = ({ isOpen, onClose }) => {
       </Animated.View>
     </TouchableWithoutFeedback>
   );
+};
+
+SideMenu.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 const styles = StyleSheet.create({
