@@ -1,12 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View, Dimensions, SafeAreaView } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View, Dimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import LargeButton from '../Components/Buttons/LargeButton';
 
 const { width, height } = Dimensions.get('window');
-const isSmallDevice = height < 700; 
 
 export default function SplashScreen() {
   const navigation = useNavigation();
@@ -25,10 +25,7 @@ export default function SplashScreen() {
         <View style={styles.headerContainer}>
           <Image
             source={require('../assets/logo-splashscreen.png')}
-            style={[
-              styles.logo,
-              isSmallDevice && styles.logoSmall
-            ]}
+            style={styles.logo}
           />
           <Text style={[typography.titleLarge, styles.headerText]}>Save More,</Text>
           <Text style={[typography.titleLarge, styles.headerText]}>Spend Less</Text>
@@ -36,10 +33,7 @@ export default function SplashScreen() {
       
         <Image
           source={require('../assets/splashart.png')}
-          style={[
-            styles.illustration,
-            isSmallDevice && styles.illustrationSmall
-          ]}
+          style={styles.illustration}
         />
         
         <View style={styles.actionContainer}>
@@ -71,8 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: width * 0.05, // 5% of screen width
-    paddingVertical: height * 0.02, // 2% of screen height
+    paddingHorizontal: width * 0.05,
   },
   headerContainer: {
     alignSelf: 'flex-start',
@@ -83,28 +76,20 @@ const styles = StyleSheet.create({
     color: colors.text.white,
   },
   logo: {
-    width: width * 0.5, // 50% of screen width
-    height: height * 0.1, // 10% of screen height
+    width: Math.min(width * 0.45, 200),
+    height: Math.min(height * 0.09, 80),
     resizeMode: 'contain',
     marginBottom: height * 0.01,
   },
-  logoSmall: {
-    width: width * 0.4, // 40% of screen width for small devices
-    height: height * 0.08, // 8% of screen height for small devices
-  },
   illustration: {
-    width: width * 0.85, // 85% of screen width
-    height: height * 0.4, // 40% of screen height
+    width: Math.min(width * 0.8, 400),
+    height: Math.min(height * 0.35, 300),
     resizeMode: 'contain',
-  },
-  illustrationSmall: {
-    width: width * 0.75, // 75% of screen width for small devices
-    height: height * 0.35, // 35% of screen height for small devices
   },
   actionContainer: {
     width: '100%',
     alignItems: 'center',
-    paddingBottom: height * 0.02,
+    paddingBottom: height * 0.03,
   },
   orText: {
     color: colors.text.white,
