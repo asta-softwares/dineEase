@@ -1,8 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
-  Animated,
   Image,
   ScrollView,
   StyleSheet,
@@ -20,6 +19,13 @@ import LargeButton from '../Components/Buttons/LargeButton';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import PagerView from 'react-native-pager-view';
+import Animated, { 
+  useSharedValue,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  interpolate,
+  withTiming,
+} from 'react-native-reanimated';
 
 const CustomHeader = ({ onClose }) => (
   <View style={[styles.topNav, { backgroundColor: "transparent" }]}>
@@ -33,9 +39,10 @@ const CustomHeader = ({ onClose }) => (
     <View style={styles.placeholder} />
   </View>
 );
+
 export default function DetailScreen() {
   const navigation = useNavigation();
-  const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollY = useSharedValue(0);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [index, setIndex] = useState(0);
@@ -50,10 +57,23 @@ export default function DetailScreen() {
     navigation.goBack();
   };
 
-  const imageHeight = scrollY.interpolate({
-    inputRange: [-200, 0, 200],
-    outputRange: [452, 252, 252],
-    extrapolate: "clamp",
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const imageStyle = useAnimatedStyle(() => {
+    const height = interpolate(
+      scrollY.value,
+      [-200, 0, 200],
+      [452, 252, 252],
+      { extrapolate: 'clamp' }
+    );
+
+    return {
+      height,
+    };
   });
 
   const handleCheckout = () => {
@@ -170,20 +190,18 @@ export default function DetailScreen() {
   return (
     <View style={styles.container}>
       <TopNav handleGoBack={handleGoBack} scrollY={scrollY} />
+      
       <Animated.Image
         source={{
           uri: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg",
         }}
-        style={[styles.headerImage, { height: imageHeight }]}
+        style={[styles.headerImage, imageStyle]}
       />
-      <ScrollView
-        style={styles.scrollView}
+
+      <Animated.ScrollView
+        onScroll={scrollHandler}
         scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        pointerEvents="box-none"
+        style={styles.scrollView}
       >
         <View style={styles.content}>
           <View style={styles.header}>
@@ -236,7 +254,7 @@ export default function DetailScreen() {
             />
           </View> 
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
       <Footer>
         <LargeButton 
           title="View Cart"
@@ -282,12 +300,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  menuImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 16,
-    marginTop: 16,
-  },
   content: {
     marginTop: 252,
     padding: 20,
@@ -304,13 +316,6 @@ const styles = StyleSheet.create({
     // fontWeight: "700",
     // fontSize: 24,
     // color: "#1F262C",
-  },
-  sectionTitle: {
-    // fontFamily: "Plus Jakarta Sans",
-    // fontSize: 18,
-    // fontWeight: "600",
-    // color: "#1F262C",
-    // marginTop: 20,
   },
   rating: {
     flexDirection: "row",

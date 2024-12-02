@@ -5,12 +5,13 @@ import Animated, {
     interpolateColor,
     interpolate,
     withTiming,
+    useSharedValue,
 } from 'react-native-reanimated';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 
 const TopNav = ({ handleGoBack, title = "The Flavorful Fork", scrollY }) => {
-    const defaultScrollY = new Animated.Value(100);
+    const defaultScrollY = useSharedValue(100);
     const animValue = scrollY || defaultScrollY;
 
     const containerStyle = useAnimatedStyle(() => {
@@ -63,30 +64,29 @@ const TopNav = ({ handleGoBack, title = "The Flavorful Fork", scrollY }) => {
 export default TopNav;
 
 const styles = StyleSheet.create({
-  topNav: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    paddingTop: 60,
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1,
-  },
-  backButton: {
-    padding: 8,
-  },
-  titleContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  placeholder: {
-    width: 40,
-  },
+    topNav: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: 20,
+        paddingTop: 60,
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1,
+    },
+    backButton: {
+        padding: 8,
+    },
+    titleContainer: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    title: {
+        color: colors.text.primary,
+    },
+    placeholder: {
+        width: 40,
+    }
 });

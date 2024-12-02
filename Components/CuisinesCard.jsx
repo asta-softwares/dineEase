@@ -7,7 +7,10 @@ import { typography } from '../styles/typography';
 const CuisinesCard = ({ name, imageUrl }) => {
   return (
     <View style={styles.card}>
-      <Image source={{ uri: imageUrl }} style={styles.image} />
+      <Image 
+        source={typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl} 
+        style={styles.image} 
+      />
       <View style={styles.textContainer}>
         <Text style={[typography.labelMedium, styles.name]}>{name}</Text>
       </View>
@@ -17,8 +20,12 @@ const CuisinesCard = ({ name, imageUrl }) => {
 
 CuisinesCard.propTypes = {
   name: PropTypes.string.isRequired,
-  imageUrl: PropTypes.string.isRequired,
+  imageUrl: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number
+  ]).isRequired,
 };
+
 const styles = StyleSheet.create({
   card: {
     width: 90,
@@ -49,7 +56,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     textAlign: 'center',
-    color: '#111827',
+    color: colors.text.primary,
   },
 });
 
