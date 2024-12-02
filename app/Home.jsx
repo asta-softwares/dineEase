@@ -212,31 +212,31 @@ export default function HomeScreen() {
                 <View style={styles.cuisinesCardWrapper}>
                   <CuisinesCard
                     name="Indian"
-                    imageUrl="https://s3-alpha-sig.figma.com/img/cfe8/f85b/00be0c7c8ad7d7076e528af6d65ffe04?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=WvVHOF2OsTVRRsa7lOp2uqyLHvrmvqF6gg9FARaS4sPKRXG77UeIP-knCf0z~gJ1Ps9bFoFg7VVzSOPQsg5-u2pIfTpqCYbW~Me3LqDfomXp2KR-4O-PeDbgKWNN41e9R0I5YH4K~yCrLRQMgb2HyXa1cUJuHW1pbuSuqP5F-DgcvqnebNyLLDI2p1SRiIqoVE8r4hbZRn68T81rzwxEhDWPAqe-tKYtBQVJCNh0TBG5p7sJ3QD7LsICCHnpfNGe71OcqG3cXizpXrHSM3SSz3Q8tCvK80xFVNSrKCPsxdW3nh1pNzZVLHaqOVtkg7boPxvDeAHG8RJiQoXJp~Zwkg__"
+                    imageUrl={require("../assets/Indian.png")}
                   />
                 </View>
                 <View style={styles.cuisinesCardWrapper}>
                   <CuisinesCard
                     name="Chinese"
-                    imageUrl="https://s3-alpha-sig.figma.com/img/67c7/b553/a25e7a55735ed7c98d2ca2c8b67a0703?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=Odzbp-uSaSGztF1O9kFqgM1MV7pJz9dSVBcg2Sm1M3svSTppSyJPKIx~LLalUulkppGXEjBxDno-pYO1BvdXyK3X7Gpz-JujPoGgTUfINAO0bwOv1l2JyDXAXqJM-lvUXX2kMNpJn6A0Dv33HMndhJpMN5gsqRcuVXQehJezdVVzVoHgKw7sLf9mHWPdsAAK~k9hZlGzgLmtWXfIoDPxicOiCmaEyITZm-TOr8EAHqCuPIB5q7PskyONJ8m13qistDmISfdTTUM4DmFhLEKrBC-YKv~Aw8KQgCA5yXSYCKXXzO5HKRTcXsZ3wspaM6WB9QM4mxVMLeeGq9JyhyAlOA__"
+                    imageUrl={require("../assets/chinese.png")}
                   />
                 </View>
                 <View style={styles.cuisinesCardWrapper}>
                   <CuisinesCard
                     name="American"
-                    imageUrl="https://s3-alpha-sig.figma.com/img/38c2/6b1e/2cdced7bc539af586ed5d633368589b5?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=ca2P3J1d2QOVg-8LEv4nn3b34pphEhW68SqqQW7fNuQGa4G6iK~SeCLSo8gYxSOxq7bANXX94lklSXpkssank-wJ93w0AYEpKjrE9LxBiikRe8Mvo7S~hHKX1uz1N2haxGm9torFH1OTrBeTR4cqgrwUyPdKppY7oO6FWE0I7Hevto0CWh~KXF2NIkoQvlgAnoUyhm0vxLbLXmwwmhveEaagD5QaZA3j--lSsHiHaTDbfZ0ZQWlvMWMGdNNxunXfZVSTx4jasML2NexjgcHyCsKtXBA-dR-NbRn0oRZ1pbB19daTyrhbhl1gZWJC~jCEHScuwfMwWmcnGGJWBFhvgg__"
+                    imageUrl={require("../assets/american.png")}
                   />
                 </View>
                 <View style={styles.cuisinesCardWrapper}>
                   <CuisinesCard
                     name="Filipino"
-                    imageUrl="https://s3-alpha-sig.figma.com/img/c9ae/a660/3824cdce919e8d5b705938992bd15f8e?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=HT0HhBJHc2F5bKTTYzhwKNnJ~7SbF8IelONEWEdP7vCGKTkyOslN0CJLUl4GdlhgQJ6IMlKwl~y8jv93UAUHDR3WhxZDd2utuFEV~ooP0CS~DS1MguACEs3BElAAjTTwRPzBOTnMDVQ2jVxSbE-MhiRNsKsKraSJQhpSbobB02bt6yea6FRXOTs9E4e0bZbRT9MpZTkNBxVwfotQzvzAYo5gnO-Hdu9jOfffZ61sSRQflCYSb6YUbBM5Pg6LWFnNZo8CQwupAfJHt8qA-ksLSFeKsbFrrku8JsPD5TusXMzkgyqvHaitmV9U~lE1aGPkeCN0RDFj9CDeGAJPqMEhTw__"
+                    imageUrl={require("../assets/filipino.png")}
                   />
                 </View>
                 <View style={styles.cuisinesCardWrapper}>
                   <CuisinesCard
                     name="Mediterranean"
-                    imageUrl="https://s3-alpha-sig.figma.com/img/1ebc/686d/2d1fe8c3b5246f1ef58af7165a970e27?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hbC14ruU6DULBE6RmT~RnSebPToVPmV80duItJKSOK9D~CwzVyxG9OG5Z-QHTPnr0ejBFaz9JpBXwwURRQJpES7KWfBtjONClz7fQg9uJtD7sVLuybws9~LSNSo4Paj1Y85HlZ-aHZXdhiLRihWnRFhW8Bgj-PWm~lxcrntPSOk40JilZqYsVTYTTAXFUayM0GtG5Ba7aGCSgYt2wHjbhyfEBSKIXD5NpTMFLjJVVKMFQpT0nZ-0PpSD-pnLFnUsXhLlhdZFgM8skU29VKGM9fLSudPC564nv8zaBboryBG5wdz7-2aPUUtNn2fydO-oyCCM1CEGxiI6TRRmSUollg__"
+                    imageUrl={require("../assets/mediterranean.png")}
                   />
                 </View>
               </ScrollView>

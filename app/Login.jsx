@@ -9,17 +9,41 @@ import {
   ScrollView, 
   Platform,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  Alert
 } from 'react-native';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import LargeButton from '../Components/Buttons/LargeButton';
 import CustomInput from '../Components/CustomInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import authService from '../api/services/authService';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await authService.login(email, password);
+      navigation.replace('Home'); // Replace login screen with home screen
+    } catch (error) {
+      console.error('Login error:', error);
+      Alert.alert(
+        'Login Failed',
+        error.response?.data?.message || 'An error occurred during login'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -54,6 +78,8 @@ export default function LoginScreen({ navigation }) {
                     keyboardType="email-address"
                     iconName="mail-outline"
                     iconPosition="left"
+                    autoCapitalize="none"
+                    editable={!loading}
                   />
                 </View>
 
@@ -65,18 +91,23 @@ export default function LoginScreen({ navigation }) {
                     secureTextEntry
                     iconName="lock-closed-outline"
                     iconPosition="left"
+                    editable={!loading}
                   />
                 </View>
 
-                <TouchableOpacity style={styles.forgotPassword}>
+                <TouchableOpacity 
+                  style={styles.forgotPassword}
+                  onPress={() => navigation.navigate('ForgotPassword')}
+                >
                   <Text style={[typography.labelMedium, { color: colors.text.primary }]}>
                     Forgot Password?
                   </Text>
                 </TouchableOpacity>
 
                 <LargeButton
-                  title="Sign In"
-                  onPress={() => navigation.navigate('Home')}
+                  title={loading ? "Signing In..." : "Sign In"}
+                  onPress={handleLogin}
+                  disabled={loading}
                 />
               </View>
             </View>
@@ -100,14 +131,12 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
     padding: 20,
-    minHeight: '100%',
+    justifyContent: 'center',
   },
   logoContainer: {
     alignItems: 'center',
     marginBottom: 40,
-    marginTop: Platform.OS === 'ios' ? 60 : 40,
   },
   logo: {
     width: 120,
@@ -118,14 +147,13 @@ const styles = StyleSheet.create({
     width: 200,
     height: 40,
     resizeMode: 'contain',
-    marginTop: 16,
+    marginTop: 10,
   },
   form: {
     width: '100%',
-    marginBottom: Platform.OS === 'ios' ? 40 : 20,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   forgotPassword: {
     alignSelf: 'flex-end',
