@@ -209,7 +209,7 @@ export default function HomeScreen({ navigation }) {
             scrollEventThrottle={16}
           >
             <View style={styles.scrollContent}>
-              <View style={styles.switchContainer}>
+              {/* <View style={styles.switchContainer}>
                 <TouchableOpacity 
                   style={isDineIn ? styles.switchButtonActive : styles.switchButton}
                   onPress={() => handleModeSwitch(true)}
@@ -234,7 +234,7 @@ export default function HomeScreen({ navigation }) {
                     Grab & Go
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </View> */}
               {/* <Text style={[{
                 fontFamily: 'PlusJakartaSans-Bold',
                 fontSize: 20,
@@ -320,7 +320,6 @@ export default function HomeScreen({ navigation }) {
                     rating={restaurant.ratings}
                     address={restaurant.location}
                     imageUrl={restaurant.image}
-                    price={restaurant.price}
                   />
                 </TouchableOpacity>
               ))}
