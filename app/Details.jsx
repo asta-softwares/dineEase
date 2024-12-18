@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   ScrollView,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
   useWindowDimensions,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ImageView from "react-native-image-viewing";
@@ -19,6 +20,7 @@ import Footer from './Layout/Footer';
 import LargeButton from '../Components/Buttons/LargeButton';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
+import { restaurantService } from '../api/services/restaurantService';
 import PagerView from 'react-native-pager-view';
 import Animated, { 
   useSharedValue,
@@ -47,20 +49,91 @@ const CustomHeader = ({ onClose }) => (
 
 export default function DetailScreen() {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { restaurantId } = route.params;
   const scrollY = useSharedValue(0);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [index, setIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [restaurant, setRestaurant] = useState(null);
+  const [error, setError] = useState(null);
   const [routes] = useState([
-    { key: 'popular', title: 'Popular' },
-    { key: 'appetizers', title: 'Appetizers' },
-    { key: 'main', title: 'Main' },
+    { key: 'menu', title: 'Menu' },
   ]);
   const { width } = useWindowDimensions();
+
+  useEffect(() => {
+    fetchRestaurantDetails();
+  }, [restaurantId]);
+
+  const fetchRestaurantDetails = async () => {
+    try {
+      setLoading(true);
+      const data = await restaurantService.getRestaurantById(restaurantId);
+      setRestaurant(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={[typography.h3, { color: colors.text.error }]}>Error: {error}</Text>
+      </View>
+    );
+  }
 
   const handleGoBack = () => {
     navigation.goBack();
   };
+
+  const handleCheckout = () => {
+    navigation.navigate("Checkout");
+  };
+
+  const images = [
+    {
+      uri: "https://s3-alpha-sig.figma.com/img/20fc/e656/8ae7b68095a4d524fbca4ccea6841645?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=DTbgg-21pPIWn9tGhAkaJGMKxy7l3gO8FzhR3szV1d349RSkaJCTW9SqpT1aAHL34weL53QaADuxnD1DgAqEqmLhHJytGI9I6z~BEJSofaWkJxva53nIAaSZa5odGsQpsAlWVVnEm9neDihqdormNgSRmdgWz1g0dSY1EVYL6XXjKUUdQ0ILm53LELAkLw4qF2OTQLOXQq6szLD6iwiZJqFgQuoeB5V9jQ5hrucsrKfgof382~R6Qtjo14dbne0nE-Y4BxODnppMI84o7thkQ-jUB1i-k~Ojs7eEoKimMBKjZJ9mdOmxoKnkot8QSExAxpVQYNTjVwhH-AjBPqVZVA__",
+    },
+  ];
+
+  const handleImageViewerClose = () => {
+    setImageViewerVisible(false);
+  };
+
+  const renderScene = ({ route }) => {
+    if (route.key === 'menu') {
+      return <MenuItems items={restaurant?.menus || []} />;
+    }
+    return null;
+  };
+
+  const renderTabBar = props => (
+    <TabBar
+      {...props}
+      indicatorStyle={{ backgroundColor: colors.primary }}
+      style={{ 
+        backgroundColor: colors.background,
+        elevation: 0,
+        shadowOpacity: 0,
+      }}
+      labelStyle={{ color: colors.text.black }}
+      activeColor={colors.primary}
+      inactiveColor={colors.text.secondary}
+    />
+  );
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -81,117 +154,6 @@ export default function DetailScreen() {
     };
   });
 
-  const handleCheckout = () => {
-    navigation.navigate("Checkout");
-  };
-
-  const images = [
-    {
-      uri: "https://s3-alpha-sig.figma.com/img/20fc/e656/8ae7b68095a4d524fbca4ccea6841645?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=DTbgg-21pPIWn9tGhAkaJGMKxy7l3gO8FzhR3szV1d349RSkaJCTW9SqpT1aAHL34weL53QaADuxnD1DgAqEqmLhHJytGI9I6z~BEJSofaWkJxva53nIAaSZa5odGsQpsAlWVVnEm9neDihqdormNgSRmdgWz1g0dSY1EVYL6XXjKUUdQ0ILm53LELAkLw4qF2OTQLOXQq6szLD6iwiZJqFgQuoeB5V9jQ5hrucsrKfgof382~R6Qtjo14dbne0nE-Y4BxODnppMI84o7thkQ-jUB1i-k~Ojs7eEoKimMBKjZJ9mdOmxoKnkot8QSExAxpVQYNTjVwhH-AjBPqVZVA__",
-    },
-  ];
-
-  const handleImageViewerClose = () => {
-    setImageViewerVisible(false);
-  };
-
-  const popularItems = [
-    {
-      name: "Siomai",
-      price: "$8.99",
-      imageUrl: "https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
-    },
-    {
-      name: "Lumpia",
-      price: "$7.99",
-      imageUrl: "https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
-    },
-    {
-      name: "Pancit",
-      price: "$12.99",
-      imageUrl: "https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
-    },
-    {
-      name: "Adobo",
-      price: "$14.99",
-      imageUrl: "https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
-    }
-  ];
-
-  const appetizerItems = [
-    {
-      name: "Calamari",
-      price: "$10.99",
-      imageUrl: "https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
-    },
-    {
-      name: "Bruschetta",
-      price: "$8.99",
-      imageUrl: "https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
-    },
-    {
-      name: "Garlic Bread",
-      price: "$6.99",
-      imageUrl: "https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
-    },
-    {
-      name: "Mozzarella Sticks",
-      price: "$9.99",
-      imageUrl: "https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
-    }
-  ];
-
-  const mainItems = [
-    {
-      name: "Margherita Pizza",
-      price: "$16.99",
-      imageUrl: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg"
-    },
-    {
-      name: "Pasta Carbonara",
-      price: "$15.99",
-      imageUrl: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg"
-    },
-    {
-      name: "Lasagna",
-      price: "$17.99",
-      imageUrl: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg"
-    },
-    {
-      name: "Risotto",
-      price: "$18.99",
-      imageUrl: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg"
-    }
-  ];
-
-  const renderScene = ({ route }) => {
-    switch (route.key) {
-      case 'popular':
-        return <MenuItems items={popularItems} />;
-      case 'appetizers':
-        return <MenuItems items={appetizerItems} />;
-      case 'main':
-        return <MenuItems items={mainItems} />;
-      default:
-        return null;
-    }
-  };
-
-  const renderTabBar = props => (
-    <TabBar
-      {...props}
-      indicatorStyle={{ backgroundColor: colors.primary }}
-      style={{ 
-        backgroundColor: colors.background,
-        elevation: 0,
-        shadowOpacity: 0,
-      }}
-      labelStyle={{ color: colors.text.black }}
-      activeColor={colors.primary}
-      inactiveColor={colors.text.secondary}
-    />
-  );
-
   return (
     <View style={styles.container}>
       <TopNav handleGoBack={handleGoBack} scrollY={scrollY} />
@@ -208,7 +170,7 @@ export default function DetailScreen() {
           >
             <Animated.Image
               source={{
-                uri: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg",
+                uri: restaurant?.image || 'https://via.placeholder.com/400',
               }}
               style={[styles.image, imageStyle]}
               resizeMode="cover"
@@ -216,42 +178,41 @@ export default function DetailScreen() {
           </TouchableOpacity>
           <View style={styles.content}>
             <View style={styles.header}>
-              <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>The Flavorful Fork</Text>
+              <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>{restaurant?.name}</Text>
               <View style={styles.rating}>
                 <Ionicons name="star" size={14} color={colors.text.white} />
-                <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>4.5</Text>
+                <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>{restaurant?.ratings}</Text>
               </View>
             </View>
             <View style={styles.infoContainer}>
               <View style={styles.infoItem}>
-                <Ionicons name="restaurant-outline" size={14} color={colors.text.primary}  />
-                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>Filipino-Fusion</Text>
+                <Ionicons name="restaurant-outline" size={14} color={colors.text.primary} />
+                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                  {restaurant?.categories?.map(cat => cat.name).join(', ')}
+                </Text>
               </View>
               <View style={styles.infoItem}>
                 <Ionicons name="location-outline" size={14} color={colors.text.primary} />
                 <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                  123 Main Street, Toronto, CA
+                  {restaurant?.location}
                 </Text>
                 <Text style={[typography.bodyMedium, styles.viewMap, { color: colors.text.primary }]}>view map</Text>
               </View>
               <View style={styles.infoItem}>
                 <Ionicons name="time-outline" size={14} color={colors.text.primary} />
                 <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                  Monday-Friday: 11 AM - 9 PM, Saturday-Sunday: 9 AM - 10 PM
+                  {Object.entries(restaurant?.operating_hours || {})
+                    .map(([day, hours]) => `${day}: ${hours}`)
+                    .join('\n')}
                 </Text>
               </View>
               <View style={styles.infoItem}>
                 <Ionicons name="call-outline" size={14} color={colors.text.primary} />
-                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>1-800-555-1234</Text>
+                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>{restaurant?.telephone}</Text>
               </View>
             </View>
             <Text style={[typography.bodyMedium, styles.description, { color: colors.text.black }]}>
-              Discover the perfect blend of traditional Filipino flavors with a
-              modern twist at The Flavorful Fork. Our menu features innovative
-              dishes that will tantalize your taste buds. From sizzling sisig to
-              mouthwatering adobo, we offer a variety of options to satisfy every
-              craving.
-
+              {restaurant?.description}
             </Text>
 
             <View style={styles.tabViewContainer}>
@@ -267,17 +228,7 @@ export default function DetailScreen() {
           </View>
         </View>
       </AnimatedScrollView>
-
-      <ImageView
-        images={images}
-        imageIndex={0}
-        visible={imageViewerVisible}
-        onRequestClose={handleImageViewerClose}
-        HeaderComponent={({ onClose }) => (
-          <CustomHeader onClose={onClose} />
-        )}
-      />
-
+      
       <Footer style={styles.footer}>
         <LargeButton 
           title="View Cart"
@@ -457,5 +408,18 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    padding: 20,
   },
 });

@@ -67,7 +67,7 @@ export default function HomeScreen({ navigation }) {
   });
 
   const handleDetail = (restaurant) => {
-    navigation.navigate("Detail", { restaurant });
+    navigation.navigate("Details", { restaurantId: restaurant.id });
   };
 
   const fetchRestaurants = async (filters = {}) => {

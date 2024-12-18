@@ -71,7 +71,7 @@ export default function App() {
               headerBackVisible: false
             }}
           />
-          <Stack.Screen name="Detail" component={DetailScreen} />
+          <Stack.Screen name="Details" component={DetailScreen} />
           <Stack.Screen name="Checkout" component={CheckoutScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />

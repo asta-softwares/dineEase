@@ -4,7 +4,11 @@ import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } 
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 
-const MenuItem = ({ name, price, imageUrl }) => {
+const MenuItem = ({ name, cost, description, images }) => {
+  const imageUrl = images && images.length > 0 
+    ? images[0].image 
+    : 'https://via.placeholder.com/400';
+
   return (
     <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
       <Image 
@@ -14,7 +18,8 @@ const MenuItem = ({ name, price, imageUrl }) => {
       />
       <View style={styles.textContainer}>
         <Text style={[typography.labelLarge, styles.name]}>{name}</Text>
-        <Text style={[typography.bodyMedium, styles.price]}>{price}</Text>
+        <Text style={[typography.bodySmall, styles.description]} numberOfLines={2}>{description}</Text>
+        <Text style={[typography.bodyMedium, styles.price]}>${cost}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -22,8 +27,15 @@ const MenuItem = ({ name, price, imageUrl }) => {
 
 MenuItem.propTypes = {
   name: PropTypes.string.isRequired,
-  price: PropTypes.string.isRequired,
-  imageUrl: PropTypes.string.isRequired,
+  cost: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  images: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      image: PropTypes.string,
+      caption: PropTypes.string,
+    })
+  ),
 };
 
 const MenuItems = ({ items }) => {
@@ -31,12 +43,13 @@ const MenuItems = ({ items }) => {
 
   return (
     <View style={styles.container}>
-      {items.map((item, index) => (
+      {items.map((item) => (
         <MenuItem
-          key={index}
+          key={item.id}
           name={item.name}
-          price={item.price}
-          imageUrl={item.imageUrl}
+          cost={item.cost}
+          description={item.description}
+          images={item.images}
         />
       ))}
     </View>
@@ -46,9 +59,11 @@ const MenuItems = ({ items }) => {
 MenuItems.propTypes = {
   items: PropTypes.arrayOf(
     PropTypes.shape({
+      id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
-      price: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string.isRequired,
+      cost: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      images: PropTypes.array,
     })
   ).isRequired,
 };
@@ -78,6 +93,10 @@ const styles = StyleSheet.create({
   },
   name: {
     color: colors.text.primary,
+    marginBottom: 4,
+  },
+  description: {
+    color: colors.text.secondary,
     marginBottom: 4,
   },
   price: {
