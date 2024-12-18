@@ -84,6 +84,15 @@ const authService = {
     }
   },
 
+  updateUser: async (userData) => {
+    try {
+      const response = await apiClient.patch('/update-user/', userData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   logout: async () => {
     const authToken = useUserStore.getState().authToken;
     if (!authToken) {

@@ -17,6 +17,7 @@ import HomeScreen from './app/Home';
 import LoginScreen from './app/Login';
 import SplashScreen from './app/SplashScreen';
 import ProfileScreen from './app/Profile';
+import EditProfileScreen from './app/EditProfile';
 import { colors } from './styles/colors';
 
 // Initialize reanimated
@@ -73,6 +74,7 @@ export default function App() {
           <Stack.Screen name="Detail" component={DetailScreen} />
           <Stack.Screen name="Checkout" component={CheckoutScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
