@@ -28,6 +28,7 @@ import Animated, {
   useAnimatedStyle,
   interpolate,
   withTiming,
+  withSpring,
 } from 'react-native-reanimated';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
@@ -66,7 +67,12 @@ export default function DetailScreen() {
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
+      'worklet';
+      scrollY.value = withSpring(event.contentOffset.y, {
+        damping: 20,
+        stiffness: 90,
+        mass: 0.5,
+      });
     },
   });
 
@@ -165,6 +171,8 @@ export default function DetailScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ width: '100%' }}
         style={{ width: '100%' }}
+        bounces={false}
+        overScrollMode="never"
       >
         <View style={{ width: '100%', flex: 1 }}>
           <View style={{ width: '100%' }}>
