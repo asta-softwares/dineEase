@@ -61,7 +61,7 @@ export const restaurantService = {
     }
   },
 
-  getRestaurantsByFilter: async ({ serviceType, categoryId }) => {
+  getRestaurantsByFilter: async ({ serviceType, categoryId, searchQuery }) => {
     try {
       const params = {};
       
@@ -71,6 +71,10 @@ export const restaurantService = {
       
       if (categoryId) {
         params.categories = categoryId;
+      }
+
+      if (searchQuery) {
+        params.name = searchQuery;
       }
 
       const response = await apiClient.get('/restaurants/', { params });

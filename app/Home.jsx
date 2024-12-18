@@ -43,6 +43,8 @@ export default function HomeScreen({ navigation }) {
   const [restaurants, setRestaurants] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const searchHeight = scrollY.interpolate({
@@ -73,7 +75,8 @@ export default function HomeScreen({ navigation }) {
       const serviceType = isDineIn ? 'dine-in' : 'takeout';
       const response = await restaurantService.getRestaurantsByFilter({
         serviceType,
-        categoryId: filters.categoryId
+        categoryId: filters.categoryId,
+        searchQuery: filters.searchQuery
       });
       setRestaurants(response);
     } catch (error) {
@@ -115,6 +118,21 @@ export default function HomeScreen({ navigation }) {
 
   const handleProfilePress = () => {
     navigation.navigate('Profile');
+  };
+
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+    setIsSearching(!!text);
+    fetchRestaurants({ 
+      categoryId: selectedCategory,
+      searchQuery: text 
+    });
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setIsSearching(false);
+    fetchRestaurants({ categoryId: selectedCategory });
   };
 
   useEffect(() => {
@@ -208,13 +226,24 @@ export default function HomeScreen({ navigation }) {
                 style={styles.searchInput}
                 placeholder="Search for restaurants"
                 placeholderTextColor={colors.secondary}
+                value={searchQuery}
+                onChangeText={handleSearch}
               />
-              <Ionicons
-                name="search"
-                size={15}
-                color={colors.secondary}
-                style={styles.searchIcon}
-              />
+              {searchQuery ? (
+                <TouchableOpacity 
+                  style={styles.clearButton} 
+                  onPress={handleClearSearch}
+                >
+                  <Ionicons name="close-circle" size={20} color={colors.text.secondary} />
+                </TouchableOpacity>
+              ) : (
+                <Ionicons
+                  name="search"
+                  size={15}
+                  color={colors.secondary}
+                  style={styles.searchIcon}
+                />
+              )}
             </Animated.View>
           </Animated.View>
 
@@ -229,100 +258,104 @@ export default function HomeScreen({ navigation }) {
             scrollEventThrottle={16}
           >
             <View style={styles.scrollContent}>
-              <View style={styles.switchContainer}>
-                <TouchableOpacity 
-                  style={isDineIn ? styles.switchButtonActive : styles.switchButton}
-                  onPress={() => handleModeSwitch(true)}
-                >
-                  <Text style={[{ 
-                    fontFamily: 'PlusJakartaSans-Medium',
-                    fontSize: 14,
-                    color: isDineIn ? colors.text.white : colors.text.primary 
+              {!isSearching && (
+                <>
+                  <View style={styles.switchContainer}>
+                    <TouchableOpacity 
+                      style={isDineIn ? styles.switchButtonActive : styles.switchButton}
+                      onPress={() => handleModeSwitch(true)}
+                    >
+                      <Text style={[{ 
+                        fontFamily: 'PlusJakartaSans-Medium',
+                        fontSize: 14,
+                        color: isDineIn ? colors.text.white : colors.text.primary 
+                      }]}>
+                        Dine In
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={!isDineIn ? styles.switchButtonActive : styles.switchButton}
+                      onPress={() => handleModeSwitch(false)}
+                    >
+                      <Text style={[{ 
+                        fontFamily: 'PlusJakartaSans-Medium',
+                        fontSize: 14,
+                        color: !isDineIn ? colors.text.white : colors.text.primary 
+                      }]}>
+                        Take Out
+                      </Text>
+                    </TouchableOpacity>
+                  </View> 
+                   <Text style={[{
+                    fontFamily: 'PlusJakartaSans-Bold',
+                    fontSize: 20,
+                    color: colors.text.primary,
+                    marginHorizontal: layout.spacing.md,
+                    marginBottom: layout.spacing.sm
                   }]}>
-                    Dine In
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={!isDineIn ? styles.switchButtonActive : styles.switchButton}
-                  onPress={() => handleModeSwitch(false)}
-                >
-                  <Text style={[{ 
-                    fontFamily: 'PlusJakartaSans-Medium',
-                    fontSize: 14,
-                    color: !isDineIn ? colors.text.white : colors.text.primary 
-                  }]}>
-                    Take Out
-                  </Text>
-                </TouchableOpacity>
-              </View> 
-               <Text style={[{
-                fontFamily: 'PlusJakartaSans-Bold',
-                fontSize: 20,
-                color: colors.text.primary,
-                marginHorizontal: layout.spacing.md,
-                marginBottom: layout.spacing.sm
-              }]}>
-                FEATURED OFFERS
-              </Text> 
-               <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.featuresContainer}
-                contentContainerStyle={styles.featuresContentContainer}
-              >
-                <View style={styles.featureCardWrapper}>
-                  <FeatureCard
-                    title="11 best microbreweriesfor beer lovers"
-                    description="Free delivery on orders over $30"
-                    imageUrl="https://images.squarespace-cdn.com/content/v1/58e705a1ebbd1a4ffd5b30c7/1498183161728-JE354SHTNX7RV6KHSO8J/drink.jpg?format=2500w"
-                    price="$ x"
-                  />
-                </View>
-                <View style={styles.featureCardWrapper}>
-                  <FeatureCard
-                    title="6 delicious Pan-Asian outlets"
-                    description="Free delivery on orders over $30"
-                    imageUrl="https://www.recipesbynora.com/wp-content/uploads/2023/10/Siomai-with-Pork-and-Shrimp-featured-image.jpg"
-                    price="$ 120"
-                  />
-                </View>
-                <View style={styles.featureCardWrapper}>
-                  <FeatureCard
-                    title="Happy Hour"
-                    description="50% off drinks from 4-6 PM"
-                    imageUrl="https://www.acapulcorestaurants.com/wp-content/uploads/2020/05/happy-hour-min.jpg"
-                    price="$ 400"
-                  />
-                </View>
-              </ScrollView> 
+                    FEATURED OFFERS
+                  </Text> 
+                   <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.featuresContainer}
+                    contentContainerStyle={styles.featuresContentContainer}
+                  >
+                    <View style={styles.featureCardWrapper}>
+                      <FeatureCard
+                        title="11 best microbreweriesfor beer lovers"
+                        description="Free delivery on orders over $30"
+                        imageUrl="https://images.squarespace-cdn.com/content/v1/58e705a1ebbd1a4ffd5b30c7/1498183161728-JE354SHTNX7RV6KHSO8J/drink.jpg?format=2500w"
+                        price="$ x"
+                      />
+                    </View>
+                    <View style={styles.featureCardWrapper}>
+                      <FeatureCard
+                        title="6 delicious Pan-Asian outlets"
+                        description="Free delivery on orders over $30"
+                        imageUrl="https://www.recipesbynora.com/wp-content/uploads/2023/10/Siomai-with-Pork-and-Shrimp-featured-image.jpg"
+                        price="$ 120"
+                      />
+                    </View>
+                    <View style={styles.featureCardWrapper}>
+                      <FeatureCard
+                        title="Happy Hour"
+                        description="50% off drinks from 4-6 PM"
+                        imageUrl="https://www.acapulcorestaurants.com/wp-content/uploads/2020/05/happy-hour-min.jpg"
+                        price="$ 400"
+                      />
+                    </View>
+                  </ScrollView> 
 
-              <Text style={[{
-                fontFamily: 'PlusJakartaSans-Bold',
-                fontSize: 20,
-                color: colors.text.primary,
-                marginHorizontal: layout.spacing.md,
-                marginBottom: layout.spacing.sm
-              }]}>
-                EXPLORE CRAVINGS
-              </Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.cuisinesContainer}
-                contentContainerStyle={styles.cuisinesContentContainer}
-              >
-                {categories.map((category) => (
-                  <View key={category.id} style={styles.cuisinesCardWrapper}>
-                    <CuisinesCard
-                      name={category.name}
-                      imageUrl={{ uri: category.image }}
-                      description={category.description}
-                      onPress={() => handleCategoryPress(category)}
-                      isSelected={selectedCategory === category.id}
-                    />
-                  </View>
-                ))}
-              </ScrollView>
+                  <Text style={[{
+                    fontFamily: 'PlusJakartaSans-Bold',
+                    fontSize: 20,
+                    color: colors.text.primary,
+                    marginHorizontal: layout.spacing.md,
+                    marginBottom: layout.spacing.sm
+                  }]}>
+                    EXPLORE CRAVINGS
+                  </Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.cuisinesContainer}
+                    contentContainerStyle={styles.cuisinesContentContainer}
+                  >
+                    {categories.map((category) => (
+                      <View key={category.id} style={styles.cuisinesCardWrapper}>
+                        <CuisinesCard
+                          name={category.name}
+                          imageUrl={{ uri: category.image }}
+                          description={category.description}
+                          onPress={() => handleCategoryPress(category)}
+                          isSelected={selectedCategory === category.id}
+                        />
+                      </View>
+                    ))}
+                  </ScrollView>
+                </>
+              )}
 
               <Text style={[{
                 fontFamily: 'PlusJakartaSans-Bold',
@@ -396,7 +429,6 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   searchContainer: {
-    height: 50,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.light,
@@ -415,6 +447,9 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     marginRight: layout.spacing.sm,
+  },
+  clearButton: {
+    padding: layout.spacing.xs,
   },
   switchContainer: {
     flexDirection: 'row',
