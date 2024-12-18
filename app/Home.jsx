@@ -111,11 +111,25 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const allCategories = await restaurantService.getRestaurantsCategory();
+      setCategories(allCategories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
+      // Apply current filters when refreshing
       await Promise.all([
-        fetchRestaurants(),
+        fetchRestaurants({
+          categoryId: selectedCategory,
+          searchQuery: searchQuery
+        }),
+        fetchCategories(),
         fetchPromos()
       ]);
     } catch (error) {
@@ -127,7 +141,19 @@ export default function HomeScreen({ navigation }) {
     } finally {
       setRefreshing(false);
     }
-  }, [isDineIn, selectedCategory]);
+  }, [isDineIn, selectedCategory, searchQuery]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await fetchCategories();
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     fetchRestaurants();
@@ -214,21 +240,6 @@ export default function HomeScreen({ navigation }) {
 
     return () => backHandler.remove();
   }, [navigation]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [allCategories] = await Promise.all([
-          restaurantService.getRestaurantsCategory()
-        ]);
-        setCategories(allCategories);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   if (!fontsLoaded) {
     return null;
