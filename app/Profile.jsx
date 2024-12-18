@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Image, Alert, Linking } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import TopNav from '../Components/TopNav';
 import LargeButton from '../Components/Buttons/LargeButton';
@@ -75,12 +75,51 @@ const ProfileScreen = () => {
         navigation.navigate('EditProfile', { user });
     };
 
+    const handleOpenURL = async (url) => {
+        try {
+            const supported = await Linking.canOpenURL(url);
+            
+            if (supported) {
+                await Linking.openURL(url);
+            } else {
+                Alert.alert(
+                    'Error',
+                    'Cannot open the link. Please try again later.'
+                );
+            }
+        } catch (error) {
+            console.error('Error opening URL:', error);
+            Alert.alert(
+                'Error',
+                'Something went wrong. Please try again later.'
+            );
+        }
+    };
+
+    const handleMenuItemPress = async (label) => {
+        switch (label) {
+            case 'Help / Contact Us':
+                await handleOpenURL('https://www.dineease.ca/partners');
+                break;
+            case 'About':
+                await handleOpenURL('https://www.dineease.ca/');
+                break;
+            case 'Orders':
+                navigation.navigate('Orders');
+                break;
+            case 'Partnership':
+                await handleOpenURL('https://www.dineease.ca/partners');
+                break;
+            // Add other cases as needed
+        }
+    };
+
     const menuItems = [
+        { icon: 'time-outline', label: 'Orders' },
         // { icon: 'gift-outline', label: 'Offers' },
         { icon: 'help-circle-outline', label: 'Help / Contact Us' },
         { icon: 'people-outline', label: 'Partnership' },
-        { icon: 'information-circle-outline', label: 'About' },
-        { icon: 'time-outline', label: 'Orders' },
+        // { icon: 'information-circle-outline', label: 'About' },
     ];
 
     return (
@@ -121,7 +160,11 @@ const ProfileScreen = () => {
                     <View style={styles.menuSection}>
                         <Text style={[typography.bodyLarge, styles.sectionTitle]}>Menu</Text>
                         {menuItems.map((item, index) => (
-                            <TouchableOpacity key={index} style={styles.menuItem}>
+                            <TouchableOpacity 
+                                key={index} 
+                                style={styles.menuItem}
+                                onPress={() => handleMenuItemPress(item.label)}
+                            >
                                 <View style={styles.iconContainer}>
                                     <Ionicons name={item.icon} size={24} color={colors.text.secondary} />
                                 </View>
