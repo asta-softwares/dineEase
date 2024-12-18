@@ -5,7 +5,7 @@ export const colors = {
     white: '#FFFFFF',
     background: '#FFFFFF',
     light: '#F5F5F5',
-    rating: '#FFD363',
+    rating: '#EFBF04',
     text: {
       primary: '#F29057',
       secondary: '#888888',

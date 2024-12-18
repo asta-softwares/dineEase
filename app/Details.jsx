@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Image,
   ScrollView,
@@ -51,7 +51,9 @@ export default function DetailScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { restaurantId } = route.params;
+  const { width } = useWindowDimensions();
   const scrollY = useSharedValue(0);
+  
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [index, setIndex] = useState(0);
@@ -61,7 +63,37 @@ export default function DetailScreen() {
   const [routes] = useState([
     { key: 'menu', title: 'Menu' },
   ]);
-  const { width } = useWindowDimensions();
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const imageStyle = useAnimatedStyle(() => {
+    const height = interpolate(
+      scrollY.value,
+      [-200, 0, 200],
+      [452, 252, 252],
+      { extrapolate: 'clamp' }
+    );
+
+    return {
+      height,
+    };
+  });
+
+  const handleGoBack = () => {
+    navigation.goBack();
+  };
+
+  const handleCheckout = () => {
+    navigation.navigate("Checkout");
+  };
+
+  const handleImageViewerClose = () => {
+    setImageViewerVisible(false);
+  };
 
   useEffect(() => {
     fetchRestaurantDetails();
@@ -95,23 +127,11 @@ export default function DetailScreen() {
     );
   }
 
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
-
-  const handleCheckout = () => {
-    navigation.navigate("Checkout");
-  };
-
   const images = [
     {
       uri: "https://s3-alpha-sig.figma.com/img/20fc/e656/8ae7b68095a4d524fbca4ccea6841645?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=DTbgg-21pPIWn9tGhAkaJGMKxy7l3gO8FzhR3szV1d349RSkaJCTW9SqpT1aAHL34weL53QaADuxnD1DgAqEqmLhHJytGI9I6z~BEJSofaWkJxva53nIAaSZa5odGsQpsAlWVVnEm9neDihqdormNgSRmdgWz1g0dSY1EVYL6XXjKUUdQ0ILm53LELAkLw4qF2OTQLOXQq6szLD6iwiZJqFgQuoeB5V9jQ5hrucsrKfgof382~R6Qtjo14dbne0nE-Y4BxODnppMI84o7thkQ-jUB1i-k~Ojs7eEoKimMBKjZJ9mdOmxoKnkot8QSExAxpVQYNTjVwhH-AjBPqVZVA__",
     },
   ];
-
-  const handleImageViewerClose = () => {
-    setImageViewerVisible(false);
-  };
 
   const renderScene = ({ route }) => {
     if (route.key === 'menu') {
@@ -135,101 +155,100 @@ export default function DetailScreen() {
     />
   );
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
-  const imageStyle = useAnimatedStyle(() => {
-    const height = interpolate(
-      scrollY.value,
-      [-200, 0, 200],
-      [452, 252, 252],
-      { extrapolate: 'clamp' }
-    );
-
-    return {
-      height,
-    };
-  });
-
   return (
     <View style={styles.container}>
-      <TopNav handleGoBack={handleGoBack} scrollY={scrollY} />
+      <TopNav title={restaurant?.name} handleGoBack={handleGoBack} scrollY={scrollY} />
       
       <AnimatedScrollView
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ width: '100%' }}
+        style={{ width: '100%' }}
       >
-        <View>
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => setImageViewerVisible(true)}
-          >
-            <Animated.Image
-              source={{
-                uri: restaurant?.image || 'https://via.placeholder.com/400',
-              }}
-              style={[styles.image, imageStyle]}
-              resizeMode="cover"
-            />
-          </TouchableOpacity>
-          <View style={styles.content}>
-            <View style={styles.header}>
-              <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>{restaurant?.name}</Text>
-              <View style={styles.rating}>
-                <Ionicons name="star" size={14} color={colors.text.white} />
-                <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>{restaurant?.ratings}</Text>
-              </View>
-            </View>
-            <View style={styles.infoContainer}>
-              <View style={styles.infoItem}>
-                <Ionicons name="restaurant-outline" size={14} color={colors.text.primary} />
-                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                  {restaurant?.categories?.map(cat => cat.name).join(', ')}
-                </Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Ionicons name="location-outline" size={14} color={colors.text.primary} />
-                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                  {restaurant?.location}
-                </Text>
-                <Text style={[typography.bodyMedium, styles.viewMap, { color: colors.text.primary }]}>view map</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Ionicons name="time-outline" size={14} color={colors.text.primary} />
-                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                  {Object.entries(restaurant?.operating_hours || {})
-                    .map(([day, hours]) => `${day}: ${hours}`)
-                    .join('\n')}
-                </Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Ionicons name="call-outline" size={14} color={colors.text.primary} />
-                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>{restaurant?.telephone}</Text>
-              </View>
-            </View>
-            <Text style={[typography.bodyMedium, styles.description, { color: colors.text.black }]}>
-              {restaurant?.description}
-            </Text>
-
-            <View style={styles.tabViewContainer}>
-              <TabView
-                navigationState={{ index, routes }}
-                renderScene={renderScene}
-                renderTabBar={renderTabBar}
-                onIndexChange={setIndex}
-                initialLayout={{ width }}
-                style={styles.tabView}
+        <View style={{ width: '100%', flex: 1 }}>
+          <View style={{ width: '100%' }}>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => setImageViewerVisible(true)}
+            >
+              <Animated.Image
+                source={{
+                  uri: restaurant?.image || 'https://via.placeholder.com/400',
+                }}
+                style={[styles.image, imageStyle]}
+                resizeMode="cover"
               />
-            </View> 
+            </TouchableOpacity>
+            <View style={[styles.content, { backgroundColor: colors.background, width: '100%' }]}>
+              <View style={[styles.header, { backgroundColor: colors.background }]}>
+                <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>{restaurant?.name}</Text>
+                <View style={[styles.rating, { backgroundColor: colors.rating}]}>
+                  <Ionicons name="star" size={14} color={colors.text.white} />
+                  <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>{restaurant?.ratings}</Text>
+                </View>
+              </View>
+              <View style={styles.infoContainer}>
+                <View style={styles.infoItem}>
+                  <Ionicons name="restaurant-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                  <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                    {restaurant?.categories?.map(cat => cat.name).join(', ')}
+                  </Text>
+                </View>
+                <View style={styles.infoItem}>
+                  <Ionicons name="location-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                  <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                    {restaurant?.location}
+                  </Text>
+                </View>
+                <View style={styles.infoItem}>
+                  <Ionicons name="time-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                  <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                    {Object.entries(restaurant?.operating_hours || {})
+                      .map(([day, hours]) => `${day}: ${hours}`)
+                      .join('\n')}
+                  </Text>
+                </View>
+                <View style={styles.infoItem}>
+                  <Ionicons name="call-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                  <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                    {restaurant?.telephone}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.descriptionContainer}>
+                <Text 
+                  style={[typography.bodyMedium, styles.description, { 
+                    color: colors.text.black, 
+                    width: '100%', 
+                    marginBottom: 10,
+                    textAlign: 'left',
+                    flexShrink: 1,
+                  }]}
+                  numberOfLines={0}
+                  ellipsizeMode="clip"
+                  adjustsFontSizeToFit={false}
+                >
+                  {restaurant?.description}
+                </Text>
+              </View>
+
+              <View style={styles.tabViewContainer}>
+                <TabView
+                  navigationState={{ index, routes }}
+                  renderScene={renderScene}
+                  renderTabBar={renderTabBar}
+                  onIndexChange={setIndex}
+                  initialLayout={{ width }}
+                  style={styles.tabView}
+                />
+              </View> 
+            </View>
           </View>
         </View>
       </AnimatedScrollView>
       
-      <Footer style={styles.footer}>
+      <Footer style={[styles.footer, { backgroundColor: colors.background }]}>
         <LargeButton 
           title="View Cart"
           count={2}
@@ -245,18 +264,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    width: '100%',
   },
   image: {
     width: '100%',
     height: 252,
   },
   content: {
-    backgroundColor: colors.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: -24,
     padding: 20,
     paddingTop: 24,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+    width: '100%',
+    alignSelf: 'stretch',
   },
   customHeaderContainer: {
     position: 'absolute',
@@ -295,7 +324,6 @@ const styles = StyleSheet.create({
   rating: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -309,17 +337,19 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     marginBottom: 16,
+    width: '100%',
   },
   infoItem: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 12,
+    width: '100%',
+  },
+  infoIcon: {
+    marginRight: 12,
+    marginTop: 2,
   },
   infoText: {
-    // fontFamily: "Plus Jakarta Sans",
-    // fontSize: 14,
-    // color: "#1F262C",
-    // marginLeft: 8,
+    flex: 1,
   },
   viewMap: {
     // fontFamily: "Plus Jakarta Sans",
@@ -329,13 +359,20 @@ const styles = StyleSheet.create({
     // textDecorationLine: "underline",
   },
   description: {
-    // fontFamily: "Plus Jakarta Sans",
-    // fontSize: 14,
-    // color: "#1F262C",
-    // lineHeight: 20,
+    width: '100%',
+    marginBottom: 10,
+    flexWrap: 'wrap',
+    alignSelf: 'stretch',
+    textAlign: 'left',
+  },
+  descriptionContainer: {
+    width: '100%',
+    alignSelf: 'stretch',
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   footer: {
-    backgroundColor: colors.background,
     padding: 16,
     borderTopWidth: 1,
     borderTopColor: "rgba(0, 0, 0, 0.1)",
@@ -343,42 +380,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-  },
-  viewCartButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    paddingVertical: 16,
-    marginBottom: 10,
-    width: '100%',
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-  },
-  cartCount: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 16,
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cartCountText: {
-    color: colors.white,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  viewCartText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  priceText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   tabViewContainer: {
     marginVertical: 16,
@@ -388,26 +397,6 @@ const styles = StyleSheet.create({
   tabView: {
     height: '100%',
     pointerEvents: 'box-none',
-  },
-  tabScrollView: {
-    flex: 1,
-  },
-  tabContent: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: colors.background,
-  },
-  tabContentText: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 12,
-    color: colors.text.primary,
-  },
-  menuItemContainer: {
-    gap: 8,
-  },
-  scrollView: {
-    flex: 1,
   },
   loadingContainer: {
     flex: 1,
