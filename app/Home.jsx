@@ -42,6 +42,7 @@ export default function HomeScreen({ navigation }) {
   const [categories, setCategories] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [promos, setPromos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -90,9 +91,31 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  const fetchPromos = async () => {
+    try {
+      const promosData = await restaurantService.getPromos();
+      const promosWithImages = await Promise.all(
+        promosData.map(async (promo) => {
+          const restaurant = await restaurantService.getRestaurantById(promo.restaurant_details.id);
+          return {
+            ...promo,
+            restaurantImage: restaurant.image
+          };
+        })
+      );
+      setPromos(promosWithImages);
+    } catch (error) {
+      console.error('Error fetching promos:', error);
+    }
+  };
+
   useEffect(() => {
     fetchRestaurants();
   }, [isDineIn]); // Refetch when service type changes
+
+  useEffect(() => {
+    fetchPromos();
+  }, []);
 
   const handleCategoryPress = async (category) => {
     try {
@@ -301,30 +324,16 @@ export default function HomeScreen({ navigation }) {
                     style={styles.featuresContainer}
                     contentContainerStyle={styles.featuresContentContainer}
                   >
-                    <View style={styles.featureCardWrapper}>
-                      <FeatureCard
-                        title="11 best microbreweriesfor beer lovers"
-                        description="Free delivery on orders over $30"
-                        imageUrl="https://images.squarespace-cdn.com/content/v1/58e705a1ebbd1a4ffd5b30c7/1498183161728-JE354SHTNX7RV6KHSO8J/drink.jpg?format=2500w"
-                        price="$ x"
-                      />
-                    </View>
-                    <View style={styles.featureCardWrapper}>
-                      <FeatureCard
-                        title="6 delicious Pan-Asian outlets"
-                        description="Free delivery on orders over $30"
-                        imageUrl="https://www.recipesbynora.com/wp-content/uploads/2023/10/Siomai-with-Pork-and-Shrimp-featured-image.jpg"
-                        price="$ 120"
-                      />
-                    </View>
-                    <View style={styles.featureCardWrapper}>
-                      <FeatureCard
-                        title="Happy Hour"
-                        description="50% off drinks from 4-6 PM"
-                        imageUrl="https://www.acapulcorestaurants.com/wp-content/uploads/2020/05/happy-hour-min.jpg"
-                        price="$ 400"
-                      />
-                    </View>
+                    {promos.map((promo) => (
+                      <View key={promo.id} style={styles.featureCardWrapper}>
+                        <FeatureCard
+                          title={promo.name}
+                          description={promo.description}
+                          imageUrl={promo.restaurantImage}
+                          price={promo.discount_type === 'percentage' ? `${promo.discount}% off` : `$${promo.discount}`}
+                        />
+                      </View>
+                    ))}
                   </ScrollView> 
 
                   <Text style={[{

@@ -27,7 +27,7 @@ const RestaurantCard = ({
         <View style={styles.nameAndPriceContainer}>
           <Text style={[typography.labelLarge, styles.restaurantName]} numberOfLines={1}>{name}</Text>
           {price && (
-            <Text style={[typography.bodyMedium, styles.restaurantPrice]}>{price} / per person</Text>
+            <Text style={[typography.bodyMedium, styles.restaurantPrice]}>{price} </Text>
           )}
         </View>
         <View style={styles.addressContainer}>
@@ -40,7 +40,7 @@ const RestaurantCard = ({
 
 RestaurantCard.propTypes = {
   name: PropTypes.string.isRequired,
-  rating: PropTypes.string.isRequired,
+  rating: PropTypes.number.isRequired,
   address: PropTypes.string.isRequired,
   imageUrl: PropTypes.string.isRequired,
   price: PropTypes.string,

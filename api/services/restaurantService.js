@@ -83,4 +83,14 @@ export const restaurantService = {
       throw error;
     }
   },
+
+  getPromos: async () => {
+    try {
+      const response = await apiClient.get('/promos/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching promos:', error);
+      throw error;
+    }
+  },
 };

@@ -11,7 +11,7 @@ const FeatureCard = ({ title, description, imageUrl, price }) => {
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.description}>{description}</Text>
         </View>
-        <Text style={styles.price}>{price} / per person</Text>
+        <Text style={styles.price}>{price}</Text>
       </View>
     </View>
   );
