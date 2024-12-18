@@ -1,28 +1,27 @@
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import TopNav from '../Components/TopNav';
+import { colors } from '../styles/colors';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
 import {
   Image,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
-  View,
 } from "react-native";
-import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import Footer from './Layout/Footer';
 import LargeButton from '../Components/Buttons/LargeButton';
-import TopNav from '../Components/TopNav';
 
-export default function CheckoutScreen() {
-  const navigation = useNavigation();
-  const scrollY = useSharedValue(0);
-
+const CheckoutScreen = ({ navigation }) => {
   const handleGoBack = () => {
     navigation.goBack();
   };
+
+  const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -32,10 +31,12 @@ export default function CheckoutScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.topNav}>
-        <TopNav title="Cart" onBackPress={handleGoBack} scrollY={scrollY} />
-      </View>
-      
+      <TopNav 
+        handleGoBack={handleGoBack} 
+        title="Checkout" 
+        variant="solid" 
+        scrollY={scrollY}
+      />
       <Animated.ScrollView 
         style={styles.content}
         onScroll={scrollHandler}
@@ -132,12 +133,14 @@ export default function CheckoutScreen() {
         <LargeButton 
           title="Pay Now"
           price="25.00"
-          onPress={() => navigation.navigate('Payment')}
+          onPress={() => navigation.navigate('Home')}
         />
       </Footer>
     </View>
   );
-}
+};
+
+export default CheckoutScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -150,25 +153,6 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 32,
-  },
-  topNav: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    paddingTop: 60,
-  },
-  backButton: {
-    padding: 8,
-  },
-  topBarTitle: {
-    fontFamily: "Plus Jakarta Sans",
-    fontSize: 18,
-    fontWeight: '500',
-    color: "#1F262C",
-  },
-  placeholder: {
-    width: 40,
   },
   restaurantCard: {
     flexDirection: "row",
@@ -215,11 +199,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 14,
-  },
-  footer: {
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.background,
   },
 });

@@ -39,9 +39,9 @@ export const restaurantService = {
     }
   },
 
-  getRestaurantsByCategory: async (category) => {
+  getRestaurantsCategory: async (category) => {
     try {
-      const response = await apiClient.get('/restaurants/category', {
+      const response = await apiClient.get('/restaurant-categories', {
         params: { category }
       });
       return response.data;

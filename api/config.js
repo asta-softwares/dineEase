@@ -1,12 +1,11 @@
+import { Platform } from 'react-native';
+
+const API_URL = 'https://partners.dineease.ca/api';  
+
 // API Configuration
 const config = {
-  // Base URL for API
-  BASE_URL: 'http://18.118.18.181/api',
-  
-  // Request timeout in milliseconds
+  BASE_URL: API_URL,
   TIMEOUT: 10000,
-  
-  // Headers
   HEADERS: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

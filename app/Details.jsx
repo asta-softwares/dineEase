@@ -8,8 +8,9 @@ import {
   Text,
   TouchableOpacity,
   View,
-  useWindowDimensions
+  useWindowDimensions,
 } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ImageView from "react-native-image-viewing";
 import { TabBar, TabView } from 'react-native-tab-view';
 import TopNav from "../Components/TopNav";
@@ -27,17 +28,21 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
+
 const CustomHeader = ({ onClose }) => (
-  <View style={[styles.topNav, { backgroundColor: "transparent" }]}>
-    <TouchableOpacity
-      style={styles.backButton}
-      onPress={onClose}
-      activeOpacity={0.7}
-    >
-      <Ionicons name="close" size={24} color="#FFFFFF" />
-    </TouchableOpacity>
-    <View style={styles.placeholder} />
-  </View>
+  <SafeAreaView edges={['top']} style={styles.customHeaderContainer}>
+    <View style={styles.customHeader}>
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={onClose}
+        activeOpacity={0.7}
+      >
+        <Ionicons name="close" size={24} color="#FFFFFF" />
+      </TouchableOpacity>
+      <View style={styles.placeholder} />
+    </View>
+  </SafeAreaView>
 );
 
 export default function DetailScreen() {
@@ -191,71 +196,89 @@ export default function DetailScreen() {
     <View style={styles.container}>
       <TopNav handleGoBack={handleGoBack} scrollY={scrollY} />
       
-      <Animated.Image
-        source={{
-          uri: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg",
-        }}
-        style={[styles.headerImage, imageStyle]}
-      />
-
-      <Animated.ScrollView
+      <AnimatedScrollView
         onScroll={scrollHandler}
         scrollEventThrottle={16}
-        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>The Flavorful Fork</Text>
-            <View style={styles.rating}>
-              <Ionicons name="star" size={14} color={colors.text.white} />
-              <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>4.5</Text>
-            </View>
-          </View>
-          <View style={styles.infoContainer}>
-            <View style={styles.infoItem}>
-              <Ionicons name="restaurant-outline" size={14} color={colors.text.primary}  />
-              <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>Filipino-Fusion</Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Ionicons name="location-outline" size={14} color={colors.text.primary} />
-              <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                123 Main Street, Toronto, CA
-              </Text>
-              <Text style={[typography.bodyMedium, styles.viewMap, { color: colors.text.primary }]}>view map</Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Ionicons name="time-outline" size={14} color={colors.text.primary} />
-              <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                Monday-Friday: 11 AM - 9 PM, Saturday-Sunday: 9 AM - 10 PM
-              </Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Ionicons name="call-outline" size={14} color={colors.text.primary} />
-              <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>1-800-555-1234</Text>
-            </View>
-          </View>
-          <Text style={[typography.bodyMedium, styles.description, { color: colors.text.black }]}>
-            Discover the perfect blend of traditional Filipino flavors with a
-            modern twist at The Flavorful Fork. Our menu features innovative
-            dishes that will tantalize your taste buds. From sizzling sisig to
-            mouthwatering adobo, we offer a variety of options to satisfy every
-            craving.
-
-          </Text>
-
-          <View style={styles.tabViewContainer}>
-            <TabView
-              navigationState={{ index, routes }}
-              renderScene={renderScene}
-              renderTabBar={renderTabBar}
-              onIndexChange={setIndex}
-              initialLayout={{ width }}
-              style={styles.tabView}
+        <View>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setImageViewerVisible(true)}
+          >
+            <Animated.Image
+              source={{
+                uri: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg",
+              }}
+              style={[styles.image, imageStyle]}
+              resizeMode="cover"
             />
-          </View> 
+          </TouchableOpacity>
+          <View style={styles.content}>
+            <View style={styles.header}>
+              <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>The Flavorful Fork</Text>
+              <View style={styles.rating}>
+                <Ionicons name="star" size={14} color={colors.text.white} />
+                <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>4.5</Text>
+              </View>
+            </View>
+            <View style={styles.infoContainer}>
+              <View style={styles.infoItem}>
+                <Ionicons name="restaurant-outline" size={14} color={colors.text.primary}  />
+                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>Filipino-Fusion</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Ionicons name="location-outline" size={14} color={colors.text.primary} />
+                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                  123 Main Street, Toronto, CA
+                </Text>
+                <Text style={[typography.bodyMedium, styles.viewMap, { color: colors.text.primary }]}>view map</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Ionicons name="time-outline" size={14} color={colors.text.primary} />
+                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                  Monday-Friday: 11 AM - 9 PM, Saturday-Sunday: 9 AM - 10 PM
+                </Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Ionicons name="call-outline" size={14} color={colors.text.primary} />
+                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>1-800-555-1234</Text>
+              </View>
+            </View>
+            <Text style={[typography.bodyMedium, styles.description, { color: colors.text.black }]}>
+              Discover the perfect blend of traditional Filipino flavors with a
+              modern twist at The Flavorful Fork. Our menu features innovative
+              dishes that will tantalize your taste buds. From sizzling sisig to
+              mouthwatering adobo, we offer a variety of options to satisfy every
+              craving.
+
+            </Text>
+
+            <View style={styles.tabViewContainer}>
+              <TabView
+                navigationState={{ index, routes }}
+                renderScene={renderScene}
+                renderTabBar={renderTabBar}
+                onIndexChange={setIndex}
+                initialLayout={{ width }}
+                style={styles.tabView}
+              />
+            </View> 
+          </View>
         </View>
-      </Animated.ScrollView>
-      <Footer>
+      </AnimatedScrollView>
+
+      <ImageView
+        images={images}
+        imageIndex={0}
+        visible={imageViewerVisible}
+        onRequestClose={handleImageViewerClose}
+        HeaderComponent={({ onClose }) => (
+          <CustomHeader onClose={onClose} />
+        )}
+      />
+
+      <Footer style={styles.footer}>
         <LargeButton 
           title="View Cart"
           count={2}
@@ -272,38 +295,39 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  topNav: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  image: {
+    width: '100%',
+    height: 252,
+  },
+  content: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    marginTop: -24,
     padding: 20,
-    paddingTop: 60,
-    position: "absolute",
+    paddingTop: 24,
+  },
+  customHeaderContainer: {
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     zIndex: 1,
+    backgroundColor: 'transparent',
   },
-  backButton: {
+  customHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+  },
+  closeButton: {
     padding: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   placeholder: {
     width: 40,
-  },
-  headerImage: {
-    width: "100%",
-    height: 252,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-  },
-  content: {
-    marginTop: 252,
-    padding: 20,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",

@@ -14,14 +14,23 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.DineEase",
-      "icon": "./assets/logo.png"
+      "icon": "./assets/logo.png",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#F29057"
       },
-      "package": "com.anonymous.DineEase"
+      "package": "com.anonymous.DineEase",
+      "permissions": ["INTERNET"],
+      "networkSecurityConfig": {
+        "cleartextTrafficPermitted": true
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

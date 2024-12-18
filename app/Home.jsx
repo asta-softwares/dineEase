@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,9 +12,11 @@ import {
   StatusBar,
   SafeAreaView,
   Platform,
+  BackHandler,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useNavigationState } from "@react-navigation/native";
 import { useFonts } from 'expo-font';
 import { PlusJakartaSans_400Regular, PlusJakartaSans_500Medium, PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans';
 import CuisinesCard from "../Components/CuisinesCard";
@@ -24,8 +26,9 @@ import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import { layout } from '../styles/layout';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { restaurantService } from '../api/services/restaurantService';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
     'PlusJakartaSans-Regular': PlusJakartaSans_400Regular,
     'PlusJakartaSans-Medium': PlusJakartaSans_500Medium,
@@ -34,8 +37,10 @@ export default function HomeScreen() {
   });
 
   const { width } = useWindowDimensions();
-  const navigation = useNavigation();
   const [isDineIn, setIsDineIn] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const searchHeight = scrollY.interpolate({
@@ -56,8 +61,8 @@ export default function HomeScreen() {
     extrapolate: 'clamp'
   });
 
-  const handleDetail = () => {
-    navigation.navigate("Detail");
+  const handleDetail = (restaurant) => {
+    navigation.navigate("Detail", { restaurant });
   };
   const handleModeSwitch = (isDineInMode = false) => {
     setIsDineIn(isDineInMode);
@@ -65,6 +70,70 @@ export default function HomeScreen() {
 
   const handleProfilePress = () => {
     navigation.navigate('Profile');
+  };
+
+  useEffect(() => {
+    // Prevent going back to login only on Home screen
+    navigation.setOptions({
+      headerLeft: () => null,
+      gestureEnabled: false,
+    });
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Get current route name
+      const currentRoute = navigation.getState().routes[navigation.getState().index];
+      
+      // Only handle back press if we're on the Home screen
+      if (currentRoute.name === 'Home') {
+        Alert.alert(
+          'Exit App',
+          'Do you want to exit the app?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => null,
+              style: 'cancel',
+            },
+            {
+              text: 'Exit',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ],
+          { cancelable: false }
+        );
+        return true; // Prevent default behavior
+      }
+      return false; // Allow default back behavior on other screens
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [allRestaurants, allCategories] = await Promise.all([
+          restaurantService.getAllRestaurants(),
+          restaurantService.getRestaurantsCategory()
+        ]);
+        setRestaurants(allRestaurants);
+        setCategories(allCategories);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleCuisinePress = async (category) => {
+    try {
+      setSelectedCategory(category.id);
+      const categoryRestaurants = await restaurantService.getRestaurantsCategory(category.id);
+      setRestaurants(categoryRestaurants);
+    } catch (error) {
+      console.error('Error fetching restaurants by category:', error);
+    }
   };
 
   if (!fontsLoaded) {
@@ -153,7 +222,7 @@ export default function HomeScreen() {
                   </Text>
                 </TouchableOpacity>
               </View>
-              <Text style={[{
+              {/* <Text style={[{
                 fontFamily: 'PlusJakartaSans-Bold',
                 fontSize: 20,
                 color: colors.text.primary,
@@ -161,8 +230,8 @@ export default function HomeScreen() {
                 marginBottom: layout.spacing.sm
               }]}>
                 FEATURED OFFERS
-              </Text>
-              <ScrollView
+              </Text> */}
+              {/* <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={styles.featuresContainer}
@@ -192,7 +261,7 @@ export default function HomeScreen() {
                     price="$ 400"
                   />
                 </View>
-              </ScrollView>
+              </ScrollView> */}
 
               <Text style={[{
                 fontFamily: 'PlusJakartaSans-Bold',
@@ -209,36 +278,23 @@ export default function HomeScreen() {
                 style={styles.cuisinesContainer}
                 contentContainerStyle={styles.cuisinesContentContainer}
               >
-                <View style={styles.cuisinesCardWrapper}>
-                  <CuisinesCard
-                    name="Indian"
-                    imageUrl={require("../assets/Indian.png")}
-                  />
-                </View>
-                <View style={styles.cuisinesCardWrapper}>
-                  <CuisinesCard
-                    name="Chinese"
-                    imageUrl={require("../assets/chinese.png")}
-                  />
-                </View>
-                <View style={styles.cuisinesCardWrapper}>
-                  <CuisinesCard
-                    name="American"
-                    imageUrl={require("../assets/american.png")}
-                  />
-                </View>
-                <View style={styles.cuisinesCardWrapper}>
-                  <CuisinesCard
-                    name="Filipino"
-                    imageUrl={require("../assets/filipino.png")}
-                  />
-                </View>
-                <View style={styles.cuisinesCardWrapper}>
-                  <CuisinesCard
-                    name="Mediterranean"
-                    imageUrl={require("../assets/mediterranean.png")}
-                  />
-                </View>
+                {categories.map((category) => (
+                  <View key={category.id} style={styles.cuisinesCardWrapper}>
+                    <TouchableOpacity 
+                      onPress={() => handleCuisinePress(category)}
+                      style={[
+                        styles.categoryButton,
+                        selectedCategory === category.id && styles.selectedCategory
+                      ]}
+                    >
+                      <CuisinesCard
+                        name={category.name}
+                        imageUrl={{ uri: category.image }}
+                        description={category.description}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                ))}
               </ScrollView>
 
               <Text style={[{
@@ -248,44 +304,19 @@ export default function HomeScreen() {
                 marginHorizontal: layout.spacing.md,
                 marginBottom: layout.spacing.sm
               }]}>
-                1000 restaurants to explore
+                {restaurants.length} restaurants to explore
               </Text>
-              <TouchableOpacity onPress={handleDetail}>
-                <RestaurantCard
-                  name="The Bistro"
-                  rating="4.5"
-                  address="123 Fake Street, Vancouver, BC"
-                  imageUrl="https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg"
-                  price="$ 100"
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleDetail}>
-                <RestaurantCard
-                  name="The Corner Cafe"
-                  rating="4.5"
-                  address="456 Dummy Avenue, Toronto, ON"
-                  imageUrl="https://kaapimachines.com/wp-content/uploads/2023/06/cafe-chain-3-1.png"
-                  price="$ 100"
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleDetail}>
-                <RestaurantCard
-                  name="The Italian Kitchen"
-                  rating="4.5"
-                  address="789 Fictitious Road, Montreal, QC"
-                  imageUrl="https://italianstreetkitchen.com/au/wp-content/uploads/2021/10/Gamberi-Prawn-Pizza.jpg"
-                  price="$ 100"
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleDetail}>
-                <RestaurantCard
-                  name="The Sushi Bar"
-                  rating="4.5"
-                  address="1011 Make-Believe Street, Calgary, AB"
-                  imageUrl="https://media-cdn.tripadvisor.com/media/photo-s/1b/01/24/ef/catering.jpg"
-                  price="$ 100"
-                />
-              </TouchableOpacity>
+              {restaurants.map((restaurant) => (
+                <TouchableOpacity key={restaurant.id} onPress={() => handleDetail(restaurant)}>
+                  <RestaurantCard
+                    name={restaurant.name}
+                    rating={restaurant.ratings}
+                    address={restaurant.location}
+                    imageUrl={restaurant.image}
+                    price={restaurant.price}
+                  />
+                </TouchableOpacity>
+              ))}
             </View>
           </ScrollView>
         </View>
@@ -307,7 +338,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     zIndex: 1,
     paddingHorizontal: layout.spacing.md,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    paddingTop: Platform.OS === 'android' ? 20 : 0,
+    marginTop:  Platform.OS === 'android' ? 8: 0,
   },
   topHeader: {
     flexDirection: 'row',
@@ -386,5 +418,12 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: layout.spacing.xl,
+  },
+  categoryButton: {
+    borderRadius: 45,
+    padding: 2,
+  },
+  selectedCategory: {
+    backgroundColor: colors.primary,
   },
 });

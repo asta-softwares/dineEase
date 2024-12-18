@@ -4,15 +4,16 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 
-const CuisinesCard = ({ name, imageUrl }) => {
+const CuisinesCard = ({ name, imageUrl, description }) => {
   return (
     <View style={styles.card}>
       <Image 
-        source={typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl} 
-        style={styles.image} 
+        source={typeof imageUrl === 'object' ? imageUrl : { uri: imageUrl }} 
+        style={styles.image}
+        resizeMode="cover"
       />
       <View style={styles.textContainer}>
-        <Text style={[typography.labelMedium, styles.name]}>{name}</Text>
+        <Text style={[typography.labelMedium, styles.name]} numberOfLines={2}>{name}</Text>
       </View>
     </View>
   );
@@ -21,9 +22,12 @@ const CuisinesCard = ({ name, imageUrl }) => {
 CuisinesCard.propTypes = {
   name: PropTypes.string.isRequired,
   imageUrl: PropTypes.oneOfType([
-    PropTypes.string,
+    PropTypes.shape({
+      uri: PropTypes.string
+    }),
     PropTypes.number
   ]).isRequired,
+  description: PropTypes.string
 };
 
 const styles = StyleSheet.create({
@@ -40,7 +44,6 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
-    resizeMode: 'cover',
   },
   textContainer: {
     width: 90,
@@ -51,13 +54,10 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   name: {
-    width: 90,
-    height: 21,
-    display: 'flex',
-    alignItems: 'center',
     textAlign: 'center',
-    color: colors.text.primary,
-  },
+    width: '100%',
+    color: colors.text.primary
+  }
 });
 
 export default CuisinesCard;
