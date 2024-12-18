@@ -128,11 +128,24 @@ export default function HomeScreen({ navigation }) {
 
   const handleCuisinePress = async (category) => {
     try {
-      setSelectedCategory(category.id);
-      const categoryRestaurants = await restaurantService.getRestaurantsCategory(category.id);
-      setRestaurants(categoryRestaurants);
+      if (selectedCategory === category.id) {
+        setSelectedCategory(null);
+        const allRestaurants = await restaurantService.getAllRestaurants();
+        setRestaurants(allRestaurants);
+      } else {
+        setSelectedCategory(category.id);
+        const restaurantData = await restaurantService.searchRestaurantsByCategory(category.id);
+        setRestaurants(restaurantData);
+      }
     } catch (error) {
-      console.error('Error fetching restaurants by category:', error);
+      console.error('Error fetching restaurants:', error);
+      setSelectedCategory(null);
+      try {
+        const allRestaurants = await restaurantService.getAllRestaurants();
+        setRestaurants(allRestaurants);
+      } catch (fallbackError) {
+        console.error('Error fetching all restaurants:', fallbackError);
+      }
     }
   };
 

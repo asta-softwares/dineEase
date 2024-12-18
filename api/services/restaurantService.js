@@ -49,4 +49,15 @@ export const restaurantService = {
       throw error;
     }
   },
+
+  searchRestaurantsByCategory: async (categoryId) => {
+    try {
+      const response = await apiClient.get('/restaurants/', {
+        params: { categories: categoryId }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
