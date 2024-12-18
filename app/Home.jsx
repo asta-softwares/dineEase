@@ -14,7 +14,8 @@ import {
   Platform,
   BackHandler,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  RefreshControl
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useNavigationState } from "@react-navigation/native";
@@ -46,6 +47,7 @@ export default function HomeScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const searchHeight = scrollY.interpolate({
@@ -108,6 +110,24 @@ export default function HomeScreen({ navigation }) {
       console.error('Error fetching promos:', error);
     }
   };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        fetchRestaurants(),
+        fetchPromos()
+      ]);
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      Alert.alert(
+        'Error',
+        'Failed to refresh data. Please try again.'
+      );
+    } finally {
+      setRefreshing(false);
+    }
+  }, [isDineIn, selectedCategory]);
 
   useEffect(() => {
     fetchRestaurants();
@@ -279,6 +299,14 @@ export default function HomeScreen({ navigation }) {
               { useNativeDriver: false }
             )}
             scrollEventThrottle={16}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={colors.primary}
+                colors={[colors.primary]}
+              />
+            }
           >
             <View style={styles.scrollContent}>
               {!isSearching && (
