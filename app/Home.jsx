@@ -280,19 +280,13 @@ export default function HomeScreen({ navigation }) {
               >
                 {categories.map((category) => (
                   <View key={category.id} style={styles.cuisinesCardWrapper}>
-                    <TouchableOpacity 
+                    <CuisinesCard
+                      name={category.name}
+                      imageUrl={{ uri: category.image }}
+                      description={category.description}
                       onPress={() => handleCuisinePress(category)}
-                      style={[
-                        styles.categoryButton,
-                        selectedCategory === category.id && styles.selectedCategory
-                      ]}
-                    >
-                      <CuisinesCard
-                        name={category.name}
-                        imageUrl={{ uri: category.image }}
-                        description={category.description}
-                      />
-                    </TouchableOpacity>
+                      isSelected={selectedCategory === category.id}
+                    />
                   </View>
                 ))}
               </ScrollView>

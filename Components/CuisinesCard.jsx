@@ -1,21 +1,37 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 
-const CuisinesCard = ({ name, imageUrl, description }) => {
+const CuisinesCard = ({ name, imageUrl, description, onPress, isSelected }) => {
   return (
-    <View style={styles.card}>
-      <Image 
-        source={typeof imageUrl === 'object' ? imageUrl : { uri: imageUrl }} 
-        style={styles.image}
-        resizeMode="cover"
-      />
-      <View style={styles.textContainer}>
-        <Text style={[typography.labelMedium, styles.name]} numberOfLines={2}>{name}</Text>
+    <TouchableOpacity onPress={onPress} style={styles.touchable}>
+      <View style={styles.card}>
+        <View style={[
+          styles.imageContainer,
+          isSelected && styles.selectedImageContainer
+        ]}>
+          <Image 
+            source={typeof imageUrl === 'object' ? imageUrl : { uri: imageUrl }} 
+            style={styles.image}
+            resizeMode="cover"
+          />
+        </View>
+        <View style={styles.textContainer}>
+          <Text 
+            style={[
+              typography.labelMedium,
+              styles.name,
+              { color: isSelected ? colors.primary : colors.text.black}
+            ]} 
+            numberOfLines={2}
+          >
+            {name}
+          </Text>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -27,37 +43,53 @@ CuisinesCard.propTypes = {
     }),
     PropTypes.number
   ]).isRequired,
-  description: PropTypes.string
+  description: PropTypes.string,
+  onPress: PropTypes.func,
+  isSelected: PropTypes.bool
 };
 
 const styles = StyleSheet.create({
+  touchable: {
+    width: 90,
+  },
   card: {
     width: 90,
-    height: 115,
+    minHeight: 115,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
     padding: 0,
     gap: 4,
   },
-  image: {
+  imageContainer: {
     width: 90,
     height: 90,
+    borderRadius: 45,
+    overflow: 'hidden',
+  },
+  selectedImageContainer: {
+    borderWidth: 5,
+    borderColor: colors.primary,
+    borderRadius: 45,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
     borderRadius: 45,
   },
   textContainer: {
     width: 90,
-    height: 21,
+    minHeight: 25,
+    paddingVertical: 4,
     display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    padding: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   name: {
     textAlign: 'center',
-    width: '100%',
-    color: colors.text.primary
-  }
+    flexWrap: 'wrap',
+    lineHeight: 16,
+  },
 });
 
 export default CuisinesCard;
