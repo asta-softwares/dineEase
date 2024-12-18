@@ -60,4 +60,23 @@ export const restaurantService = {
       throw error;
     }
   },
+
+  getRestaurantsByFilter: async ({ serviceType, categoryId }) => {
+    try {
+      const params = {};
+      
+      if (serviceType) {
+        params.service_type = serviceType;
+      }
+      
+      if (categoryId) {
+        params.categories = categoryId;
+      }
+
+      const response = await apiClient.get('/restaurants/', { params });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };

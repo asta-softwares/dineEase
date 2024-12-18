@@ -14,8 +14,8 @@ const RestaurantCard = ({
   price, 
   style = {} 
 }) => (
-  <View style={styles.cardWrapper}>
-    <View style={[styles.restaurantCard, style]}>
+  <View style={[styles.cardWrapper, style]}>
+    <View style={styles.restaurantCard}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: imageUrl }} style={styles.restaurantImage} />
         <View style={styles.rating}>
@@ -25,11 +25,13 @@ const RestaurantCard = ({
       </View>
       <View style={styles.restaurantInfo}>
         <View style={styles.nameAndPriceContainer}>
-          <Text style={[typography.labelLarge, styles.restaurantName]}>{name}</Text>
-          {/* <Text style={[typography.bodyMedium, styles.restaurantPrice]}>{price} / per person</Text> */}
+          <Text style={[typography.labelLarge, styles.restaurantName]} numberOfLines={1}>{name}</Text>
+          {price && (
+            <Text style={[typography.bodyMedium, styles.restaurantPrice]}>{price} / per person</Text>
+          )}
         </View>
         <View style={styles.addressContainer}>
-          <Text style={[typography.bodyMedium, styles.restaurantAddress]}>{address}</Text>
+          <Text style={[typography.bodyMedium, styles.restaurantAddress]} numberOfLines={1}>{address}</Text>
         </View>
       </View>
     </View>
@@ -41,13 +43,13 @@ RestaurantCard.propTypes = {
   rating: PropTypes.string.isRequired,
   address: PropTypes.string.isRequired,
   imageUrl: PropTypes.string.isRequired,
-  price: PropTypes.string.isRequired,
+  price: PropTypes.string,
   style: PropTypes.object
 };
 
 const styles = StyleSheet.create({
   cardWrapper: {
-    paddingHorizontal: layout.spacing.md,
+    width: '100%',
     marginBottom: layout.spacing.md,
   },
   restaurantCard: {
@@ -88,10 +90,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: layout.spacing.xs,
   },
+  restaurantName: {
+    flex: 1,
+    marginRight: layout.spacing.sm,
+  },
   addressContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  restaurantAddress: {
+    flex: 1,
   },
 });
 

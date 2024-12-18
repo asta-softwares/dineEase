@@ -14,6 +14,7 @@ import {
   Platform,
   BackHandler,
   Alert,
+  ActivityIndicator
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useNavigationState } from "@react-navigation/native";
@@ -41,6 +42,7 @@ export default function HomeScreen({ navigation }) {
   const [categories, setCategories] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const searchHeight = scrollY.interpolate({
@@ -64,8 +66,51 @@ export default function HomeScreen({ navigation }) {
   const handleDetail = (restaurant) => {
     navigation.navigate("Detail", { restaurant });
   };
-  const handleModeSwitch = (isDineInMode = false) => {
-    setIsDineIn(isDineInMode);
+
+  const fetchRestaurants = async (filters = {}) => {
+    try {
+      setLoading(true);
+      const serviceType = isDineIn ? 'dine-in' : 'takeout';
+      const response = await restaurantService.getRestaurantsByFilter({
+        serviceType,
+        categoryId: filters.categoryId
+      });
+      setRestaurants(response);
+    } catch (error) {
+      console.error('Error fetching restaurants:', error);
+      Alert.alert(
+        'Error',
+        'Failed to load restaurants. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRestaurants();
+  }, [isDineIn]); // Refetch when service type changes
+
+  const handleCategoryPress = async (category) => {
+    try {
+      if (selectedCategory === category.id) {
+        setSelectedCategory(null);
+        fetchRestaurants();
+      } else {
+        setSelectedCategory(category.id);
+        fetchRestaurants({ categoryId: category.id });
+      }
+    } catch (error) {
+      console.error('Error handling category press:', error);
+      Alert.alert(
+        'Error',
+        'Failed to filter restaurants. Please try again.'
+      );
+    }
+  };
+
+  const handleModeSwitch = (dineIn) => {
+    setIsDineIn(dineIn);
   };
 
   const handleProfilePress = () => {
@@ -112,11 +157,9 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [allRestaurants, allCategories] = await Promise.all([
-          restaurantService.getAllRestaurants(),
+        const [allCategories] = await Promise.all([
           restaurantService.getRestaurantsCategory()
         ]);
-        setRestaurants(allRestaurants);
         setCategories(allCategories);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -125,29 +168,6 @@ export default function HomeScreen({ navigation }) {
 
     fetchData();
   }, []);
-
-  const handleCuisinePress = async (category) => {
-    try {
-      if (selectedCategory === category.id) {
-        setSelectedCategory(null);
-        const allRestaurants = await restaurantService.getAllRestaurants();
-        setRestaurants(allRestaurants);
-      } else {
-        setSelectedCategory(category.id);
-        const restaurantData = await restaurantService.searchRestaurantsByCategory(category.id);
-        setRestaurants(restaurantData);
-      }
-    } catch (error) {
-      console.error('Error fetching restaurants:', error);
-      setSelectedCategory(null);
-      try {
-        const allRestaurants = await restaurantService.getAllRestaurants();
-        setRestaurants(allRestaurants);
-      } catch (fallbackError) {
-        console.error('Error fetching all restaurants:', fallbackError);
-      }
-    }
-  };
 
   if (!fontsLoaded) {
     return null;
@@ -209,7 +229,7 @@ export default function HomeScreen({ navigation }) {
             scrollEventThrottle={16}
           >
             <View style={styles.scrollContent}>
-              {/* <View style={styles.switchContainer}>
+              <View style={styles.switchContainer}>
                 <TouchableOpacity 
                   style={isDineIn ? styles.switchButtonActive : styles.switchButton}
                   onPress={() => handleModeSwitch(true)}
@@ -231,11 +251,11 @@ export default function HomeScreen({ navigation }) {
                     fontSize: 14,
                     color: !isDineIn ? colors.text.white : colors.text.primary 
                   }]}>
-                    Grab & Go
+                    Take Out
                   </Text>
                 </TouchableOpacity>
-              </View> */}
-              {/* <Text style={[{
+              </View> 
+               <Text style={[{
                 fontFamily: 'PlusJakartaSans-Bold',
                 fontSize: 20,
                 color: colors.text.primary,
@@ -243,8 +263,8 @@ export default function HomeScreen({ navigation }) {
                 marginBottom: layout.spacing.sm
               }]}>
                 FEATURED OFFERS
-              </Text> */}
-              {/* <ScrollView
+              </Text> 
+               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={styles.featuresContainer}
@@ -274,7 +294,7 @@ export default function HomeScreen({ navigation }) {
                     price="$ 400"
                   />
                 </View>
-              </ScrollView> */}
+              </ScrollView> 
 
               <Text style={[{
                 fontFamily: 'PlusJakartaSans-Bold',
@@ -297,7 +317,7 @@ export default function HomeScreen({ navigation }) {
                       name={category.name}
                       imageUrl={{ uri: category.image }}
                       description={category.description}
-                      onPress={() => handleCuisinePress(category)}
+                      onPress={() => handleCategoryPress(category)}
                       isSelected={selectedCategory === category.id}
                     />
                   </View>
@@ -313,16 +333,30 @@ export default function HomeScreen({ navigation }) {
               }]}>
                 {restaurants.length} restaurants to explore
               </Text>
-              {restaurants.map((restaurant) => (
-                <TouchableOpacity key={restaurant.id} onPress={() => handleDetail(restaurant)}>
-                  <RestaurantCard
-                    name={restaurant.name}
-                    rating={restaurant.ratings}
-                    address={restaurant.location}
-                    imageUrl={restaurant.image}
-                  />
-                </TouchableOpacity>
-              ))}
+              <View style={styles.restaurantsContainer}>
+                {loading ? (
+                  <ActivityIndicator size="large" color={colors.primary} />
+                ) : restaurants.length > 0 ? (
+                  restaurants.map((restaurant) => (
+                    <TouchableOpacity 
+                      key={restaurant.id} 
+                      onPress={() => handleDetail(restaurant)}
+                      style={styles.restaurantCardWrapper}
+                    >
+                      <RestaurantCard
+                        name={restaurant.name}
+                        rating={restaurant.ratings}
+                        address={restaurant.location}
+                        imageUrl={restaurant.image}
+                      />
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <Text style={[typography.bodyLarge, { textAlign: 'center', marginTop: 20 }]}>
+                    No restaurants found
+                  </Text>
+                )}
+              </View>
             </View>
           </ScrollView>
         </View>
@@ -432,4 +466,11 @@ const styles = StyleSheet.create({
   selectedCategory: {
     backgroundColor: colors.primary,
   },
+  restaurantsContainer: {
+    marginBottom: layout.spacing.md,
+  },
+  restaurantCardWrapper: {
+    width: '100%',
+    paddingHorizontal: layout.spacing.md,
+  }
 });
