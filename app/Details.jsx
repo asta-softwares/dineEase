@@ -1,93 +1,101 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useState, useEffect, useRef } from "react";
+import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
 import {
-  Image,
+  View,
+  Text,
   ScrollView,
   StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  useWindowDimensions,
   ActivityIndicator,
+  Image,
+  TouchableOpacity,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ImageView from "react-native-image-viewing";
-import { TabBar, TabView } from 'react-native-tab-view';
+import { TabView, TabBar } from 'react-native-tab-view';
 import TopNav from "../Components/TopNav";
-import MenuItems from '../Components/MenuItems';
-import Footer from './Layout/Footer';
-import LargeButton from '../Components/Buttons/LargeButton';
-import { colors } from '../styles/colors';
-import { typography } from '../styles/typography';
-import { restaurantService } from '../api/services/restaurantService';
-import PagerView from 'react-native-pager-view';
-import Animated, { 
+import MenuItems from "../Components/MenuItems";
+import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   interpolate,
-  withTiming,
-  withSpring,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
+import { restaurantService } from "../api/services/restaurantService";
+import { colors } from "../styles/colors";
+import { typography } from "../styles/typography";
+import Footer from './Layout/Footer';
+import LargeButton from '../Components/Buttons/LargeButton';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 const CustomHeader = ({ onClose }) => (
   <SafeAreaView edges={['top']} style={styles.customHeaderContainer}>
-    <View style={styles.customHeader}>
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={onClose}
-        activeOpacity={0.7}
-      >
-        <Ionicons name="close" size={24} color="#FFFFFF" />
-      </TouchableOpacity>
-      <View style={styles.placeholder} />
-    </View>
+    <TouchableOpacity
+      style={styles.closeButton}
+      onPress={onClose}
+      activeOpacity={0.7}
+    >
+      <Ionicons name="close" size={24} color="#FFFFFF" />
+    </TouchableOpacity>
   </SafeAreaView>
 );
 
-export default function DetailScreen() {
+export default function DetailScreen({ route }) {
   const navigation = useNavigation();
-  const route = useRoute();
   const { restaurantId } = route.params;
   const { width } = useWindowDimensions();
   const scrollY = useSharedValue(0);
-  
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
-  const [imageLoading, setImageLoading] = useState(true);
-  const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [restaurant, setRestaurant] = useState(null);
   const [error, setError] = useState(null);
-  const [routes] = useState([
-    { key: 'menu', title: 'Menu' },
+  const [index, setIndex] = useState(0);
+  const [routes, setRoutes] = useState([
+    { key: 'all', title: 'All Items' }
   ]);
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      'worklet';
-      scrollY.value = withSpring(event.contentOffset.y, {
-        damping: 20,
-        stiffness: 90,
-        mass: 0.5,
-      });
-    },
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [restaurantData, cuisinesData] = await Promise.all([
+          restaurantService.getRestaurantById(restaurantId),
+          restaurantService.getMenuCuisines()
+        ]);
+        setRestaurant(restaurantData);
+        
+        const newRoutes = [
+          { key: 'all', title: 'All Items' },
+          ...(cuisinesData || [])
+            .filter(cuisine => restaurantData?.menus?.some(menu => menu.category && menu.category.toString() === cuisine.id?.toString()))
+            .map(cuisine => ({
+              key: cuisine.id?.toString() || 'unknown',
+              title: cuisine.name || 'Unknown'
+            }))
+        ];
+        setRoutes(newRoutes);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [restaurantId]);
+
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y;
   });
 
-  const imageStyle = useAnimatedStyle(() => {
-    const height = interpolate(
+  const imageStyle = useAnimatedStyle(() => ({
+    height: interpolate(
       scrollY.value,
       [-200, 0, 200],
       [452, 252, 252],
       { extrapolate: 'clamp' }
-    );
-
-    return {
-      height,
-    };
-  });
+    ),
+  }));
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -101,21 +109,56 @@ export default function DetailScreen() {
     setImageViewerVisible(false);
   };
 
-  useEffect(() => {
-    fetchRestaurantDetails();
-  }, [restaurantId]);
-
-  const fetchRestaurantDetails = async () => {
-    try {
-      setLoading(true);
-      const data = await restaurantService.getRestaurantById(restaurantId);
-      setRestaurant(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  const renderScene = ({ route }) => {
+    if (!restaurant?.menus) return null;
+    
+    if (route.key === 'all') {
+      return (
+        <ScrollView style={{ flex: 1 }}>
+          <MenuItems items={restaurant.menus} />
+        </ScrollView>
+      );
     }
+    
+    const cuisineMenus = restaurant.menus.filter(menu => 
+      menu.category && menu.category.toString() === route.key
+    );
+    return (
+      <ScrollView style={{ flex: 1 }}>
+        <MenuItems items={cuisineMenus} />
+      </ScrollView>
+    );
   };
+
+  const renderTabBar = props => (
+    <TabBar
+      {...props}
+      scrollEnabled
+      indicatorStyle={{ backgroundColor: colors.primary }}
+      style={{ 
+        backgroundColor: colors.background,
+        elevation: 0,
+        shadowOpacity: 0,
+        height: 'auto',
+      }}
+      tabStyle={{ 
+        width: 'auto',
+        paddingHorizontal: 15,
+        height: 'auto',
+        minHeight: 48,
+      }}
+      labelStyle={[
+        typography.bodyMedium, 
+        { 
+          color: colors.text.black,
+          textAlign: 'center',
+          textTransform: 'none',
+        }
+      ]}
+      activeColor={colors.primary}
+      inactiveColor={colors.text.secondary}
+    />
+  );
 
   if (loading) {
     return (
@@ -135,31 +178,9 @@ export default function DetailScreen() {
 
   const images = [
     {
-      uri: "https://s3-alpha-sig.figma.com/img/20fc/e656/8ae7b68095a4d524fbca4ccea6841645?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=DTbgg-21pPIWn9tGhAkaJGMKxy7l3gO8FzhR3szV1d349RSkaJCTW9SqpT1aAHL34weL53QaADuxnD1DgAqEqmLhHJytGI9I6z~BEJSofaWkJxva53nIAaSZa5odGsQpsAlWVVnEm9neDihqdormNgSRmdgWz1g0dSY1EVYL6XXjKUUdQ0ILm53LELAkLw4qF2OTQLOXQq6szLD6iwiZJqFgQuoeB5V9jQ5hrucsrKfgof382~R6Qtjo14dbne0nE-Y4BxODnppMI84o7thkQ-jUB1i-k~Ojs7eEoKimMBKjZJ9mdOmxoKnkot8QSExAxpVQYNTjVwhH-AjBPqVZVA__",
+      uri: restaurant?.image || "https://via.placeholder.com/400",
     },
   ];
-
-  const renderScene = ({ route }) => {
-    if (route.key === 'menu') {
-      return <MenuItems items={restaurant?.menus || []} />;
-    }
-    return null;
-  };
-
-  const renderTabBar = props => (
-    <TabBar
-      {...props}
-      indicatorStyle={{ backgroundColor: colors.primary }}
-      style={{ 
-        backgroundColor: colors.background,
-        elevation: 0,
-        shadowOpacity: 0,
-      }}
-      labelStyle={{ color: colors.text.black }}
-      activeColor={colors.primary}
-      inactiveColor={colors.text.secondary}
-    />
-  );
 
   return (
     <View style={styles.container}>
@@ -188,7 +209,8 @@ export default function DetailScreen() {
                 resizeMode="cover"
               />
             </TouchableOpacity>
-            <View style={[styles.content, { backgroundColor: colors.background, width: '100%' }]}>
+
+            <View style={[styles.content, { backgroundColor: colors.background }]}>
               <View style={[styles.header, { backgroundColor: colors.background }]}>
                 <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>{restaurant?.name}</Text>
                 <View style={[styles.rating, { backgroundColor: colors.rating}]}>
@@ -196,6 +218,7 @@ export default function DetailScreen() {
                   <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>{restaurant?.ratings}</Text>
                 </View>
               </View>
+
               <View style={styles.infoContainer}>
                 <View style={styles.infoItem}>
                   <Ionicons name="restaurant-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
@@ -203,12 +226,14 @@ export default function DetailScreen() {
                     {restaurant?.categories?.map(cat => cat.name).join(', ')}
                   </Text>
                 </View>
+
                 <View style={styles.infoItem}>
                   <Ionicons name="location-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
                   <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
                     {restaurant?.location}
                   </Text>
                 </View>
+
                 <View style={styles.infoItem}>
                   <Ionicons name="time-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
                   <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
@@ -217,6 +242,7 @@ export default function DetailScreen() {
                       .join('\n')}
                   </Text>
                 </View>
+
                 <View style={styles.infoItem}>
                   <Ionicons name="call-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
                   <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
@@ -224,6 +250,7 @@ export default function DetailScreen() {
                   </Text>
                 </View>
               </View>
+
               <View style={styles.descriptionContainer}>
                 <Text 
                   style={[typography.bodyMedium, styles.description, { 
@@ -250,18 +277,26 @@ export default function DetailScreen() {
                   initialLayout={{ width }}
                   style={styles.tabView}
                 />
-              </View> 
+              </View>
             </View>
           </View>
         </View>
       </AnimatedScrollView>
+
+      <ImageView
+        images={images}
+        imageIndex={0}
+        visible={imageViewerVisible}
+        onRequestClose={handleImageViewerClose}
+        HeaderComponent={({ onClose }) => (
+          <CustomHeader onClose={onClose} />
+        )}
+      />
       
       <Footer style={[styles.footer, { backgroundColor: colors.background }]}>
         <LargeButton 
           title="View Cart"
-          count={2}
-          price="25.99"
-          onPress={() => navigation.navigate('Checkout')}
+          onPress={handleCheckout}
         />
       </Footer>
     </View>
@@ -301,21 +336,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1,
-    backgroundColor: 'transparent',
-  },
-  customHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 16,
   },
   closeButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  placeholder: {
     width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: "row",
@@ -398,13 +427,11 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   tabViewContainer: {
-    marginVertical: 16,
-    height: 600,
-    pointerEvents: 'box-none',
+    marginTop: 16,
+    height: 400, // Set a fixed height or adjust as needed
   },
   tabView: {
     height: '100%',
-    pointerEvents: 'box-none',
   },
   loadingContainer: {
     flex: 1,

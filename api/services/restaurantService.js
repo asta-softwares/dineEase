@@ -3,7 +3,7 @@ import apiClient from '../client';
 export const restaurantService = {
   getAllRestaurants: async (params) => {
     try {
-      const response = await apiClient.get('/restaurants', { params });
+      const response = await apiClient.get('/restaurants/', { params });
       return response.data;
     } catch (error) {
       throw error;
@@ -15,6 +15,7 @@ export const restaurantService = {
       const response = await apiClient.get(`/restaurants/${id}`);
       return response.data;
     } catch (error) {
+      console.error('Error fetching restaurant:', error);
       throw error;
     }
   },
@@ -80,6 +81,16 @@ export const restaurantService = {
       const response = await apiClient.get('/restaurants/', { params });
       return response.data;
     } catch (error) {
+      throw error;
+    }
+  },
+
+  getMenuCuisines: async () => {
+    try {
+      const response = await apiClient.get('/menu-cuisines/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching menu cuisines:', error);
       throw error;
     }
   },
