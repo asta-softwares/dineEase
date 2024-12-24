@@ -46,7 +46,7 @@ const Footer = ({ children, keyboardAware = false, style }) => {
     return (
         <View style={[
             styles.footer,
-            { paddingBottom: Math.max(8, insets.bottom + 4) },
+            { paddingBottom: Math.max(0, insets.bottom + 4) },
             style
         ]}>
             {children}
@@ -62,7 +62,8 @@ const styles = StyleSheet.create({
         right: 0,
         backgroundColor: colors.white,
         paddingHorizontal: 24,
-        paddingTop: 10,
+        paddingTop: 16,
+        paddingBottom: 0,
         borderTopWidth: 1,
         borderTopColor: colors.border,
         shadowColor: "#000",

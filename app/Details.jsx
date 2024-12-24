@@ -1,361 +1,396 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
-import { Alert, Animated, TouchableOpacity, View, Text, FlatList, Dimensions, Platform, StyleSheet, SafeAreaView, ActivityIndicator } from "react-native";
-import { getStatusBarHeight } from "react-native-iphone-x-helper";
-import CollapsibleTabViewHeader from "react-native-tab-view-header";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+  TouchableOpacity,
+  useWindowDimensions,
+} from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import ImageView from "react-native-image-viewing";
+import TopNav from "../Components/TopNav";
+import MenuItems from "../Components/MenuItems";
+import Animated, {
+  useSharedValue,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  interpolate,
+} from "react-native-reanimated";
+import { restaurantService } from "../api/services/restaurantService";
+import { colors } from "../styles/colors";
 import { typography } from "../styles/typography";
-import { colors } from '../styles/colors';
-import { restaurantService } from '../api/services/restaurantService';
+import Footer from './Layout/Footer';
+import LargeButton from '../Components/Buttons/LargeButton';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-const WINDOW_HEIGHT = Dimensions.get('window').height;
-const HEADER_HEIGHT = 350;  // Total header height
-const TAB_BAR_HEIGHT = 48;  // Tab bar height
-const STATUS_BAR_HEIGHT = getStatusBarHeight();
-const STICKY_HEADER_HEIGHT = 60;  // Height of header that remains when collapsed
+const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-const DetailScreen = () => {
-    const navigation = useNavigation();
-    const route = useRoute();
-    const { restaurantId } = route.params;
-    
-    const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-    const [isTabBarSticky, setIsTabBarSticky] = useState(false);
-    const [fadeAnim] = useState(new Animated.Value(0));
-    const [restaurant, setRestaurant] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [slideData, setSlideData] = useState([
-        { key: 'all', title: 'All Items' }
-    ]);
+const CustomHeader = ({ onClose }) => (
+  <SafeAreaView edges={['top']} style={styles.customHeaderContainer}>
+    <TouchableOpacity
+      style={styles.closeButton}
+      onPress={onClose}
+      activeOpacity={0.7}
+    >
+      <Ionicons name="close" size={24} color="#FFFFFF" />
+    </TouchableOpacity>
+  </SafeAreaView>
+);
 
-    useEffect(() => {
-        Animated.timing(fadeAnim, {
-            toValue: isTabBarSticky ? 1 : 0,
-            duration: 200,
-            useNativeDriver: true,
-        }).start();
-    }, [isTabBarSticky]);
+export default function DetailScreen({ route }) {
+  const navigation = useNavigation();
+  const { restaurantId } = route.params;
+  const { width } = useWindowDimensions();
+  const scrollY = useSharedValue(0);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [restaurant, setRestaurant] = useState(null);
+  const [error, setError] = useState(null);
+  const [cuisines, setCuisines] = useState([]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [restaurantData, cuisinesData] = await Promise.all([
-                    restaurantService.getRestaurantById(restaurantId),
-                    restaurantService.getMenuCuisines()
-                ]);
-                setRestaurant(restaurantData);
-                
-                const newSlides = [
-                    {
-                        key: 'all',
-                        title: 'All Items',
-                        Wrapper: Animated.FlatList,
-                        WrapperProps: {
-                            data: restaurantData?.menus || [],
-                            renderItem: ({ item }) => (
-                                <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-                                    <Text style={typography.h3}>{item.name}</Text>
-                                    <Text style={typography.body}>{item.description}</Text>
-                                    <Text style={[typography.h3, { color: colors.primary }]}>₱{item.price}</Text>
-                                </View>
-                            ),
-                            keyExtractor: item => item.id.toString()
-                        }
-                    },
-                    ...(cuisinesData || [])
-                        .filter(cuisine => restaurantData?.menus?.some(menu => 
-                            menu.category && menu.category.toString() === cuisine.id?.toString()
-                        ))
-                        .map(cuisine => ({
-                            key: cuisine.id?.toString() || 'unknown',
-                            title: cuisine.name || 'Unknown',
-                            Wrapper: Animated.FlatList,
-                            WrapperProps: {
-                                data: restaurantData?.menus?.filter(menu => 
-                                    menu.category && menu.category.toString() === cuisine.id?.toString()
-                                ) || [],
-                                renderItem: ({ item }) => (
-                                    <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-                                        <Text style={typography.h3}>{item.name}</Text>
-                                        <Text style={typography.body}>{item.description}</Text>
-                                        <Text style={[typography.h3, { color: colors.primary }]}>₱{item.price}</Text>
-                                    </View>
-                                ),
-                                keyExtractor: item => item.id.toString()
-                            }
-                        }))
-                ];
-                setSlideData(newSlides);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [restaurantId]);
-
-    const handleBack = () => {
-        navigation.goBack();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [restaurantData, cuisinesData] = await Promise.all([
+          restaurantService.getRestaurantById(restaurantId),
+          restaurantService.getMenuCuisines()
+        ]);
+        setRestaurant(restaurantData);
+        setCuisines(cuisinesData);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchData();
+  }, [restaurantId]);
 
-    const HeaderTitle = ({ isSticky = false }) => (
-        <View style={[
-            styles.headerTitleContainer,
-            isSticky ? {
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: TAB_BAR_HEIGHT,
-                backgroundColor: colors.background,
-                position: 'relative',
-                paddingHorizontal: 40,
-            } : {
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: 16,
-                marginBottom: 8,
-                paddingHorizontal: 40,
-                width: '100%',
-            }
-        ]}>
-            <Text style={[
-                typography.h2,
-                { 
-                    color: isSticky ? colors.text.black : colors.text.white,
-                    textAlign: 'center',
-                    fontSize: isSticky ? 18 : typography.h2.fontSize,
-                }
-            ]}>
-                {restaurant?.name || 'Restaurant'}
-            </Text>
-        </View>
-    );
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y;
+  });
 
-    const renderTabBar = (props) => {
-        const { navigationState } = props;
-        return (
-            <View style={{ 
-                flexDirection: 'column',
-                backgroundColor: colors.background,
-            }}>
-                <Animated.View style={{ 
-                    opacity: fadeAnim,
-                    transform: [{
-                        translateY: fadeAnim.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [-10, 0],
-                        })
-                    }]
-                }}>
-                    {isTabBarSticky && (
-                        <View style={styles.stickyHeader}>
-                            <TouchableOpacity
-                                onPress={handleBack}
-                                style={[styles.backButton, styles.stickyBackButton]}
-                            >
-                                <Ionicons name="arrow-back" size={24} color={colors.text.black} />
-                            </TouchableOpacity>
-                            <View style={styles.stickyTitleContainer}>
-                                <Text style={[
-                                    typography.h2,
-                                    styles.stickyTitle,
-                                ]}>
-                                    {restaurant?.name || 'Restaurant'}
-                                </Text>
-                            </View>
-                        </View>
-                    )}
-                </Animated.View>
-                <View style={[
-                    styles.tabBar,
-                    { 
-                        borderBottomColor: colors.border,
-                        elevation: isTabBarSticky ? 4 : 0,
-                        shadowOpacity: isTabBarSticky ? 0.1 : 0,
-                    }
-                ]}>
-                    {navigationState.routes.map((route, index) => {
-                        const isActive = currentSlideIndex === index;
-                        return (
-                            <TouchableOpacity
-                                key={route.key}
-                                style={[
-                                    styles.tab,
-                                    { borderBottomColor: isActive ? colors.primary : 'transparent' }
-                                ]}
-                                onPress={() => setCurrentSlideIndex(index)}
-                            >
-                                <Text style={{
-                                    color: isActive ? colors.primary : colors.text.secondary,
-                                    fontWeight: isActive ? '600' : '400'
-                                }}>
-                                    {route.title}
-                                </Text>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </View>
-            </View>
-        );
-    };
+  const imageStyle = useAnimatedStyle(() => ({
+    height: interpolate(
+      scrollY.value,
+      [-200, 0, 200],
+      [452, 252, 252],
+      { extrapolate: 'clamp' }
+    ),
+  }));
 
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={colors.primary} />
-            </View>
-        );
-    }
+  const handleGoBack = () => {
+    navigation.goBack();
+  };
 
-    if (error) {
-        return (
-            <View style={styles.errorContainer}>
-                <Text style={typography.h2}>Error</Text>
-                <Text style={typography.body}>{error}</Text>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Text style={[typography.body, { color: colors.primary }]}>Go Back</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
+  const handleCheckout = () => {
+    navigation.navigate("Checkout");
+  };
 
+  const handleImageViewerClose = () => {
+    setImageViewerVisible(false);
+  };
+
+  if (loading) {
     return (
-        <SafeAreaView style={styles.container}>
-            <CollapsibleTabViewHeader
-                tabSlides={slideData}
-                tabIndex={currentSlideIndex}
-                onIndexChange={i => {
-                    console.log('onIndexChange: ', i);
-                    setCurrentSlideIndex(i);
-                }}
-                renderTabBar={renderTabBar}
-                renderHeader={() =>
-                    <View style={[styles.header, { backgroundColor: colors.primary }]}>
-                        <Animated.View style={{ 
-                            opacity: fadeAnim.interpolate({
-                                inputRange: [0, 1],
-                                outputRange: [1, 0],
-                            })
-                        }}>
-                            <TouchableOpacity
-                                onPress={handleBack}
-                                style={[styles.backButton, { top: 16, zIndex: 2 }]}
-                            >
-                                <Ionicons name="arrow-back" size={24} color={colors.text.white} />
-                            </TouchableOpacity>
-                            <HeaderTitle />
-                        </Animated.View>
-                        <View style={styles.headerContent}>
-                            <Text style={[typography.body, { color: colors.text.white }]}>
-                                {restaurant?.description || 'Loading...'}
-                            </Text>
-                            {restaurant?.rating && (
-                                <View style={styles.ratingContainer}>
-                                    <Ionicons name="star" size={16} color={colors.rating} />
-                                    <Text style={[typography.body, { color: colors.text.white, marginLeft: 4 }]}>
-                                        {restaurant.rating}
-                                    </Text>
-                                </View>
-                            )}
-                        </View>
-                    </View>
-                }
-                enableRefresh={false}
-                tabBarStickyPosition={0}
-                onTabBarStickyChange={sticky => setIsTabBarSticky(sticky)}
-            />
-        </SafeAreaView>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
     );
-};
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={[typography.h3, { color: colors.text.error }]}>Error: {error}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <TopNav title={restaurant?.name} handleGoBack={handleGoBack} scrollY={scrollY} />
+      
+      <AnimatedScrollView
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ width: '100%' }}
+        style={{ width: '100%' }}
+        bounces={false}
+        overScrollMode="never"
+      >
+        <View style={{ width: '100%', flex: 1 }}>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setImageViewerVisible(true)}
+          >
+            <Animated.Image
+              source={{
+                uri: restaurant?.image || 'https://via.placeholder.com/400',
+              }}
+              style={[styles.image, imageStyle]}
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
+
+          <View style={[styles.content, { backgroundColor: colors.background }]}>
+            <View style={[styles.header, { backgroundColor: colors.background }]}>
+              <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>{restaurant?.name}</Text>
+              <View style={[styles.rating, { backgroundColor: colors.rating}]}>
+                <Ionicons name="star" size={14} color={colors.text.white} />
+                <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>{restaurant?.ratings}</Text>
+              </View>
+            </View>
+
+            <View style={styles.infoContainer}>
+              <View style={styles.infoItem}>
+                <Ionicons name="restaurant-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                  {restaurant?.categories?.map(cat => cat.name).join(', ')}
+                </Text>
+              </View>
+
+              <View style={styles.infoItem}>
+                <Ionicons name="location-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                  {restaurant?.location}
+                </Text>
+              </View>
+
+              <View style={styles.infoItem}>
+                <Ionicons name="time-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                  {Object.entries(restaurant?.operating_hours || {})
+                    .map(([day, hours]) => `${day}: ${hours}`)
+                    .join('\n')}
+                </Text>
+              </View>
+
+              <View style={styles.infoItem}>
+                <Ionicons name="call-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                  {restaurant?.telephone}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.descriptionContainer}>
+              <Text 
+                style={[typography.bodyMedium, styles.description, { 
+                  color: colors.text.black, 
+                  width: '100%', 
+                  marginBottom: 10,
+                  textAlign: 'left',
+                  flexShrink: 1,
+                }]}
+                numberOfLines={0}
+                ellipsizeMode="clip"
+                adjustsFontSizeToFit={false}
+              >
+                {restaurant?.description}
+              </Text>
+            </View>
+
+            <View style={styles.menuContainer}>
+              <Text style={[typography.h3, styles.sectionTitle]}>Menu Items</Text>
+              {cuisines.map(cuisine => {
+                const menuItems = restaurant?.menus?.filter(
+                  menu => menu.category && menu.category.toString() === cuisine.id.toString()
+                );
+                
+                if (menuItems && menuItems.length > 0) {
+                  return (
+                    <View key={cuisine.id} style={styles.menuSection}>
+                      <Text style={[styles.cuisineTitle]}>{cuisine.name}</Text>
+                      <MenuItems items={menuItems} />
+                    </View>
+                  );
+                }
+                return null;
+              })}
+              
+              {/* Uncategorized items */}
+              {restaurant?.menus?.filter(
+                menu => !menu.category || !cuisines.some(cuisine => cuisine.id.toString() === menu.category.toString())
+              ).length > 0 && (
+                <View style={styles.menuSection}>
+                  <Text style={[styles.cuisineTitle]}>Other Items</Text>
+                  <MenuItems 
+                    items={restaurant.menus.filter(
+                      menu => !menu.category || !cuisines.some(cuisine => cuisine.id.toString() === menu.category.toString())
+                    )} 
+                  />
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      </AnimatedScrollView>
+
+      <ImageView
+        images={[{ uri: restaurant?.image }]}
+        imageIndex={0}
+        visible={imageViewerVisible}
+        onRequestClose={handleImageViewerClose}
+        HeaderComponent={({ onClose }) => (
+          <CustomHeader onClose={onClose} />
+        )}
+      />
+      
+      <Footer style={[styles.footer, { backgroundColor: colors.background }]}>
+        <LargeButton 
+          title="View Cart"
+          onPress={handleCheckout}
+        />
+      </Footer>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.primary,
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    width: '100%',
+  },
+  image: {
+    width: '100%',
+    height: 252,
+  },
+  content: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    marginTop: -24,
+    padding: 20,
+    paddingTop: 24,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
     },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: colors.background,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+    width: '100%',
+    alignSelf: 'stretch',
+  },
+  customHeaderContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    padding: 16,
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  title: {
+    flex: 1,
+    marginRight: 16,
+  },
+  rating: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  ratingText: {
+    marginLeft: 4,
+  },
+  infoContainer: {
+    marginBottom: 16,
+    width: '100%',
+  },
+  infoItem: {
+    flexDirection: "row",
+    marginBottom: 12,
+    width: '100%',
+  },
+  infoIcon: {
+    marginRight: 12,
+    marginTop: 2,
+  },
+  infoText: {
+    flex: 1,
+  },
+  description: {
+    width: '100%',
+    marginBottom: 10,
+    flexWrap: 'wrap',
+    alignSelf: 'stretch',
+    textAlign: 'left',
+  },
+  descriptionContainer: {
+    width: '100%',
+    alignSelf: 'stretch',
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  menuContainer: {
+    marginTop: 24,
+    paddingBottom: 100, // Add padding for the footer
+  },
+  menuSection: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    marginBottom: 24,
+    color: colors.text.black,
+  },
+  cuisineTitle: {
+    marginBottom: 16,
+    fontFamily: 'PlusJakartaSans-Bold',
+    fontSize: 20,
+    color: colors.text.primary,
+    paddingHorizontal: 4,
+  },
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0, 0, 0, 0.1)",
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
     },
-    errorContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: colors.background,
-        padding: 16,
-    },
-    header: {
-        height: HEADER_HEIGHT,
-        paddingTop: Platform.OS === 'android' ? STATUS_BAR_HEIGHT : 0,
-    },
-    headerContent: {
-        height: HEADER_HEIGHT - TAB_BAR_HEIGHT,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-    },
-    headerTitleContainer: {
-        justifyContent: 'center',
-        position: 'relative',
-    },
-    backButton: {
-        position: 'absolute',
-        left: 16,
-        zIndex: 1,
-        padding: 8,
-        borderRadius: 20,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    },
-    stickyHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: TAB_BAR_HEIGHT,
-        width: '100%',
-        position: 'relative',
-    },
-    stickyBackButton: {
-        position: 'absolute',
-        left: 16,
-        top: '50%',
-        transform: [{ translateY: -20 }],
-        backgroundColor: 'transparent',
-        zIndex: 2,
-    },
-    stickyTitleContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 40,
-    },
-    stickyTitle: {
-        color: colors.text.black,
-        fontSize: 18,
-        textAlign: 'center',
-    },
-    tabBar: {
-        flexDirection: 'row',
-        height: TAB_BAR_HEIGHT,
-        borderBottomWidth: 1,
-        shadowRadius: 4,
-        shadowOffset: { width: 0, height: 2 },
-    },
-    tab: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderBottomWidth: 2,
-    },
-    ratingContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 8,
-    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    padding: 20,
+  },
 });
-
-export default DetailScreen;
