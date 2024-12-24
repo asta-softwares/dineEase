@@ -10,6 +10,8 @@ import { useUserStore } from '../stores/userStore';
 import { Ionicons } from '@expo/vector-icons';
 import { typography } from '../styles/typography';
 import authService from '../api/services/authService';
+import { tokenStorage } from '../utils/tokenStorage';
+import apiClient from '../api/client';
 
 const ProfileScreen = () => {
     const navigation = useNavigation();
@@ -55,20 +57,36 @@ const ProfileScreen = () => {
     };
 
     const handleLogout = async () => {
-        try {
-            await logout();
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
-            });
-        } catch (error) {
-            console.error('Logout error:', error);
-            Alert.alert(
-                'Error',
-                'Unable to logout. Please try again.',
-                [{ text: 'OK' }]
-            );
-        }
+        Alert.alert(
+            'Logout',
+            'Are you sure you want to logout?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel'
+                },
+                {
+                    text: 'Logout',
+                    onPress: async () => {
+                        try {
+                            // Call the logout API
+                            await authService.logout();
+                            // Clear tokens from storage
+                            await tokenStorage.clearTokens();
+                            // Reset navigation to splash screen
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'SplashScreen' }],
+                            });
+                        } catch (error) {
+                            console.error('Error during logout:', error);
+                            Alert.alert('Error', 'Failed to logout. Please try again.');
+                        }
+                    },
+                    style: 'destructive'
+                }
+            ]
+        );
     };
 
     const handleEditProfile = () => {
