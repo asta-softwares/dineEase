@@ -348,15 +348,17 @@ export default function HomeScreen({ navigation }) {
                       </Text>
                     </TouchableOpacity>
                   </View> 
-                   <Text style={[{
-                    fontFamily: 'PlusJakartaSans-Bold',
-                    fontSize: 20,
-                    color: colors.text.primary,
-                    marginHorizontal: layout.spacing.md,
-                    marginBottom: layout.spacing.sm
-                  }]}>
-                    FEATURED OFFERS
-                  </Text> 
+                     {promos.length > 0 && (
+                    <Text style={[{
+                      fontFamily: 'PlusJakartaSans-Bold',
+                      fontSize: 20,
+                      color: colors.text.primary,
+                      marginHorizontal: layout.spacing.md,
+                      marginBottom: layout.spacing.sm
+                    }]}>
+                      FEATURED OFFERS
+                    </Text>
+                  )}
                    <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -375,15 +377,18 @@ export default function HomeScreen({ navigation }) {
                     ))}
                   </ScrollView> 
 
-                  <Text style={[{
-                    fontFamily: 'PlusJakartaSans-Bold',
-                    fontSize: 20,
-                    color: colors.text.primary,
-                    marginHorizontal: layout.spacing.md,
-                    marginBottom: layout.spacing.sm
-                  }]}>
-                    EXPLORE CRAVINGS
+                  {categories.length > 0 && (
+                    <Text style={[{
+                      fontFamily: 'PlusJakartaSans-Bold',
+                      fontSize: 20,
+                      color: colors.text.primary,
+                      marginHorizontal: layout.spacing.md,
+                      marginBottom: layout.spacing.sm
+                    }]}>
+                      EXPLORE CRAVINGS
                   </Text>
+                  )}
+
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
