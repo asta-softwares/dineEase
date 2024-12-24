@@ -29,6 +29,7 @@ import { typography } from '../styles/typography';
 import { layout } from '../styles/layout';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { restaurantService } from '../api/services/restaurantService';
+import { tokenStorage } from '../utils/tokenStorage';
 
 export default function HomeScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -185,8 +186,18 @@ export default function HomeScreen({ navigation }) {
     setIsDineIn(dineIn);
   };
 
-  const handleProfilePress = () => {
-    navigation.navigate('Profile');
+  const handleProfilePress = async () => {
+    try {
+      const token = await tokenStorage.getAccessToken();
+      if (token) {
+        navigation.navigate('Profile');
+      } else {
+        navigation.navigate('Login');
+      }
+    } catch (error) {
+      console.log('Token check failed:', error);
+      navigation.navigate('Login');
+    }
   };
 
   const handleSearch = (text) => {
