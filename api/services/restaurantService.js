@@ -22,7 +22,7 @@ export const restaurantService = {
 
   getRestaurantMenu: async (id) => {
     try {
-      const response = await apiClient.get(`/restaurants/${id}/menu`);
+      const response = await apiClient.get(`/menus/${id}/`);
       return response.data;
     } catch (error) {
       throw error;

@@ -11,15 +11,17 @@ const MenuItem = ({ name, cost, description, images }) => {
 
   return (
     <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
-      <Image 
-        source={{ uri: imageUrl }} 
-        style={styles.image}
-        resizeMode="cover"
-      />
-      <View style={styles.textContainer}>
-        <Text style={[typography.labelLarge, styles.name]}>{name}</Text>
-        <Text style={[typography.bodySmall, styles.description]} numberOfLines={2}>{description}</Text>
-        <Text style={[typography.bodyMedium, styles.price]}>${cost}</Text>
+      <View style={styles.contentContainer}>
+        <View style={styles.textContainer}>
+          <Text style={[typography.labelLarge, styles.name]}>{name}</Text>
+          <Text style={[typography.bodySmall, styles.description]} numberOfLines={2}>{description}</Text>
+          <Text style={[typography.bodyMedium, styles.price]}>${cost}</Text>
+        </View>
+        <Image 
+          source={{ uri: imageUrl }} 
+          style={styles.image}
+          resizeMode="cover"
+        />
       </View>
     </TouchableOpacity>
   );
@@ -70,26 +72,31 @@ MenuItems.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    marginTop: 10,
-    height: '100%',
+    flex: 1,
+    width: '100%',
   },
   menuItem: {
-    width: '50%',
-    paddingHorizontal: 4,
-    paddingVertical: 4,
-  },
-  image: {
     width: '100%',
-    height: 120,
+    marginBottom: 16,
+    backgroundColor: colors.white,
     borderRadius: 12,
-    backgroundColor: '#E1E9EE',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    overflow: 'hidden',
+  },
+  contentContainer: {
+    flexDirection: 'row',
+    padding: 12,
   },
   textContainer: {
-    padding: 8,
+    flex: 1,
+    marginRight: 12,
+  },
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: '#E1E9EE',
   },
   name: {
     color: colors.text.primary,
@@ -100,7 +107,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   price: {
-    color: colors.text.secondary,
+    color: colors.primary,
+    fontWeight: '600',
   },
 });
 
