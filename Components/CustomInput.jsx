@@ -3,6 +3,7 @@ import { View, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
+import { layout } from '../styles/layout';
 
 const CustomInput = ({
   placeholder,
@@ -16,6 +17,8 @@ const CustomInput = ({
   editable = true,
   style,
 }) => {
+  const iconPadding = 48; // Increased from 40 to add more space
+
   return (
     <View style={[
       styles.inputContainer,
@@ -23,20 +26,21 @@ const CustomInput = ({
       style
     ]}>
       {iconPosition === 'left' && iconName && (
-        <Ionicons
-          name={iconName}
-          size={15}
-          color={editable ? colors.secondary : colors.text.disabled}
-          style={styles.iconLeft}
-        />
+        <View style={styles.iconLeftContainer}>
+          <Ionicons
+            name={iconName}
+            size={20}
+            color={editable ? colors.secondary : colors.text.disabled}
+          />
+        </View>
       )}
       <TextInput
         style={[
           styles.input,
           typography.bodyMedium,
           !editable && styles.inputDisabled,
-          iconPosition === 'left' && styles.inputWithLeftIcon,
-          iconPosition === 'right' && styles.inputWithRightIcon,
+          iconPosition === 'left' && { paddingLeft: iconPadding },
+          iconPosition === 'right' && { paddingRight: iconPadding },
         ]}
         placeholder={placeholder}
         value={value}
@@ -48,12 +52,13 @@ const CustomInput = ({
         editable={editable}
       />
       {iconPosition === 'right' && iconName && (
-        <Ionicons
-          name={iconName}
-          size={15}
-          color={editable ? colors.secondary : colors.text.disabled}
-          style={styles.iconRight}
-        />
+        <View style={styles.iconRightContainer}>
+          <Ionicons
+            name={iconName}
+            size={20}
+            color={editable ? colors.secondary : colors.text.disabled}
+          />
+        </View>
       )}
     </View>
   );
@@ -64,11 +69,10 @@ const styles = StyleSheet.create({
     height: 50,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 5,
-    paddingLeft: 12,
     backgroundColor: colors.light,
     borderRadius: 8,
     overflow: 'hidden',
+    position: 'relative',
   },
   inputContainerDisabled: {
     backgroundColor: colors.background,
@@ -77,27 +81,25 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: '100%',
-    fontFamily: 'Plus Jakarta Sans',
-    fontSize: 14,
-    color: colors.text.secondary,
-    opacity: 0.75,
+    paddingHorizontal: layout.spacing.lg,
+    color: colors.text.primary,
   },
   inputDisabled: {
     color: colors.text.disabled,
   },
-  inputWithLeftIcon: {
-    marginLeft: 8,
-  },
-  inputWithRightIcon: {
-    marginRight: 8,
-  },
-  iconLeft: {
+  iconLeftContainer: {
     position: 'absolute',
-    left: 12,
+    left: layout.spacing.lg,
+    height: '100%',
+    justifyContent: 'center',
     zIndex: 1,
   },
-  iconRight: {
-    marginRight: 10,
+  iconRightContainer: {
+    position: 'absolute',
+    right: layout.spacing.lg,
+    height: '100%',
+    justifyContent: 'center',
+    zIndex: 1,
   },
 });
 
