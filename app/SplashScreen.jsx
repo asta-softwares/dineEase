@@ -1,15 +1,37 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import LargeButton from '../Components/Buttons/LargeButton';
+import { tokenStorage } from '../utils/tokenStorage';
+import { useUserStore } from '../stores/userStore';
 
 const { width, height } = Dimensions.get('window');
 
 export default function SplashScreen() {
   const navigation = useNavigation();
+  const setUser = useUserStore((state) => state.setUser);
+
+  useEffect(() => {
+    checkAuthState();
+  }, []);
+
+  const checkAuthState = async () => {
+    try {
+      const token = await tokenStorage.getAccessToken();
+      if (token) {
+        // If we have a token, verify it by making an API call
+        // This could be a /me endpoint or similar
+        // For now, just navigate to Home if token exists
+        navigation.replace('Home');
+      }
+    } catch (error) {
+      // Token check failed, stay on splash screen
+      console.log('Token check failed:', error);
+    }
+  };
 
   const handleLoginSignup = () => {
     navigation.navigate('Login');

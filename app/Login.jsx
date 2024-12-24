@@ -18,11 +18,14 @@ import LargeButton from '../Components/Buttons/LargeButton';
 import CustomInput from '../Components/CustomInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import authService from '../api/services/authService';
+import { tokenStorage } from '../utils/tokenStorage';
+import { useUserStore } from '../stores/userStore';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const setUser = useUserStore(state => state.setUser);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -32,14 +35,28 @@ export default function LoginScreen({ navigation }) {
 
     try {
       setLoading(true);
-      await authService.login(email, password);
+      const response = await authService.login(email, password);
+      
+      // Store tokens securely
+      await tokenStorage.storeTokens(response.access, response.refresh);
+      
+      // Set user in global state if needed
+      if (response.user) {
+        setUser(response.user);
+      }
+
       navigation.replace('Home'); // Replace login screen with home screen
     } catch (error) {
       console.error('Login error:', error);
-      Alert.alert(
-        'Login Failed',
-        error.response?.data?.message || 'An error occurred during login'
-      );
+      let errorMessage = 'An error occurred during login';
+      
+      if (error.response?.status === 401) {
+        errorMessage = 'Invalid email or password';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      Alert.alert('Login Failed', errorMessage);
     } finally {
       setLoading(false);
     }

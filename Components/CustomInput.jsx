@@ -13,15 +13,20 @@ const CustomInput = ({
   secureTextEntry = false,
   keyboardType = 'default',
   autoCapitalize = 'none',
+  editable = true,
   style,
 }) => {
   return (
-    <View style={[styles.inputContainer, style]}>
+    <View style={[
+      styles.inputContainer,
+      !editable && styles.inputContainerDisabled,
+      style
+    ]}>
       {iconPosition === 'left' && iconName && (
         <Ionicons
           name={iconName}
           size={15}
-          color={colors.secondary}
+          color={editable ? colors.secondary : colors.text.disabled}
           style={styles.iconLeft}
         />
       )}
@@ -29,22 +34,24 @@ const CustomInput = ({
         style={[
           styles.input,
           typography.bodyMedium,
-          iconPosition === 'left' && { paddingLeft: 35 },
-          iconPosition === 'right' && { paddingRight: 35 },
+          !editable && styles.inputDisabled,
+          iconPosition === 'left' && styles.inputWithLeftIcon,
+          iconPosition === 'right' && styles.inputWithRightIcon,
         ]}
         placeholder={placeholder}
-        placeholderTextColor={colors.secondary}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
+        placeholderTextColor={editable ? colors.text.secondary : colors.text.disabled}
+        editable={editable}
       />
       {iconPosition === 'right' && iconName && (
         <Ionicons
           name={iconName}
           size={15}
-          color={colors.secondary}
+          color={editable ? colors.secondary : colors.text.disabled}
           style={styles.iconRight}
         />
       )}
@@ -63,6 +70,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
   },
+  inputContainerDisabled: {
+    backgroundColor: colors.background,
+    borderColor: colors.border,
+  },
   input: {
     flex: 1,
     height: '100%',
@@ -70,6 +81,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text.secondary,
     opacity: 0.75,
+  },
+  inputDisabled: {
+    color: colors.text.disabled,
+  },
+  inputWithLeftIcon: {
+    marginLeft: 8,
+  },
+  inputWithRightIcon: {
+    marginRight: 8,
   },
   iconLeft: {
     position: 'absolute',
