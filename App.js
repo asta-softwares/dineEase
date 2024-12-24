@@ -18,6 +18,7 @@ import LoginScreen from './app/Login';
 import SplashScreen from './app/SplashScreen';
 import ProfileScreen from './app/Profile';
 import EditProfileScreen from './app/EditProfile';
+import RegisterScreen from './app/Register';
 import { colors } from './styles/colors';
 
 // Initialize reanimated
@@ -58,6 +59,14 @@ export default function App() {
           <Stack.Screen 
             name="Login" 
             component={LoginScreen} 
+            options={{
+              gestureEnabled: false,
+              headerBackVisible: false
+            }}
+          />
+          <Stack.Screen 
+            name="Register" 
+            component={RegisterScreen} 
             options={{
               gestureEnabled: false,
               headerBackVisible: false

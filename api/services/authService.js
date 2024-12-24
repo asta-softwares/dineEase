@@ -3,15 +3,15 @@ import config from '../config';
 import { useUserStore } from '../../stores/userStore';
 
 const authService = {
-  register: async (email, phone, username, password, name, typeOfUser) => {
+  register: async (email, phone, password, first_name, last_name, type_of_user) => {
     try {
       const response = await apiClient.post('/register/', {
         email,
         phone,
-        username,
         password,
-        name,
-        typeOfUser,
+        first_name,
+        last_name,
+        type_of_user,
       });
 
       const { access, refresh } = response.data;

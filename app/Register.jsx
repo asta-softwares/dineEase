@@ -21,42 +21,54 @@ import authService from '../api/services/authService';
 import { tokenStorage } from '../utils/tokenStorage';
 import { useUserStore } from '../stores/userStore';
 
-export default function LoginScreen({ navigation }) {
+export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore(state => state.setUser);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
+  const handleRegister = async () => {
+    if (!email || !phone || !password || !confirmPassword || !firstName || !lastName) {
       Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
       return;
     }
 
     try {
       setLoading(true);
-      const response = await authService.login(email, password);
+      const response = await authService.register(
+        email,
+        phone,
+        password,
+        firstName,
+        lastName,
+        'customer'
+      );
       
-      // Store tokens securely
       await tokenStorage.storeTokens(response.access, response.refresh);
       
-      // Set user in global state if needed
       if (response.user) {
         setUser(response.user);
       }
 
-      navigation.replace('Home'); // Replace login screen with home screen
+      navigation.replace('Home');
     } catch (error) {
-      console.error('Login error:', error);
-      let errorMessage = 'An error occurred during login';
+      console.error('Registration error:', error);
+      let errorMessage = 'An error occurred during registration';
       
-      if (error.response?.status === 401) {
-        errorMessage = 'Invalid email or password';
-      } else if (error.response?.data?.message) {
+      if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       }
       
-      Alert.alert('Login Failed', errorMessage);
+      Alert.alert('Registration Failed', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -89,9 +101,33 @@ export default function LoginScreen({ navigation }) {
               <View style={styles.form}>
                 <View style={styles.inputContainer}>
                   <CustomInput
+                    value={firstName}
+                    onChangeText={setFirstName}
+                    placeholder="First Name"
+                    iconName="person-outline"
+                    iconPosition="left"
+                    autoCapitalize="words"
+                    editable={!loading}
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <CustomInput
+                    value={lastName}
+                    onChangeText={setLastName}
+                    placeholder="Last Name"
+                    iconName="person-outline"
+                    iconPosition="left"
+                    autoCapitalize="words"
+                    editable={!loading}
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <CustomInput
                     value={email}
                     onChangeText={setEmail}
-                    placeholder="Enter your email"
+                    placeholder="Email Address"
                     keyboardType="email-address"
                     iconName="mail-outline"
                     iconPosition="left"
@@ -102,9 +138,21 @@ export default function LoginScreen({ navigation }) {
 
                 <View style={styles.inputContainer}>
                   <CustomInput
+                    value={phone}
+                    onChangeText={setPhone}
+                    placeholder="Phone Number"
+                    keyboardType="phone-pad"
+                    iconName="call-outline"
+                    iconPosition="left"
+                    editable={!loading}
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <CustomInput
                     value={password}
                     onChangeText={setPassword}
-                    placeholder="Enter your password"
+                    placeholder="Password"
                     secureTextEntry
                     iconName="lock-closed-outline"
                     iconPosition="left"
@@ -112,27 +160,30 @@ export default function LoginScreen({ navigation }) {
                   />
                 </View>
 
-                <TouchableOpacity 
-                  style={styles.forgotPassword}
-                  onPress={() => navigation.navigate('ForgotPassword')}
-                >
-                  <Text style={[typography.labelMedium, { color: colors.text.primary }]}>
-                    Forgot Password?
-                  </Text>
-                </TouchableOpacity>
+                <View style={styles.inputContainer}>
+                  <CustomInput
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    placeholder="Confirm Password"
+                    secureTextEntry
+                    iconName="lock-closed-outline"
+                    iconPosition="left"
+                    editable={!loading}
+                  />
+                </View>
 
                 <LargeButton
-                  title={loading ? "Signing In..." : "Sign In"}
-                  onPress={handleLogin}
+                  title={loading ? "Creating Account..." : "Create Account"}
+                  onPress={handleRegister}
                   disabled={loading}
                 />
 
                 <TouchableOpacity 
-                  style={styles.registerLink}
-                  onPress={() => navigation.navigate('Register')}
+                  style={styles.loginLink}
+                  onPress={() => navigation.navigate('Login')}
                 >
                   <Text style={[typography.labelMedium, { color: colors.text.primary }]}>
-                    Don't have an account? Sign Up
+                    Already have an account? Sign In
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -181,11 +232,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginBottom: 16,
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: 24,
-  },
-  registerLink: {
+  loginLink: {
     alignSelf: 'center',
     marginTop: 16,
   },
