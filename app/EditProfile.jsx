@@ -260,16 +260,16 @@ const styles = StyleSheet.create({
   },
   keyboardView: {
     flex: 1,
-    marginTop: 120,
+    marginTop: Platform.OS === 'ios' ? 100 : 120,
   },
   content: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: Platform.OS === 'ios' ? 90 : 10,
+    paddingHorizontal: layout.spacing.md,
+    paddingBottom: Platform.OS === 'ios' ? 120 : 140,
   },
   section: {
-    paddingHorizontal: layout.spacing.md,
     paddingVertical: layout.spacing.sm,
     marginBottom: layout.spacing.md,
   },
