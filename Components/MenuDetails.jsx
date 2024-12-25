@@ -92,14 +92,13 @@ const MenuDetails = ({ item, restaurantId, visible, onClose }) => {
                 style={[
                   styles.addToCartButton,
                   styles.addButton,
-                  quantity === 0 && styles.removeButton
                 ]}
                 onPress={handleAddToCart}
               >
                 <Text style={styles.addButtonText}>
-                  {quantity === 0 
-                    ? 'Remove from Cart'
-                    : `${getItemQuantity(item.id) > 0 ? 'Update Cart' : 'Add to Cart'} - $${(parseFloat(item?.cost) * quantity).toFixed(2)}`
+                  {getItemQuantity(item.id) > 0 
+                    ? `Update Cart - $${(parseFloat(item?.cost) * quantity).toFixed(2)}`
+                    : `Add to Cart - $${(parseFloat(item?.cost) * quantity).toFixed(2)}`
                   }
                 </Text>
               </TouchableOpacity>
@@ -212,9 +211,6 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 16,
     fontFamily: 'PlusJakartaSans-SemiBold',
-  },
-  removeButton: {
-    backgroundColor: colors.error,
   },
 });
 

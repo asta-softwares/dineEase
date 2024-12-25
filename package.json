@@ -34,7 +34,6 @@
     "react-native-screens": "3.31.1",
     "react-native-skeleton-placeholder": "^5.2.4",
     "react-native-tab-view": "^4.0.5",
-    "react-native-tab-view-header": "^1.0.1",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
