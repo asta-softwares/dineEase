@@ -1,27 +1,52 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import TopNav from '../Components/TopNav';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Platform } from 'react-native';
 import { colors } from '../styles/colors';
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import {
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-} from "react-native";
 import { typography } from '../styles/typography';
+import { useCart } from '../context/CartContext';
+import TopNav from '../Components/TopNav';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import { restaurantService } from '../api/services/restaurantService';
 import Footer from './Layout/Footer';
 import LargeButton from '../Components/Buttons/LargeButton';
 
-const CheckoutScreen = ({ navigation }) => {
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
+const CartItem = ({ item, quantity }) => {
+  const { updateQuantity } = useCart();
 
+  return (
+    <View style={styles.cartItem}>
+      <View style={styles.itemInfo}>
+        <Text style={[typography.labelLarge, { color: colors.text.primary }]}>
+          {quantity} x {item.name}
+        </Text>
+        <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
+          ${item.cost} each
+        </Text>
+      </View>
+      <Text style={[typography.labelLarge, { color: colors.text.primary }]}>
+        ${(item.cost * quantity).toFixed(2)}
+      </Text>
+    </View>
+  );
+};
+
+const CheckoutScreen = ({ navigation }) => {
+  const { cart, getTotalCost } = useCart();
+  const [restaurant, setRestaurant] = useState(null);
   const scrollY = useSharedValue(0);
+
+  useEffect(() => {
+    const loadRestaurant = async () => {
+      if (cart.restaurantId) {
+        try {
+          const data = await restaurantService.getRestaurantById(cart.restaurantId);
+          setRestaurant(data);
+        } catch (error) {
+          console.error('Error loading restaurant:', error);
+        }
+      }
+    };
+    loadRestaurant();
+  }, [cart.restaurantId]);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -29,118 +54,109 @@ const CheckoutScreen = ({ navigation }) => {
     },
   });
 
+  if (!cart.restaurantId || Object.keys(cart.items).length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <TopNav 
+          handleGoBack={() => navigation.goBack()} 
+          title="Checkout" 
+          variant="solid" 
+          scrollY={scrollY}
+        />
+        <View style={styles.emptyCart}>
+          <Text style={[typography.h3, { color: colors.text.secondary }]}>
+            Your cart is empty
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const subtotal = getTotalCost();
+  const tax = subtotal * 0.13;
+  const total = subtotal + tax;
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TopNav 
-        handleGoBack={handleGoBack} 
+        handleGoBack={() => navigation.goBack()} 
         title="Checkout" 
         variant="solid" 
         scrollY={scrollY}
       />
+      
       <Animated.ScrollView 
         style={styles.content}
+        contentContainerStyle={styles.scrollContent}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
+        showsVerticalScrollIndicator={true}
       >
-        <View style={styles.section}>
-          <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
-            Restaurant Information
-          </Text>
-          
-          <View style={styles.restaurantCard}>
-            <Image
-              source={{
-                uri: "https://d2w1ef2ao9g8r9.cloudfront.net/otl-images/_1600x1066_crop_center-center_82_line/jonas-jacobsson-1iTKoFJvJ6E-unsplash.jpg",
-              }}
-              style={styles.restaurantImage}
-            />
-            <View style={styles.restaurantInfo}>
-              <View style={styles.restaurantTextContainer}>
-                <Text style={[typography.labelLarge, { color: colors.text.primary }]}>
-                  4 x The Flavorful Fork
-                </Text>
-                <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
-                  123 Main Street, Toronto, CA
-                </Text>
+        <View style={styles.contentPadding}>
+          <View style={styles.section}>
+            <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
+              Restaurant Information
+            </Text>
+            
+            {restaurant && (
+              <View style={styles.restaurantCard}>
+                <Image
+                  source={{ uri: restaurant.image }}
+                  style={styles.restaurantImage}
+                />
+                <View style={styles.restaurantInfo}>
+                  <View style={styles.restaurantTextContainer}>
+                    <Text style={[typography.h3, { color: colors.text.primary }]}>
+                      {restaurant.name}
+                    </Text>
+                    <Text style={[typography.bodyMedium, { color: colors.text.secondary, marginTop: 4 }]}>
+                      {restaurant.location}
+                    </Text>
+                  </View>
+                </View>
               </View>
-              <Text style={[typography.labelLarge, { color: colors.text.primary }]}>$ 25.00</Text>
-            </View>
+            )}
           </View>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
-            Details Transaction
-          </Text>
-          
-          <View style={styles.detailsList}>
-            <View style={styles.detailItem}>
-              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Total Bill</Text>
-              <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>$ 25.00 x 4</Text>
-            </View>
+          <View style={styles.section}>
+            <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
+              Order Details
+            </Text>
             
-            <View style={styles.detailItem}>
-              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Discount</Text>
-              <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>$ 0.00</Text>
-            </View>
-            
-            <View style={styles.detailItem}>
-              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Tax 13%</Text>
-              <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>$ 0.00</Text>
-            </View>
-            
-            <View style={[styles.detailItem, styles.totalItem]}>
-              <Text style={[typography.h3, { color: colors.text.primary }]}>Total Price</Text>
-              <Text style={[typography.h3, { color: colors.text.primary }]}>$ 100.00</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
-            Guest Information
-          </Text>
-          
-          <View style={styles.guestInfo}>
-            <View style={styles.infoItem}>
-              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Name</Text>
-              <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>Albert Stevano</Text>
-            </View>
-            
-            <View style={styles.infoItem}>
-              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Phone No.</Text>
-              <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>+12 8347 2838 28</Text>
-            </View>
-            
-            <View style={styles.infoItem}>
-              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Address</Text>
-              <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>New York</Text>
-            </View>
-            
-            <View style={styles.infoItem}>
-              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>House No.</Text>
-              <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>BC54 Berlin</Text>
-            </View>
-            
-            <View style={styles.infoItem}>
-              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>City</Text>
-              <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>New York City</Text>
+            <View style={styles.detailsList}>
+              {Object.entries(cart.items).map(([id, { item, quantity }]) => (
+                <CartItem key={id} item={item} quantity={quantity} />
+              ))}
+              
+              <View style={styles.detailItem}>
+                <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Subtotal</Text>
+                <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${subtotal.toFixed(2)}</Text>
+              </View>
+              
+              <View style={styles.detailItem}>
+                <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Tax (13%)</Text>
+                <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${tax.toFixed(2)}</Text>
+              </View>
+              
+              <View style={[styles.detailItem, styles.totalItem]}>
+                <Text style={[typography.h3, { color: colors.text.primary }]}>Total Price</Text>
+                <Text style={[typography.h3, { color: colors.text.primary }]}>${total.toFixed(2)}</Text>
+              </View>
             </View>
           </View>
         </View>
       </Animated.ScrollView>
+      
       <Footer>
         <LargeButton 
           title="Pay Now"
-          price="25.00"
+          price={`$${total.toFixed(2)}`}
           onPress={() => navigation.navigate('Home')}
         />
       </Footer>
-    </View>
+    </SafeAreaView>
   );
 };
-
-export default CheckoutScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -149,36 +165,55 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     padding: 20,
+    paddingTop: 0,
+    paddingBottom: 100,
+  },
+  contentPadding: {
+    paddingTop: Platform.OS === 'ios' ? 100 : 120,
   },
   section: {
     marginBottom: 32,
   },
+  emptyCart: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   restaurantCard: {
-    flexDirection: "row",
-    margin: 20,
     backgroundColor: "#FFFFFF",
     borderRadius: 8,
+    overflow: 'hidden',
+    padding: 16,
   },
   restaurantImage: {
-    width: 168,
-    height: 149,
+    width: '100%',
+    height: 200,
     borderRadius: 8,
+    marginBottom: 16,
   },
   restaurantInfo: {
-    marginLeft: 15,
     flex: 1,
-    justifyContent: "space-between",
   },
   restaurantTextContainer: {
     gap: 4,
   },
   detailsList: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.white,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  cartItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingVertical: 8,
   },
   detailItem: {
     flexDirection: 'row',
@@ -192,12 +227,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
-  guestInfo: {
-    margin: 20,
-  },
-  infoItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 14,
-  },
 });
+
+export default CheckoutScreen;

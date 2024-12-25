@@ -267,7 +267,7 @@ export default function DetailScreen({ route, navigation }) {
       <Animated.View style={[styles.footer, footerAnimatedStyle]}>
         <TouchableOpacity 
           style={styles.cartButton}
-          onPress={() => navigation.navigate('Cart')}
+          onPress={() => navigation.navigate('Checkout')}
         >
           <Text style={styles.cartButtonText}>
             View Cart ({totalItems} {totalItems === 1 ? 'item' : 'items'}) - Total: ${cartTotal.toFixed(2)}
