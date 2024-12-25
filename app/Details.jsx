@@ -52,10 +52,11 @@ export default function DetailScreen({ route, navigation }) {
   const [restaurant, setRestaurant] = useState(null);
   const [error, setError] = useState(null);
   const [cuisines, setCuisines] = useState([]);
-  const { cart, getTotalItems, getTotalCost } = useCart();
+  const cartContext = useCart();
+  const { cart, getTotalItems, getTotalCost } = cartContext || {};
   
-  const totalItems = cart.restaurantId === restaurantId ? getTotalItems() : 0;
-  const cartTotal = cart.restaurantId === restaurantId ? getTotalCost() : 0;
+  const totalItems = cart?.restaurantId === restaurantId ? (getTotalItems?.() || 0) : 0;
+  const cartTotal = cart?.restaurantId === restaurantId ? (getTotalCost?.() || 0) : 0;
   const footerAnimatedStyle = useAnimatedStyle(() => {
     return {
       transform: [

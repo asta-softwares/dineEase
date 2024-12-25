@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Platform } from 'react-native';
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Alert, Platform } from 'react-native';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import { useCart } from '../context/CartContext';
@@ -8,6 +8,7 @@ import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native
 import { restaurantService } from '../api/services/restaurantService';
 import Footer from './Layout/Footer';
 import LargeButton from '../Components/Buttons/LargeButton';
+import { useStripe } from '@stripe/stripe-react-native';
 
 const CartItem = ({ item, quantity }) => {
   const { updateQuantity } = useCart();
@@ -30,9 +31,11 @@ const CartItem = ({ item, quantity }) => {
 };
 
 const CheckoutScreen = ({ navigation }) => {
-  const { cart, getTotalCost } = useCart();
+  const { cart, getTotalCost, clearCart } = useCart();
   const [restaurant, setRestaurant] = useState(null);
+  const [loading, setLoading] = useState(false);
   const scrollY = useSharedValue(0);
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   useEffect(() => {
     const loadRestaurant = async () => {
@@ -47,6 +50,81 @@ const CheckoutScreen = ({ navigation }) => {
     };
     loadRestaurant();
   }, [cart.restaurantId]);
+
+  const handlePayment = async () => {
+    try {
+      setLoading(true);
+
+      if (subtotal <= 0) {
+        Alert.alert('Error', 'Your cart is empty');
+        return;
+      }
+
+      // Prepare order data
+      const orderData = {
+        amount: Math.round(total * 100), // Convert to cents
+        restaurant_id: cart.restaurantId,
+        owner_id: 1, // Replace with actual user ID
+        order_total: total,
+        menu_items: Object.entries(cart.items).map(([id, { item, quantity }]) => ({
+          menu_item_id: item.id,
+          quantity: quantity,
+        })),
+      };
+
+      // Step 1: Get the payment intent from the backend
+      const { clientSecret } = await restaurantService.createPaymentIntent(orderData.amount);
+
+      // Step 2: Initialize the Payment Sheet
+      const { error: initError } = await initPaymentSheet({
+        paymentIntentClientSecret: clientSecret,
+        merchantDisplayName: 'DineEase',
+      });
+
+      if (initError) {
+        throw new Error(initError.message);
+      }
+
+      // Step 3: Present the Payment Sheet
+      const { error: paymentError } = await presentPaymentSheet();
+
+      if (paymentError) {
+        throw new Error(paymentError.message);
+      }
+
+      // Step 4: Create the order
+      const result = await restaurantService.createOrder({
+        ...orderData,
+        payment: {
+          payment_method: 'credit_card',
+          payment_status: 'succeeded',
+          amount_paid: total,
+          payment_gateway: 'stripe',
+        },
+      });
+
+      // Success handling
+      Alert.alert(
+        'Success',
+        'Payment successful! Your order has been placed.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              clearCart();
+              navigation.navigate('Home');
+            },
+          },
+        ]
+      );
+
+    } catch (error) {
+      console.error('Payment error:', error);
+      Alert.alert('Error', error.message || 'Something went wrong with the payment.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -72,7 +150,7 @@ const CheckoutScreen = ({ navigation }) => {
     );
   }
 
-  const subtotal = getTotalCost();
+  const subtotal = getTotalCost() || 0;
   const tax = subtotal * 0.13;
   const total = subtotal + tax;
 
@@ -151,7 +229,8 @@ const CheckoutScreen = ({ navigation }) => {
         <LargeButton 
           title="Pay Now"
           price={`$${total.toFixed(2)}`}
-          onPress={() => navigation.navigate('Home')}
+          onPress={handlePayment}
+          loading={loading}
         />
       </Footer>
     </SafeAreaView>

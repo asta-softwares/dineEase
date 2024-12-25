@@ -21,6 +21,7 @@ import EditProfileScreen from './app/EditProfile';
 import RegisterScreen from './app/Register';
 import { colors } from './styles/colors';
 import { CartProvider } from './context/CartContext';
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 // Initialize reanimated
 import 'react-native-reanimated';
@@ -44,51 +45,56 @@ export default function App() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <CartProvider>
-          <Stack.Navigator 
-            initialRouteName="SplashScreen" 
-            screenOptions={{ headerShown: false }}>
-            <Stack.Screen 
-              name="SplashScreen" 
-              component={SplashScreen} 
-              options={{
-                gestureEnabled: false,
-                headerBackVisible: false
-              }}
-            />
-            <Stack.Screen 
-              name="Login" 
-              component={LoginScreen} 
-              options={{
-                gestureEnabled: false,
-                headerBackVisible: false
-              }}
-            />
-            <Stack.Screen 
-              name="Register" 
-              component={RegisterScreen} 
-              options={{
-                gestureEnabled: false,
-                headerBackVisible: false
-              }}
-            />
-            <Stack.Screen 
-              name="Home" 
-              component={HomeScreen} 
-              options={{
-                gestureEnabled: false,
-                headerBackVisible: false
-              }}
-            />
-            <Stack.Screen name="Details" component={DetailScreen} />
-            <Stack.Screen name="Checkout" component={CheckoutScreen} />
-            <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-          </Stack.Navigator>
-        </CartProvider>
-      </NavigationContainer>
-    </GestureHandlerRootView>
+    <StripeProvider
+      publishableKey="pk_test_51QMpBEAECjFQcoAiIBBR2ytlseH5Ztrp19gx9RWhTox7fzADahNcnjrnyLz0a4N3cv0xp63wx2daPuf3TXWaBSRE00muGzaBD0" // Replace with your Stripe publishable key
+      merchantIdentifier="merchant.com.dineease" // Optional: Only required for Apple Pay
+    >
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <NavigationContainer>
+          <CartProvider>
+            <Stack.Navigator 
+              initialRouteName="SplashScreen" 
+              screenOptions={{ headerShown: false }}>
+              <Stack.Screen 
+                name="SplashScreen" 
+                component={SplashScreen} 
+                options={{
+                  gestureEnabled: false,
+                  headerBackVisible: false
+                }}
+              />
+              <Stack.Screen 
+                name="Login" 
+                component={LoginScreen} 
+                options={{
+                  gestureEnabled: false,
+                  headerBackVisible: false
+                }}
+              />
+              <Stack.Screen 
+                name="Register" 
+                component={RegisterScreen} 
+                options={{
+                  gestureEnabled: false,
+                  headerBackVisible: false
+                }}
+              />
+              <Stack.Screen 
+                name="Home" 
+                component={HomeScreen} 
+                options={{
+                  gestureEnabled: false,
+                  headerBackVisible: false
+                }}
+              />
+              <Stack.Screen name="Details" component={DetailScreen} />
+              <Stack.Screen name="Checkout" component={CheckoutScreen} />
+              <Stack.Screen name="Profile" component={ProfileScreen} />
+              <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            </Stack.Navigator>
+          </CartProvider>
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </StripeProvider>
   );
 }

@@ -104,4 +104,26 @@ export const restaurantService = {
       throw error;
     }
   },
+
+  createOrder: async (orderData) => {
+    try {
+      const response = await apiClient.post('/payments/order-create/', orderData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating order:', error);
+      throw error;
+    }
+  },
+
+  createPaymentIntent: async (amount) => {
+    try {
+      const response = await apiClient.post('/payments/create-payment-intent/', { amount });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating payment intent:', error);
+      throw error;
+    }
+  }
 };
+
+export default restaurantService;

@@ -1,7 +1,16 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CartContext = createContext();
+const CartContext = createContext({
+  cart: { restaurantId: null, items: {} },
+  addToCart: () => {},
+  updateQuantity: () => {},
+  removeFromCart: () => {},
+  clearCart: () => {},
+  getItemQuantity: () => 0,
+  getTotalItems: () => 0,
+  getTotalCost: () => 0,
+});
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState({
@@ -123,10 +132,12 @@ export const CartProvider = ({ children }) => {
   };
 
   const getTotalItems = () => {
+    if (!cart.items || Object.keys(cart.items).length === 0) return 0;
     return Object.values(cart.items).reduce((sum, { quantity }) => sum + quantity, 0);
   };
 
   const getTotalCost = () => {
+    if (!cart.items || Object.keys(cart.items).length === 0) return 0;
     return Object.values(cart.items).reduce((total, { item, quantity }) => total + (item.cost * quantity), 0);
   };
 
