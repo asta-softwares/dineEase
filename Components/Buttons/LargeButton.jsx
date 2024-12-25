@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
     button: {
         borderRadius: 16,
         paddingVertical: 16,
-        marginBottom: 10,
         width: '100%',
         height: 60,
     },

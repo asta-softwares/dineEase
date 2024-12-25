@@ -1,57 +1,88 @@
 import PropTypes from 'prop-types';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import React, { useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
+import { useCart } from '../context/CartContext';
+import MenuDetails from './MenuDetails';
 
-const MenuItem = ({ name, cost, description, images }) => {
-  const imageUrl = images && images.length > 0 
-    ? images[0].image 
+const MenuItem = ({ item, restaurantId }) => {
+  const [showDetails, setShowDetails] = useState(false);
+  const { getItemQuantity } = useCart();
+  const quantity = getItemQuantity(item.id);
+  
+  const imageUrl = item.images && item.images.length > 0 
+    ? item.images[0].image 
     : 'https://via.placeholder.com/400';
 
   return (
-    <TouchableOpacity style={styles.menuItem} activeOpacity={0.7}>
-      <View style={styles.contentContainer}>
-        <View style={styles.textContainer}>
-          <Text style={[typography.labelLarge, styles.name]}>{name}</Text>
-          <Text style={[typography.bodySmall, styles.description]} numberOfLines={2}>{description}</Text>
-          <Text style={[typography.bodyMedium, styles.price]}>${cost}</Text>
+    <>
+      <TouchableOpacity 
+        style={[
+          styles.menuItem,
+          quantity > 0 && styles.menuItemSelected
+        ]} 
+        activeOpacity={0.7}
+        onPress={() => setShowDetails(true)}
+      >
+        <View style={styles.contentContainer}>
+          <View style={styles.textContainer}>
+            <Text style={[typography.labelLarge, styles.name]}>{item.name}</Text>
+            <Text style={[typography.bodySmall, styles.description]} numberOfLines={2}>
+              {item.description}
+            </Text>
+            <Text style={[typography.bodyMedium, styles.price]}>${item.cost}</Text>
+          </View>
+          <View>
+            <Image 
+              source={{ uri: imageUrl }} 
+              style={styles.image}
+              resizeMode="cover"
+            />
+            {quantity > 0 && (
+              <View style={styles.quantityBadge}>
+                <Text style={styles.quantityBadgeText}>{quantity}</Text>
+              </View>
+            )}
+          </View>
         </View>
-        <Image 
-          source={{ uri: imageUrl }} 
-          style={styles.image}
-          resizeMode="cover"
-        />
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+
+      <MenuDetails
+        item={item}
+        restaurantId={restaurantId}
+        visible={showDetails}
+        onClose={() => setShowDetails(false)}
+      />
+    </>
   );
 };
 
 MenuItem.propTypes = {
-  name: PropTypes.string.isRequired,
-  cost: PropTypes.string.isRequired,
-  description: PropTypes.string,
-  images: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number,
-      image: PropTypes.string,
-      caption: PropTypes.string,
-    })
-  ),
+  item: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    cost: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    images: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number,
+        image: PropTypes.string,
+        caption: PropTypes.string,
+      })
+    ),
+  }).isRequired,
+  restaurantId: PropTypes.number.isRequired,
 };
 
-const MenuItems = ({ items }) => {
-  const { width } = useWindowDimensions();
-
+const MenuItems = ({ items, restaurantId }) => {
   return (
     <View style={styles.container}>
       {items.map((item) => (
         <MenuItem
           key={item.id}
-          name={item.name}
-          cost={item.cost}
-          description={item.description}
-          images={item.images}
+          item={item}
+          restaurantId={restaurantId}
         />
       ))}
     </View>
@@ -68,6 +99,7 @@ MenuItems.propTypes = {
       images: PropTypes.array,
     })
   ).isRequired,
+  restaurantId: PropTypes.number.isRequired,
 };
 
 const styles = StyleSheet.create({
@@ -82,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border,
     overflow: 'hidden',
     shadowColor: "#000",
     shadowOffset: {
@@ -92,6 +124,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+  },
+  menuItemSelected: {
+    borderColor: colors.primary,
+    borderWidth: 2,
   },
   contentContainer: {
     flexDirection: 'row',
@@ -118,6 +154,25 @@ const styles = StyleSheet.create({
   price: {
     color: colors.primary,
     fontWeight: '600',
+  },
+  quantityBadge: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.white,
+  },
+  quantityBadgeText: {
+    color: colors.white,
+    fontSize: 12,
+    fontFamily: 'PlusJakartaSans-Bold',
+    paddingHorizontal: 6,
   },
 });
 

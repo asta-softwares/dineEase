@@ -19,6 +19,7 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   interpolate,
+  withSpring,
 } from "react-native-reanimated";
 import { restaurantService } from "../api/services/restaurantService";
 import { colors } from "../styles/colors";
@@ -26,6 +27,7 @@ import { typography } from "../styles/typography";
 import Footer from './Layout/Footer';
 import LargeButton from '../Components/Buttons/LargeButton';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useCart } from '../context/CartContext';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -41,8 +43,7 @@ const CustomHeader = ({ onClose }) => (
   </SafeAreaView>
 );
 
-export default function DetailScreen({ route }) {
-  const navigation = useNavigation();
+export default function DetailScreen({ route, navigation }) {
   const { restaurantId } = route.params;
   const { width } = useWindowDimensions();
   const scrollY = useSharedValue(0);
@@ -51,6 +52,22 @@ export default function DetailScreen({ route }) {
   const [restaurant, setRestaurant] = useState(null);
   const [error, setError] = useState(null);
   const [cuisines, setCuisines] = useState([]);
+  const { cart, getTotalItems } = useCart();
+  
+  const totalItems = cart.restaurantId === restaurantId ? getTotalItems() : 0;
+  const footerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: withSpring(totalItems > 0 ? 0 : 100, {
+            damping: 20,
+            stiffness: 90,
+          })
+        }
+      ],
+      opacity: withSpring(totalItems > 0 ? 1 : 0)
+    };
+  }, [totalItems]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -207,7 +224,10 @@ export default function DetailScreen({ route }) {
                   return (
                     <View key={cuisine.id} style={styles.menuSection}>
                       <Text style={[styles.cuisineTitle]}>{cuisine.name}</Text>
-                      <MenuItems items={menuItems} />
+                      <MenuItems 
+                        items={menuItems}
+                        restaurantId={restaurant.id} 
+                      />
                     </View>
                   );
                 }
@@ -223,7 +243,8 @@ export default function DetailScreen({ route }) {
                   <MenuItems 
                     items={restaurant.menus.filter(
                       menu => !menu.category || !cuisines.some(cuisine => cuisine.id.toString() === menu.category.toString())
-                    )} 
+                    )}
+                    restaurantId={restaurant.id}
                   />
                 </View>
               )}
@@ -242,12 +263,16 @@ export default function DetailScreen({ route }) {
         )}
       />
       
-      <Footer style={[styles.footer, { backgroundColor: colors.background }]}>
-        <LargeButton 
-          title="View Cart"
-          onPress={handleCheckout}
-        />
-      </Footer>
+      <Animated.View style={[styles.footer, footerAnimatedStyle]}>
+        <TouchableOpacity 
+          style={styles.cartButton}
+          onPress={() => navigation.navigate('Cart')}
+        >
+          <Text style={styles.cartButtonText}>
+            View Cart ({totalItems} {totalItems === 1 ? 'item' : 'items'})
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
@@ -364,21 +389,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   footer: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0, 0, 0, 0.1)",
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
+    backgroundColor: colors.white,
+    paddingBottom: 32,
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: -2,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  cartButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  cartButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontFamily: 'PlusJakartaSans-SemiBold',
   },
   loadingContainer: {
     flex: 1,
