@@ -37,7 +37,7 @@ const CheckoutScreen = ({ navigation }) => {
   const [calculating, setCalculating] = useState(false);
   const [orderTotals, setOrderTotals] = useState(null);
   const scrollY = useSharedValue(0);
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const { initPaymentSheet, presentPaymentSheet, retrievePaymentIntent } = useStripe();
 
   const subtotal = getTotalCost() || 0;
 
@@ -105,34 +105,66 @@ const CheckoutScreen = ({ navigation }) => {
 
       // Step 1: Get the payment intent from the backend
       const { clientSecret } = await restaurantService.createPaymentIntent(orderData.amount);
+      console.log('Payment Intent Response:', { clientSecret });
 
       // Step 2: Initialize the Payment Sheet
       const { error: initError } = await initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: 'DineEase',
       });
+      console.log('Payment Sheet Init Response:', { error: initError });
 
       if (initError) {
+        console.error('Payment Sheet Init Error:', initError);
         throw new Error(initError.message);
       }
 
       // Step 3: Present the Payment Sheet
-      const { error: paymentError } = await presentPaymentSheet();
+      const { error: paymentError, paymentOption } = await presentPaymentSheet();
+      console.log('Payment Sheet Presentation Response:', {
+        error: paymentError,
+        paymentOption,
+      });
 
       if (paymentError) {
+        console.error('Payment Error:', paymentError);
         throw new Error(paymentError.message);
       }
 
-      // Step 4: Create the order
-      const result = await restaurantService.createOrder({
-        ...orderData,
-        payment: {
-          payment_method: 'credit_card',
-          payment_status: 'succeeded',
-          amount_paid: orderTotals.total,
+      // Retrieve the PaymentIntent details after successful payment
+      const { paymentIntent, error: retrieveError } = await retrievePaymentIntent(clientSecret);
+      
+      if (retrieveError) {
+        console.error('Error retrieving payment details:', retrieveError);
+      } else {
+        console.log('Payment Success Details:', {
+          id: paymentIntent.id,
+          status: paymentIntent.status,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency,
+          paymentMethod: paymentIntent.payment_method,
+          created: new Date(paymentIntent.created * 1000).toISOString(),
+          clientSecret: paymentIntent.client_secret,
+        });
+      }
+      
+      if (paymentIntent.status == "Succeeded") {
+        // Step 4: Create the order
+        const result = await restaurantService.createOrder({
+          ...orderData,
+          payment: {
+            payment_method: "credit_card",
+            payment_status: paymentIntent.status,
+            amount_paid: paymentIntent.amount,
           payment_gateway: 'stripe',
+          transaction_id: paymentIntent.id,
         },
       });
+      console.log('Order Creation Response:', result);
+      } else {
+        throw new Error("Payment failed");
+      }
+  
 
       // Success handling
       Alert.alert(
