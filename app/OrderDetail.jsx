@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, Image, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import TopNav from '../Components/TopNav';
 import Footer from './Layout/Footer';
@@ -16,7 +16,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const response = await restaurantService.getOrdersById(order.order_id);
+        const response = await restaurantService.getOrdersById(order.id);
         setOrderDetails(response);
       } catch (error) {
         console.error('Error fetching order details:', error);
@@ -77,7 +77,12 @@ const OrderDetailScreen = ({ route, navigation }) => {
         variant="solid"
       />
       
-      <ScrollView style={styles.content}>
+      <ScrollView 
+        bounces={false}
+        overScrollMode="never"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.contentContainer}
+      >
         <Image
           source={{
             uri: restaurant?.image || 'https://via.placeholder.com/400',
@@ -88,7 +93,14 @@ const OrderDetailScreen = ({ route, navigation }) => {
         <View style={styles.orderInfo}>
           <Text style={[typography.h2, styles.sectionTitle]}>Order from</Text>
           <View style={styles.restaurantInfo}>
-            <Text style={typography.h3}>{orderDetails?.restaurant}</Text>
+            <View style={styles.restaurantHeader}>
+              <Text style={typography.h3}>{restaurant?.name}</Text>
+              <View style={[styles.statusBadge, styles[`status_${order.status}`]]}>
+                <Text style={[typography.labelMedium, styles.statusText]}>
+                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                </Text>
+              </View>
+            </View>
             <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
               Order Time: {new Date(orderDetails?.order_time).toLocaleString()}
             </Text>
@@ -120,7 +132,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
         </View>
       </ScrollView>
 
-      <Footer>
+      <Footer style={{ paddingBottom: 20 }}>
         <LargeButton
           title="Back to Home"
           onPress={() => navigation.navigate('Home')}
@@ -139,8 +151,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  content: {
-    flex: 1,
+  contentContainer: {
+    paddingTop: Platform.OS === 'ios' ? 120 : 140,
+    paddingBottom: 120,
   },
   headerImage: {
     width: '100%',
@@ -158,6 +171,44 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     padding: 16,
     borderRadius: 12,
+  },
+  restaurantHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statusText: {
+    color: colors.white,
+    fontSize: 12,
+    fontFamily: 'PlusJakartaSans-SemiBold',
+    marginLeft: 2,
+  },
+  status_pending: {
+    backgroundColor: '#FFA500',
+  },
+  status_confirmed: {
+    backgroundColor: '#3498db',
+  },
+  status_preparing: {
+    backgroundColor: colors.primary,
+  },
+  status_delivered: {
+    backgroundColor: '#2ecc71',
+  },
+  status_completed: {
+    backgroundColor: '#2ecc71',
+  },
+  status_cancelled: {
+    backgroundColor: '#e74c3c',
   },
   orderItems: {
     backgroundColor: colors.background.secondary,

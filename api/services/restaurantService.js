@@ -156,7 +156,7 @@ export const restaurantService = {
 
   getOrdersById: async (orderId) => {
     try {
-      const response = await apiClient.get(`/payments/orders/${orderId}`);
+      const response = await apiClient.get(`/payments/orders/${orderId}/`);
       return response.data;
     } catch (error) {
       console.error('Error fetching payment orders:', error);

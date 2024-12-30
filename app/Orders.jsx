@@ -36,18 +36,18 @@ const OrderCard = ({ order, onPress }) => {
       <View style={styles.contentContainer}>
         <View style={styles.textContainer}>
           <View style={styles.orderHeader}>
-            <Text style={[typography.labelLarge, styles.name]}>
+            <Text style={[typography.labelLarge, styles.orderId]}>
               Order #{order.id}
             </Text>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) }]}>
-              <Text style={styles.statusText}>
-                {order.status.toUpperCase()}
+            <View style={[styles.statusBadge, styles[`status_${order.status}`]]}>
+              <Text style={[typography.labelMedium, styles.statusText]}>
+                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </Text>
             </View>
           </View>
           
           <Text style={[typography.labelLarge, styles.restaurantName]}>
-            {order.restaurant}
+            {order.restaurant_details.name}
           </Text>
           
           <View style={styles.itemsList}>
@@ -101,12 +101,8 @@ const OrdersScreen = ({ navigation }) => {
 
   const handleOrderPress = (order) => {
     navigation.navigate('OrderDetailScreen', { 
-      order: {
-        order_id: order.id
-      },
-      restaurant: {
-        name: order.restaurant
-      }
+      order: order,
+      restaurant: order.restaurant_details
     });
   };
 
@@ -184,8 +180,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  name: {
+  orderId: {
     color: colors.text.primary,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statusText: {
+    color: colors.white,
+    fontSize: 12,
+    fontFamily: 'PlusJakartaSans-SemiBold',
+  },
+  status_pending: {
+    backgroundColor: '#FFA500',
+  },
+  status_confirmed: {
+    backgroundColor: '#3498db',
+  },
+  status_preparing: {
+    backgroundColor: colors.primary,
+  },
+  status_delivered: {
+    backgroundColor: '#2ecc71',
+  },
+  status_completed: {
+    backgroundColor: '#2ecc71',
+  },
+  status_cancelled: {
+    backgroundColor: '#e74c3c',
   },
   restaurantName: {
     color: colors.text.primary,
@@ -194,16 +220,6 @@ const styles = StyleSheet.create({
   description: {
     color: colors.text.secondary,
     marginBottom: 4,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  statusText: {
-    color: colors.white,
-    fontSize: 12,
-    fontFamily: 'PlusJakartaSans-Bold',
   },
   itemsList: {
     marginBottom: 8,
