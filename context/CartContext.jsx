@@ -2,19 +2,26 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CartContext = createContext({
-  cart: { restaurantId: null, items: {} },
+  cart: { restaurantId: null, items: {}, promos: [] },
   addToCart: () => {},
   updateQuantity: () => {},
   removeFromCart: () => {},
   clearCart: () => {},
+  getTotalCost: () => {},
+  addPromo: () => {},
   getItemQuantity: () => 0,
   getTotalItems: () => 0,
   getTotalCost: () => 0,
+  removePromo: () => {},
+  clearPromos: () => {},
+  getPromos: () => {},
+  validatePromo: () => {},
 });
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState({
     restaurantId: null,
+    promos: [],
     items: {},  // { itemId: { item: {}, quantity: number } }
   });
 
@@ -121,8 +128,94 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  const updatePromos = (promos) => {
+    setCart(prevCart => {
+      const newCart = {
+        ...prevCart,
+        promos
+      };
+      saveCart(newCart);
+      return newCart;
+    });
+  };
+
+  const addPromo = async (promoId, orderTotal) => {
+    try {
+      if (!cart.restaurantId) {
+        throw new Error('No restaurant selected');
+      }
+
+      // Validate promo with restaurant service
+      const promos = await restaurantService.getOrderPromos(cart.restaurantId, orderTotal);
+      const validPromo = promos.find(promo => promo.id === promoId);
+
+      if (!validPromo) {
+        throw new Error('Invalid promo code for this restaurant');
+      }
+
+      setCart(prevCart => {
+        const newPromos = [...prevCart.promos];
+        if (!newPromos.includes(promoId)) {
+          newPromos.push(promoId);
+        }
+        const newCart = {
+          ...prevCart,
+          promos: newPromos
+        };
+        saveCart(newCart);
+        return newCart;
+      });
+
+      return validPromo;
+    } catch (error) {
+      console.error('Error adding promo:', error);
+      throw error;
+    }
+  };
+
+  const validatePromo = async (promoId, orderTotal) => {
+    try {
+      if (!cart.restaurantId) {
+        throw new Error('No restaurant selected');
+      }
+
+      const promos = await restaurantService.getOrderPromos(cart.restaurantId, orderTotal);
+      return promos.find(promo => promo.id === promoId);
+    } catch (error) {
+      console.error('Error validating promo:', error);
+      throw error;
+    }
+  };
+
+  const removePromo = (promoId) => {
+    setCart(prevCart => {
+      const newPromos = prevCart.promos.filter(id => id !== promoId);
+      const newCart = {
+        ...prevCart,
+        promos: newPromos
+      };
+      saveCart(newCart);
+      return newCart;
+    });
+  };
+
+  const clearPromos = () => {
+    setCart(prevCart => {
+      const newCart = {
+        ...prevCart,
+        promos: []
+      };
+      saveCart(newCart);
+      return newCart;
+    });
+  };
+
+  const getPromos = () => {
+    return cart.promos;
+  };
+
   const clearCart = () => {
-    const emptyCart = { restaurantId: null, items: {} };
+    const emptyCart = { restaurantId: null, items: {}, promos: [] };
     setCart(emptyCart);
     saveCart(emptyCart);
   };
@@ -148,6 +241,12 @@ export const CartProvider = ({ children }) => {
       updateQuantity,
       removeFromCart,
       clearCart,
+      getTotalCost,
+      addPromo,
+      removePromo,
+      clearPromos,
+      getPromos,
+      validatePromo,
       getItemQuantity,
       getTotalItems,
       getTotalCost

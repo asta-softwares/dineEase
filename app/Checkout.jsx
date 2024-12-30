@@ -34,8 +34,34 @@ const CheckoutScreen = ({ navigation }) => {
   const { cart, getTotalCost, clearCart } = useCart();
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [calculating, setCalculating] = useState(false);
+  const [orderTotals, setOrderTotals] = useState(null);
   const scrollY = useSharedValue(0);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+  const subtotal = getTotalCost() || 0;
+
+  useEffect(() => {
+    const calculateOrderTotal = async () => {
+      if (cart.restaurantId && subtotal > 0) {
+        try {
+          setCalculating(true);
+          const calculateTotal = await restaurantService.getOrderTotal({
+            order_total: subtotal.toFixed(2),
+            restaurant_id: cart.restaurantId,
+            promo_ids: cart.promos,
+          });
+          setOrderTotals(calculateTotal);
+        } catch (error) {
+          console.error('Error calculating order total:', error);
+          Alert.alert('Error', 'Unable to calculate order total');
+        } finally {
+          setCalculating(false);
+        }
+      }
+    };
+    calculateOrderTotal();
+  }, [cart.restaurantId, subtotal, cart.promos]);
 
   useEffect(() => {
     const loadRestaurant = async () => {
@@ -60,12 +86,17 @@ const CheckoutScreen = ({ navigation }) => {
         return;
       }
 
+      if (!orderTotals) {
+        Alert.alert('Error', 'Unable to calculate order total');
+        return;
+      }
+
       // Prepare order data
       const orderData = {
-        amount: Math.round(total * 100), // Convert to cents
+        amount: orderTotals.total.toFixed(2),
         restaurant_id: cart.restaurantId,
         owner_id: 1, // Replace with actual user ID
-        order_total: total,
+        order_total: orderTotals.total.toFixed(2),
         menu_items: Object.entries(cart.items).map(([id, { item, quantity }]) => ({
           menu_item_id: item.id,
           quantity: quantity,
@@ -98,7 +129,7 @@ const CheckoutScreen = ({ navigation }) => {
         payment: {
           payment_method: 'credit_card',
           payment_status: 'succeeded',
-          amount_paid: total,
+          amount_paid: orderTotals.total,
           payment_gateway: 'stripe',
         },
       });
@@ -150,9 +181,7 @@ const CheckoutScreen = ({ navigation }) => {
     );
   }
 
-  const subtotal = getTotalCost() || 0;
-  const tax = subtotal * 0.13;
-  const total = subtotal + tax;
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -204,33 +233,66 @@ const CheckoutScreen = ({ navigation }) => {
             <View style={styles.detailsList}>
               {Object.entries(cart.items).map(([id, { item, quantity }]) => (
                 <CartItem key={id} item={item} quantity={quantity} />
-              ))}
+              ))}  
               
-              <View style={styles.detailItem}>
-                <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Subtotal</Text>
-                <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${subtotal.toFixed(2)}</Text>
-              </View>
-              
-              <View style={styles.detailItem}>
-                <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Tax (13%)</Text>
-                <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${tax.toFixed(2)}</Text>
-              </View>
-              
-              <View style={[styles.detailItem, styles.totalItem]}>
-                <Text style={[typography.h3, { color: colors.text.primary }]}>Total Price</Text>
-                <Text style={[typography.h3, { color: colors.text.primary }]}>${total.toFixed(2)}</Text>
-              </View>
+              {calculating ? (
+                <View style={styles.detailItem}>
+                  <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Calculating total...</Text>
+                </View>
+              ) : orderTotals && (
+                <>
+                  <View style={styles.detailItem}>
+                    <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Subtotal</Text>
+                    <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${orderTotals.order_total.toFixed(2)}</Text>
+                  </View>
+
+                  {orderTotals.tax_amount > 0 && (
+                    <View style={styles.detailItem}>
+                      <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Tax ({(orderTotals.tax_rate * 100).toFixed(1)}%)</Text>
+                      <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${orderTotals.tax_amount.toFixed(2)}</Text>
+                    </View>
+                  )}
+
+                  {orderTotals.discount > 0 && (
+                    <View style={styles.detailItem}>
+                      <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Discount</Text>
+                      <Text style={[typography.bodyLarge, { color: colors.success }]}>-${orderTotals.discount.toFixed(2)}</Text>
+                    </View>
+                  )}
+
+                  {orderTotals.service_fee > 0 && (
+                    <View style={styles.detailItem}>
+                      <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Service Fee</Text>
+                      <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${orderTotals.service_fee.toFixed(2)}</Text>
+                    </View>
+                  )}
+
+                  {orderTotals.service_fee_tax > 0 && (
+                    <View style={styles.detailItem}>
+                      <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Service Fee Tax</Text>
+                      <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${orderTotals.service_fee_tax.toFixed(2)}</Text>
+                    </View>
+                  )}
+                  
+                  <View style={[styles.detailItem, styles.totalItem]}>
+                    <Text style={[typography.h3, { color: colors.text.primary }]}>Total Price</Text>
+                    <Text style={[typography.h3, { color: colors.text.primary }]}>${orderTotals.total.toFixed(2)}</Text>
+                  </View>
+                </>
+              )}
             </View>
           </View>
+
         </View>
       </Animated.ScrollView>
       
       <Footer>
         <LargeButton 
           title="Pay Now"
-          price={`$${total.toFixed(2)}`}
+          price={orderTotals ? `$${orderTotals.total.toFixed(2)}` : `$${subtotal.toFixed(2)}`}
           onPress={handlePayment}
-          loading={loading}
+          loading={loading || calculating}
+          disabled={calculating}
         />
       </Footer>
     </SafeAreaView>
@@ -303,6 +365,26 @@ const styles = StyleSheet.create({
   totalItem: {
     marginTop: 12,
     paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  summaryContainer: {
+    padding: 16,
+    backgroundColor: colors.surface,
+    borderRadius: 8,
+    marginVertical: 16,
+  },
+  summaryTitle: {
+    marginBottom: 16,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  totalRow: {
+    marginTop: 8,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },

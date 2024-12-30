@@ -95,12 +95,32 @@ export const restaurantService = {
     }
   },
 
-  getPromos: async () => {
+  getAllPromos: async () => {
     try {
       const response = await apiClient.get('/promos/');
       return response.data;
     } catch (error) {
       console.error('Error fetching promos:', error);
+      throw error;
+    }
+  },
+
+  getOrderPromos: async (restaurantId, orderTotal) => {
+    try {
+      const response = await apiClient.get(`/promos/restaurant/${restaurantId}?order_total=${orderTotal}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching promos:', error);
+      throw error;
+    }
+  },
+
+  getOrderTotal: async (orderData) => {
+    try {
+      const response = await apiClient.post(`/payments/order-preview/`, orderData);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching order total preview:', error);
       throw error;
     }
   },
