@@ -31,7 +31,7 @@ export const restaurantService = {
 
   searchRestaurants: async (query) => {
     try {
-      const response = await apiClient.get('/restaurants/search', { 
+      const response = await apiClient.get('/restaurants/search/', { 
         params: { q: query } 
       });
       return response.data;
@@ -42,7 +42,7 @@ export const restaurantService = {
 
   getRestaurantsCategory: async (category) => {
     try {
-      const response = await apiClient.get('/restaurant-categories', {
+      const response = await apiClient.get('/restaurant-categories/', {
         params: { category }
       });
       return response.data;
@@ -140,10 +140,29 @@ export const restaurantService = {
       const response = await apiClient.post('/payments/create-payment-intent/', { amount });
       return response.data;
     } catch (error) {
-      console.error('Error creating payment intent:', error);
       throw error;
     }
-  }
+  },
+
+  getOrders: async () => {
+    try {
+      const response = await apiClient.get('/payments/orders/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching payment orders:', error);
+      throw error;
+    }
+  },
+
+  getOrdersById: async (orderId) => {
+    try {
+      const response = await apiClient.get(`/payments/orders/${orderId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching payment orders:', error);
+      throw error;
+    }
+  },
 };
 
 export default restaurantService;

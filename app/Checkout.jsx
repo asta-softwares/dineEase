@@ -147,6 +147,8 @@ const CheckoutScreen = ({ navigation }) => {
           clientSecret: paymentIntent.client_secret,
         });
       }
+
+      let orderResponse = '';
       
       if (paymentIntent.status == "Succeeded") {
         // Step 4: Create the order
@@ -160,6 +162,7 @@ const CheckoutScreen = ({ navigation }) => {
           transaction_id: paymentIntent.id,
         },
       });
+      orderResponse = result;
       console.log('Order Creation Response:', result);
       } else {
         throw new Error("Payment failed");
@@ -175,7 +178,7 @@ const CheckoutScreen = ({ navigation }) => {
             text: 'OK',
             onPress: () => {
               clearCart();
-              navigation.navigate('Home');
+              navigation.navigate('OrderDetailScreen', { order: orderResponse, restaurant: restaurant });
             },
           },
         ]
@@ -346,7 +349,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   contentPadding: {
-    paddingTop: Platform.OS === 'ios' ? 100 : 120,
+    paddingTop: Platform.OS === 'ios' ? 70 : 90,
   },
   section: {
     marginBottom: 32,

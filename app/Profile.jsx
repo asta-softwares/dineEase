@@ -123,7 +123,7 @@ const ProfileScreen = () => {
                 await handleOpenURL('https://www.dineease.ca/');
                 break;
             case 'Orders':
-                navigation.navigate('Orders');
+                navigation.navigate('OrdersScreen');
                 break;
             case 'Partnership':
                 await handleOpenURL('https://www.dineease.ca/partners');

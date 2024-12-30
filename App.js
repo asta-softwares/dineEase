@@ -22,7 +22,8 @@ import RegisterScreen from './app/Register';
 import { colors } from './styles/colors';
 import { CartProvider } from './context/CartContext';
 import { StripeProvider } from '@stripe/stripe-react-native';
-
+import OrderDetailScreen from './app/OrderDetail';
+import OrdersScreen from './app/Orders';
 // Initialize reanimated
 import 'react-native-reanimated';
 
@@ -91,6 +92,8 @@ export default function App() {
               <Stack.Screen name="Checkout" component={CheckoutScreen} />
               <Stack.Screen name="Profile" component={ProfileScreen} />
               <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+              <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} />
+              <Stack.Screen name="OrdersScreen" component={OrdersScreen} />
             </Stack.Navigator>
           </CartProvider>
         </NavigationContainer>
