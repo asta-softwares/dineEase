@@ -132,7 +132,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
         </View>
       </ScrollView>
 
-      <Footer style={{ paddingBottom: 20 }}>
+      <Footer>
         <LargeButton
           title="Back to Home"
           onPress={() => navigation.navigate('Home')}
