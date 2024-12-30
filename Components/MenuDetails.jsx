@@ -198,8 +198,10 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: colors.primary,
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    height: 60,
+    width: '100%',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   addToCartButton: {
@@ -209,8 +211,8 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: colors.white,
-    fontSize: 16,
     fontFamily: 'PlusJakartaSans-SemiBold',
+    fontSize: 16,
   },
 });
 

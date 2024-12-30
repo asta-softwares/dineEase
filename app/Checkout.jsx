@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Alert, Platform } from 'react-native';
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Alert, Platform, ActivityIndicator } from 'react-native';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import { useCart } from '../context/CartContext';
@@ -36,6 +36,7 @@ const CheckoutScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [calculating, setCalculating] = useState(false);
   const [orderTotals, setOrderTotals] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const scrollY = useSharedValue(0);
   const { initPaymentSheet, presentPaymentSheet, retrievePaymentIntent } = useStripe();
 
@@ -78,7 +79,11 @@ const CheckoutScreen = ({ navigation }) => {
   }, [cart.restaurantId]);
 
   const handlePayment = async () => {
+    // Prevent multiple submissions
+    if (isProcessing || loading || calculating) return;
+
     try {
+      setIsProcessing(true);
       setLoading(true);
 
       if (subtotal <= 0) {
@@ -185,10 +190,11 @@ const CheckoutScreen = ({ navigation }) => {
       );
 
     } catch (error) {
-      console.error('Payment error:', error);
-      Alert.alert('Error', error.message || 'Something went wrong with the payment.');
+      console.error('Error processing payment:', error);
+      Alert.alert('Error', 'Failed to process payment. Please try again.');
     } finally {
       setLoading(false);
+      setIsProcessing(false);
     }
   };
 
@@ -283,7 +289,7 @@ const CheckoutScreen = ({ navigation }) => {
 
                   {orderTotals.tax_amount > 0 && (
                     <View style={styles.detailItem}>
-                      <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Tax ({(orderTotals.tax_rate * 100).toFixed(1)}%)</Text>
+                      <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Tax ({(orderTotals.tax_rate).toFixed(1)}%)</Text>
                       <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${orderTotals.tax_amount.toFixed(2)}</Text>
                     </View>
                   )}
@@ -326,8 +332,8 @@ const CheckoutScreen = ({ navigation }) => {
           title="Pay Now"
           price={orderTotals ? `$${orderTotals.total.toFixed(2)}` : `$${subtotal.toFixed(2)}`}
           onPress={handlePayment}
-          loading={loading || calculating}
-          disabled={calculating}
+          loading={loading || calculating || isProcessing}
+          disabled={loading || calculating || isProcessing}
         />
       </Footer>
     </SafeAreaView>
@@ -422,6 +428,18 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: colors.border,
+  },
+  payButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
+  },
+  payButtonDisabled: {
+    opacity: 0.7,
   },
 });
 

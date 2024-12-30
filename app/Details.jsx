@@ -411,14 +411,15 @@ const styles = StyleSheet.create({
   },
   cartButton: {
     backgroundColor: colors.primary,
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    height: 60,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   cartButtonText: {
     color: colors.white,
-    fontSize: 16,
     fontFamily: 'PlusJakartaSans-SemiBold',
+    fontSize: 16,
   },
   loadingContainer: {
     flex: 1,
