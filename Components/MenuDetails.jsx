@@ -97,8 +97,8 @@ const MenuDetails = ({ item, restaurantId, visible, onClose }) => {
               >
                 <Text style={styles.addButtonText}>
                   {getItemQuantity(item.id) > 0 
-                    ? `Update Cart - $${(parseFloat(item?.cost) * quantity).toFixed(2)}`
-                    : `Add to Cart - $${(parseFloat(item?.cost) * quantity).toFixed(2)}`
+                    ? `Update Cart - $${(parseFloat(item?.discounted_cost) * quantity).toFixed(2)}`
+                    : `Add to Cart - $${(parseFloat(item?.discounted_cost) * quantity).toFixed(2)}`
                   }
                 </Text>
               </TouchableOpacity>

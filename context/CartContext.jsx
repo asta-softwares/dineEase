@@ -231,7 +231,7 @@ export const CartProvider = ({ children }) => {
 
   const getTotalCost = () => {
     if (!cart.items || Object.keys(cart.items).length === 0) return 0;
-    return Object.values(cart.items).reduce((total, { item, quantity }) => total + (item.cost * quantity), 0);
+    return Object.values(cart.items).reduce((total, { item, quantity }) => total + (item.discounted_cost * quantity), 0);
   };
 
   return (
@@ -247,7 +247,7 @@ export const CartProvider = ({ children }) => {
       clearPromos,
       getPromos,
       validatePromo,
-      getItemQuantity,
+         getItemQuantity,
       getTotalItems,
       getTotalCost
     }}>
