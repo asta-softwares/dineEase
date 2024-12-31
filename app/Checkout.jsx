@@ -10,6 +10,7 @@ import { restaurantService } from '../api/services/restaurantService';
 import Footer from './Layout/Footer';
 import LargeButton from '../Components/Buttons/LargeButton';
 import { useStripe } from '@stripe/stripe-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const CartItem = ({ item, quantity }) => {
   const { updateQuantity } = useCart();
@@ -40,6 +41,9 @@ const CheckoutScreen = ({ navigation }) => {
   const [calculating, setCalculating] = useState(false);
   const [orderTotals, setOrderTotals] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [availablePromos, setAvailablePromos] = useState([]);
+  const [selectedPromo, setSelectedPromo] = useState(null);
+  const [showPromoDropdown, setShowPromoDropdown] = useState(false);
   const scrollY = useSharedValue(0);
   const { initPaymentSheet, presentPaymentSheet, retrievePaymentIntent } = useStripe();
 
@@ -53,7 +57,7 @@ const CheckoutScreen = ({ navigation }) => {
           const calculateTotal = await restaurantService.getOrderTotal({
             order_total: subtotal.toFixed(2),
             restaurant_id: cart.restaurantId,
-            promo_ids: cart.promos,
+            promo_ids: selectedPromo ? [selectedPromo.id] : [],
           });
           setOrderTotals(calculateTotal);
         } catch (error) {
@@ -65,7 +69,7 @@ const CheckoutScreen = ({ navigation }) => {
       }
     };
     calculateOrderTotal();
-  }, [cart.restaurantId, subtotal, cart.promos]);
+  }, [cart.restaurantId, subtotal, selectedPromo]);
 
   useEffect(() => {
     const loadRestaurant = async () => {
@@ -80,6 +84,26 @@ const CheckoutScreen = ({ navigation }) => {
     };
     loadRestaurant();
   }, [cart.restaurantId]);
+
+  useEffect(() => {
+    const fetchAvailablePromos = async () => {
+      try {
+        const promos = await restaurantService.getOrderPromos(
+          cart.owner_id,
+          cart.total
+        );
+        setAvailablePromos(promos);
+      } catch (error) {
+        console.error('Error fetching promos:', error);
+      }
+    };
+    fetchAvailablePromos();
+  }, []);
+
+  const handlePromoSelect = (promo) => {
+    setSelectedPromo(promo);
+    setShowPromoDropdown(false);
+  };
 
   const handlePayment = async () => {
     if (isProcessing || loading || calculating) return;
@@ -111,7 +135,7 @@ const CheckoutScreen = ({ navigation }) => {
           menu_item_id: item.id,
           quantity: quantity,
         })),
-        promo_ids: cart?.promos?.length ? cart.promos : [],
+        promo_ids: selectedPromo ? [selectedPromo.id] : [],
         owner_id: cart.owner_id
       };
 
@@ -269,6 +293,56 @@ const CheckoutScreen = ({ navigation }) => {
             )}
           </View>
 
+          <View style={styles.promoSection}>
+              <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
+                 Promos
+              </Text>
+              <TouchableOpacity
+                style={styles.promoSelector}
+                onPress={() => setShowPromoDropdown(!showPromoDropdown)}
+              >
+                <Text style={typography.bodyMedium}>
+                  {selectedPromo ? selectedPromo.name : 'Select a promo'}
+                </Text>
+                <Ionicons
+                  name={showPromoDropdown ? 'chevron-up' : 'chevron-down'}
+                  size={24}
+                  color={colors.text.secondary}
+                />
+              </TouchableOpacity>
+
+              {showPromoDropdown && (
+                <View style={styles.promoDropdown}>
+                  {availablePromos.length > 0 ? (
+                    availablePromos.map((promo) => (
+                      <TouchableOpacity
+                        key={promo.id}
+                        style={styles.promoOption}
+                        onPress={() => handlePromoSelect(promo)}
+                      >
+                        <View>
+                          <Text style={typography.bodyLarge}>{promo.name}</Text>
+                          <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
+                            {promo.discount_type === 'percentage'
+                              ? `${promo.discount}% off`
+                              : `$${promo.discount} off`}
+                          </Text>
+                        </View>
+                        {selectedPromo?.id === promo.id && (
+                          <Ionicons name="checkmark" size={24} color={colors.primary} />
+                        )}
+                      </TouchableOpacity>
+                    ))
+                  ) : (
+                    <Text style={[typography.bodyMedium, styles.noPromos]}>
+                      No promos available for this order
+                    </Text>
+                  )}
+                </View>
+              )}
+            </View>
+
+
           <View style={styles.section}>
             <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
               Order Details
@@ -277,11 +351,12 @@ const CheckoutScreen = ({ navigation }) => {
             <Text style={[typography.bodyMedium, { color: colors.text.secondary, marginBottom: 16 }]}>
               Payment will be linked to: {user?.email}
             </Text>
+            
 
             <View style={styles.detailsList}>
               {Object.entries(cart.items).map(([id, { item, quantity }]) => (
                 <CartItem key={id} item={item} quantity={quantity} />
-              ))}  
+              ))}
               
               {calculating ? (
                 <View style={styles.detailItem}>
@@ -416,11 +491,45 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
+  promoSection: {
+    marginTop: 24,
+    marginBottom: 32,
+  },
+  promoSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: colors.light,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  promoDropdown: {
+    marginTop: 8,
+    backgroundColor: colors.background,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
+  promoOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  noPromos: {
+    padding: 16,
+    textAlign: 'center',
+    color: colors.text.secondary,
+  },
   summaryContainer: {
     padding: 16,
-    backgroundColor: colors.surface,
-    borderRadius: 8,
-    marginVertical: 16,
+    backgroundColor: colors.light,
+    borderRadius: 12,
+    marginBottom: 24,
   },
   summaryTitle: {
     marginBottom: 16,
@@ -435,31 +544,6 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: colors.border,
-  },
-  payButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 120,
-  },
-  payButtonDisabled: {
-    opacity: 0.7,
-  },
-  emailContainer: {
-    marginBottom: 16,
-  },
-  emailInput: {
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: 12,
-    marginTop: 8,
-    color: colors.text.primary,
-    fontSize: 16,
   },
 });
 

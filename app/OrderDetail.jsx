@@ -81,46 +81,72 @@ const OrderDetailScreen = ({ route, navigation }) => {
     </View>
   );
 
-  const TotalRow = ({ label, value, isTotal, type }) => (
-    <View style={styles.totalRow}>
-      <Text style={[
-        typography.bodyLarge,
-        { color: isTotal ? colors.text.primary : colors.text.secondary }
-      ]}>
-        {label}
-      </Text>
-      {type === 'status' ? (
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(value) }]}>
-          <Text style={[typography.labelMedium, styles.statusText]}>
-            {value?.charAt(0).toUpperCase() + value?.slice(1)}
+  const TotalRow = ({ label, value, isTotal, type }) => {
+    if (type === 'status') {
+      return (
+        <View style={styles.totalRow}>
+          <Text style={[
+            typography.bodyLarge,
+            { color: colors.text.secondary }
+          ]}>
+            {label}
           </Text>
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(value) }]}>
+            <Text style={[typography.labelMedium, styles.statusText]}>
+              {value?.charAt(0).toUpperCase() + value?.slice(1)}
+            </Text>
+          </View>
         </View>
-      ) : type === 'payment_method' ? (
-        <View style={styles.paymentMethod}>
-          <FontAwesome5 
-            name={getCardIcon(orderDetails?.payment.card_brand)} 
-            size={16} 
-            color={colors.text.primary} 
-            style={styles.cardIcon}
-          />
-          <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>
-            •••• {value}
+      );
+    }
+
+    if (type === 'payment_method') {
+      return (
+        <View style={styles.totalRow}>
+          <Text style={[
+            typography.bodyLarge,
+            { color: colors.text.secondary }
+          ]}>
+            {label}
           </Text>
+          <View style={styles.paymentMethod}>
+            <FontAwesome5 
+              name={getCardIcon(orderDetails?.payment.card_brand)} 
+              size={16} 
+              color={colors.text.primary} 
+              style={styles.cardIcon}
+            />
+            <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>
+              •••• {value}
+            </Text>
+          </View>
         </View>
-      ) : type === 'transaction' ? (
-        <Text style={[typography.bodySmall, { color: colors.text.primary }]}>
-          {value}
-        </Text>
-      ) : (
+      );
+    }
+
+    return (
+      <View style={styles.totalRow}>
         <Text style={[
           typography.bodyLarge,
-          { color: isTotal ? colors.text.primary : colors.text.primary }
+          { color: colors.text.secondary }
         ]}>
-          {value}
+          {label}
         </Text>
-      )}
-    </View>
-  );
+        {label === 'Discount' ? (
+          <Text style={[typography.bodyLarge, { color: colors.success }]}>
+            -${parseFloat(value || 0).toFixed(2)}
+          </Text>
+        ) : (
+          <Text style={[
+            typography.bodyLarge,
+            isTotal && { color: colors.text.primary }
+          ]}>
+            ${parseFloat(value || 0).toFixed(2)}
+          </Text>
+        )}
+      </View>
+    );
+  };
 
   if (loading) {
     return (
@@ -182,9 +208,32 @@ const OrderDetailScreen = ({ route, navigation }) => {
             ))}
           </View>
 
+          {orderDetails?.promos?.length > 0 && (
+            <View style={styles.promosSection}>
+              <Text style={[typography.h3, styles.sectionTitle]}>Applied Promos</Text>
+              {orderDetails.promos.map((promo, index) => (
+                <View key={promo.id} style={[
+                  styles.promoItem,
+                  index !== orderDetails.promos.length - 1 && styles.promoItemBorder
+                ]}>
+                  <View style={styles.promoInfo}>
+                    <Text style={typography.bodyLarge}>{promo.name}</Text>
+                    <Text style={[typography.bodyMedium, { color: colors.success }]}>
+                      {promo.discount_type === 'percentage' 
+                        ? `${promo.discount}% off`
+                        : `$${parseFloat(promo.discount).toFixed(2)} off`}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+
           <View style={styles.totals}>
             <TotalRow label="Subtotal" value={parseFloat(orderDetails?.order_total)} />
-            <TotalRow label="Discount" value={parseFloat(orderDetails?.discount)} />
+            {parseFloat(orderDetails?.discount) > 0 && (
+              <TotalRow label="Discount" value={parseFloat(orderDetails?.discount)} />
+            )}
             <TotalRow label="Tax" value={parseFloat(orderDetails?.tax_amount)} />
             <TotalRow label="Service Fee" value={parseFloat(orderDetails?.service_fee)} />
             <View style={styles.divider} />
@@ -316,6 +365,22 @@ const styles = StyleSheet.create({
     color: colors.primary,
     letterSpacing: 2,
     marginTop: 8,
+  },
+  promosSection: {
+    marginBottom: 24,
+    paddingHorizontal: 16,
+  },
+  promoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  promoItemBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  promoInfo: {
+    flex: 1,
   },
 });
 
