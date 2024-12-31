@@ -53,7 +53,7 @@ export default function DetailScreen({ route, navigation }) {
   const [error, setError] = useState(null);
   const [cuisines, setCuisines] = useState([]);
   const cartContext = useCart();
-  const { cart, getTotalItems, getTotalCost } = cartContext || {};
+  const { cart, getTotalItems, getTotalCost, setOwner } = cartContext || {};
   
   const totalItems = cart?.restaurantId === restaurantId ? (getTotalItems?.() || 0) : 0;
   const cartTotal = cart?.restaurantId === restaurantId ? (getTotalCost?.() || 0) : 0;
@@ -74,14 +74,21 @@ export default function DetailScreen({ route, navigation }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const [restaurantData, cuisinesData] = await Promise.all([
           restaurantService.getRestaurantById(restaurantId),
           restaurantService.getMenuCuisines()
         ]);
         setRestaurant(restaurantData);
         setCuisines(cuisinesData);
+        // Set owner ID when restaurant loads
+        if (restaurantData?.owner) {
+          setOwner(restaurantData.owner);
+        }
       } catch (error) {
         setError(error.message);
+        console.error('Error loading restaurant:', error);
       } finally {
         setLoading(false);
       }

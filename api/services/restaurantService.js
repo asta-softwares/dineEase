@@ -6,7 +6,18 @@ export const restaurantService = {
       const response = await apiClient.get('/restaurants/', { params });
       return response.data;
     } catch (error) {
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching all restaurants:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -15,8 +26,18 @@ export const restaurantService = {
       const response = await apiClient.get(`/restaurants/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching restaurant:', error);
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching restaurant by id:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -25,7 +46,18 @@ export const restaurantService = {
       const response = await apiClient.get(`/menus/${id}/`);
       return response.data;
     } catch (error) {
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching restaurant menu:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -36,7 +68,18 @@ export const restaurantService = {
       });
       return response.data;
     } catch (error) {
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error searching restaurants:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -47,7 +90,18 @@ export const restaurantService = {
       });
       return response.data;
     } catch (error) {
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching restaurant categories:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -58,7 +112,18 @@ export const restaurantService = {
       });
       return response.data;
     } catch (error) {
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error searching restaurants by category:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -81,7 +146,18 @@ export const restaurantService = {
       const response = await apiClient.get('/restaurants/', { params });
       return response.data;
     } catch (error) {
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching restaurants by filter:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -90,8 +166,18 @@ export const restaurantService = {
       const response = await apiClient.get('/menu-cuisines/');
       return response.data;
     } catch (error) {
-      console.error('Error fetching menu cuisines:', error);
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching menu cuisines:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -100,8 +186,18 @@ export const restaurantService = {
       const response = await apiClient.get('/promos/');
       return response.data;
     } catch (error) {
-      console.error('Error fetching promos:', error);
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching all promos:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -110,8 +206,18 @@ export const restaurantService = {
       const response = await apiClient.get(`/promos/restaurant/${restaurantId}?order_total=${orderTotal}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching promos:', error);
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching order promos:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -120,8 +226,18 @@ export const restaurantService = {
       const response = await apiClient.post(`/payments/order-preview/`, orderData);
       return response.data;
     } catch (error) {
-      console.error('Error fetching order total preview:', error);
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching order total preview:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -130,17 +246,38 @@ export const restaurantService = {
       const response = await apiClient.post('/payments/order-create/', orderData);
       return response.data;
     } catch (error) {
-      console.error('Error creating order:', error);
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error creating order:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
-  createPaymentIntent: async (amount) => {
+  createPaymentIntent: async (paymentData) => {
     try {
-      const response = await apiClient.post('/payments/create-payment-intent/', { amount });
+      const response = await apiClient.post('/payments/create-payment-intent/', paymentData);
       return response.data;
     } catch (error) {
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error creating payment intent:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -149,8 +286,18 @@ export const restaurantService = {
       const response = await apiClient.get('/payments/orders/');
       return response.data;
     } catch (error) {
-      console.error('Error fetching payment orders:', error);
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching payment orders:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 
@@ -159,8 +306,18 @@ export const restaurantService = {
       const response = await apiClient.get(`/payments/orders/${orderId}/`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching payment orders:', error);
-      throw error;
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error ||
+                          error.response?.data?.detail ||
+                          error.message;
+      
+      console.error('Error fetching payment orders by id:', {
+        status: error.response?.status,
+        message: errorMessage,
+        data: error.response?.data
+      });
+      
+      throw new Error(errorMessage);
     }
   },
 };

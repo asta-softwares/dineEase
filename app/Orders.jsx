@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 16,
-    paddingTop: Platform.OS === 'ios' ? 70 : 80,
+    paddingTop: Platform.OS === 'ios' ? 70 : 100,
   },
   menuItem: {
     width: '100%',

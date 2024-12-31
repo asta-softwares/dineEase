@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Alert, Platform, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Alert, Platform, ActivityIndicator, TextInput } from 'react-native';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import { useCart } from '../context/CartContext';
+import { useUserStore } from '../stores/userStore';
 import TopNav from '../Components/TopNav';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { restaurantService } from '../api/services/restaurantService';
@@ -32,7 +33,9 @@ const CartItem = ({ item, quantity }) => {
 
 const CheckoutScreen = ({ navigation }) => {
   const { cart, getTotalCost, clearCart } = useCart();
+  const user = useUserStore((state) => state.user);
   const [restaurant, setRestaurant] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [calculating, setCalculating] = useState(false);
   const [orderTotals, setOrderTotals] = useState(null);
@@ -79,7 +82,6 @@ const CheckoutScreen = ({ navigation }) => {
   }, [cart.restaurantId]);
 
   const handlePayment = async () => {
-    // Prevent multiple submissions
     if (isProcessing || loading || calculating) return;
 
     try {
@@ -96,43 +98,51 @@ const CheckoutScreen = ({ navigation }) => {
         return;
       }
 
+      if (!user?.email) {
+        Alert.alert('Error', 'Please log in to continue with payment');
+        return;
+      }
+
       // Prepare order data
       const orderData = {
         amount: orderTotals.total.toFixed(2),
         restaurant_id: cart.restaurantId,
-        owner_id: 1, // Replace with actual user ID
-        order_total: orderTotals.total.toFixed(2),
-        menu_items: Object.entries(cart.items).map(([id, { item, quantity }]) => ({
+        menu_items: Object.values(cart.items).map(({ item, quantity }) => ({
           menu_item_id: item.id,
           quantity: quantity,
         })),
+        promo_ids: cart?.promos?.length ? cart.promos : [],
+        owner_id: cart.owner_id
       };
 
-      // Step 1: Get the payment intent from the backend
-      const { clientSecret } = await restaurantService.createPaymentIntent(orderData.amount);
-      console.log('Payment Intent Response:', { clientSecret });
+      const { clientSecret } = await restaurantService.createPaymentIntent({
+        amount: orderTotals.total.toFixed(2),
+        restaurant_id: restaurant.id 
+      }).catch(error => {
+        Alert.alert('Payment Error', error.message);
+        throw error;
+      });
 
-      // Step 2: Initialize the Payment Sheet
       const { error: initError } = await initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: 'DineEase',
+      }).catch(error => {
+        Alert.alert('Payment Error', error.message);
+        throw error;
       });
-      console.log('Payment Sheet Init Response:', { error: initError });
 
       if (initError) {
-        console.error('Payment Sheet Init Error:', initError);
+        Alert.alert('Payment Error', initError.message);
         throw new Error(initError.message);
       }
 
-      // Step 3: Present the Payment Sheet
-      const { error: paymentError, paymentOption } = await presentPaymentSheet();
-      console.log('Payment Sheet Presentation Response:', {
-        error: paymentError,
-        paymentOption,
+      const { error: paymentError } = await presentPaymentSheet().catch(error => {
+        Alert.alert('Payment Error', error.message);
+        throw error;
       });
 
       if (paymentError) {
-        console.error('Payment Error:', paymentError);
+        Alert.alert('Payment Error', paymentError.message);
         throw new Error(paymentError.message);
       }
 
@@ -141,60 +151,55 @@ const CheckoutScreen = ({ navigation }) => {
       
       if (retrieveError) {
         console.error('Error retrieving payment details:', retrieveError);
-      } else {
-        console.log('Payment Success Details:', {
-          id: paymentIntent.id,
-          status: paymentIntent.status,
-          amount: paymentIntent.amount,
-          currency: paymentIntent.currency,
-          paymentMethod: paymentIntent.payment_method,
-          created: new Date(paymentIntent.created * 1000).toISOString(),
-          clientSecret: paymentIntent.client_secret,
-        });
+        Alert.alert('Error', 'Could not retrieve payment details. Please contact support.');
+        throw new Error(retrieveError.message);
       }
 
-      let orderResponse = '';
+      console.log('Payment Success Details:', {
+        id: paymentIntent.id,
+        status: paymentIntent.status,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        created: new Date(paymentIntent.created * 1000).toISOString(),
+      });
       
-      if (paymentIntent.status == "Succeeded") {
-        // Step 4: Create the order
+      if (paymentIntent.status === "Succeeded") {
+        // Create the order after successful payment
         const result = await restaurantService.createOrder({
           ...orderData,
-          payment: {
-            payment_method: "credit_card",
-            payment_status: paymentIntent.status,
-            amount_paid: paymentIntent.amount,
-          payment_gateway: 'stripe',
           transaction_id: paymentIntent.id,
-        },
-      });
-      orderResponse = result;
-      console.log('Order Creation Response:', result);
+        }).catch(error => {
+          Alert.alert('Order Error', error.message);
+          throw error;
+        });
+        
+        const orderDetailsData = result.order;
+        setOrderDetails(orderDetailsData);
+        console.log('Order Creation Response:', result);
+
+        Alert.alert(
+          'Success',
+          'Payment successful! Your order has been placed.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                clearCart();
+                navigation.navigate('OrderDetailScreen', { order: orderDetailsData, restaurant: restaurant });
+              },
+            },
+          ]
+        );
       } else {
+        Alert.alert('Payment failed');
         throw new Error("Payment failed");
       }
-  
-
-      // Success handling
-      Alert.alert(
-        'Success',
-        'Payment successful! Your order has been placed.',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              clearCart();
-              navigation.navigate('OrderDetailScreen', { order: orderResponse, restaurant: restaurant });
-            },
-          },
-        ]
-      );
 
     } catch (error) {
-      console.error('Error processing payment:', error);
-      Alert.alert('Error', 'Failed to process payment. Please try again.');
+      console.error('Payment process error:', error);
     } finally {
-      setLoading(false);
       setIsProcessing(false);
+      setLoading(false);
     }
   };
 
@@ -221,8 +226,6 @@ const CheckoutScreen = ({ navigation }) => {
       </SafeAreaView>
     );
   }
-
-  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -271,6 +274,10 @@ const CheckoutScreen = ({ navigation }) => {
               Order Details
             </Text>
             
+            <Text style={[typography.bodyMedium, { color: colors.text.secondary, marginBottom: 16 }]}>
+              Payment will be linked to: {user?.email}
+            </Text>
+
             <View style={styles.detailsList}>
               {Object.entries(cart.items).map(([id, { item, quantity }]) => (
                 <CartItem key={id} item={item} quantity={quantity} />
@@ -355,7 +362,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   contentPadding: {
-    paddingTop: Platform.OS === 'ios' ? 70 : 90,
+    paddingTop: Platform.OS === 'ios' ? 70 : 100,
   },
   section: {
     marginBottom: 32,
@@ -440,6 +447,19 @@ const styles = StyleSheet.create({
   },
   payButtonDisabled: {
     opacity: 0.7,
+  },
+  emailContainer: {
+    marginBottom: 16,
+  },
+  emailInput: {
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 8,
+    color: colors.text.primary,
+    fontSize: 16,
   },
 });
 

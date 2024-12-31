@@ -26,7 +26,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
     };
 
     fetchOrderDetails();
-  }, [order.order_id]);
+  }, [order.id]);
 
   const OrderItem = ({ menu_item, quantity, price }) => (
     <View style={styles.orderItem}>
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   contentContainer: {
-    paddingTop: Platform.OS === 'ios' ? 120 : 140,
+    paddingTop: Platform.OS === 'ios' ? 120 : 100,
     paddingBottom: 120,
   },
   headerImage: {

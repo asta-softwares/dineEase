@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CartContext = createContext({
-  cart: { restaurantId: null, items: {}, promos: [] },
+  cart: { restaurantId: null, items: {}, promos: [], owner_id: null },
   addToCart: () => {},
   updateQuantity: () => {},
   removeFromCart: () => {},
@@ -16,6 +16,7 @@ const CartContext = createContext({
   clearPromos: () => {},
   getPromos: () => {},
   validatePromo: () => {},
+  setOwner: () => {},
 });
 
 export const CartProvider = ({ children }) => {
@@ -23,6 +24,7 @@ export const CartProvider = ({ children }) => {
     restaurantId: null,
     promos: [],
     items: {},  // { itemId: { item: {}, quantity: number } }
+    owner_id: null,
   });
 
   useEffect(() => {
@@ -48,13 +50,26 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const setOwner = (ownerId) => {
+    setCart(prevCart => {
+      const newCart = {
+        ...prevCart,
+        owner_id: ownerId
+      };
+      saveCart(newCart);
+      return newCart;
+    });
+  };
+
   const addToCart = (restaurantId, item, quantity) => {
     setCart(prevCart => {
       // If different restaurant, clear cart
       if (prevCart.restaurantId && prevCart.restaurantId !== restaurantId) {
         const newCart = {
           restaurantId,
-          items: quantity > 0 ? { [item.id]: { item, quantity } } : {}
+          items: quantity > 0 ? { [item.id]: { item, quantity } } : {},
+          promos: [],
+          owner_id: null // Reset owner when changing restaurant
         };
         saveCart(newCart);
         return newCart;
@@ -62,6 +77,7 @@ export const CartProvider = ({ children }) => {
 
       // Update existing cart
       const newCart = {
+        ...prevCart,
         restaurantId,
         items: {
           ...prevCart.items,
@@ -77,9 +93,10 @@ export const CartProvider = ({ children }) => {
         delete newCart.items[item.id];
       }
 
-      // If cart is empty, clear restaurant ID
+      // If cart is empty, clear restaurant ID and owner
       if (Object.keys(newCart.items).length === 0) {
         newCart.restaurantId = null;
+        newCart.owner_id = null;
       }
 
       saveCart(newCart);
@@ -105,9 +122,10 @@ export const CartProvider = ({ children }) => {
         delete newCart.items[itemId];
       }
 
-      // If cart is empty, clear restaurant ID
+      // If cart is empty, clear restaurant ID and owner
       if (Object.keys(newCart.items).length === 0) {
         newCart.restaurantId = null;
+        newCart.owner_id = null;
       }
 
       saveCart(newCart);
@@ -215,7 +233,12 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearCart = () => {
-    const emptyCart = { restaurantId: null, items: {}, promos: [] };
+    const emptyCart = {
+      restaurantId: null,
+      items: {},
+      promos: [],
+      owner_id: null
+    };
     setCart(emptyCart);
     saveCart(emptyCart);
   };
@@ -243,13 +266,14 @@ export const CartProvider = ({ children }) => {
       clearCart,
       getTotalCost,
       addPromo,
+      getItemQuantity,
+      getTotalItems,
+      getTotalCost,
       removePromo,
       clearPromos,
       getPromos,
       validatePromo,
-         getItemQuantity,
-      getTotalItems,
-      getTotalCost
+      setOwner,
     }}>
       {children}
     </CartContext.Provider>
