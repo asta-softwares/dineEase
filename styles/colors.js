@@ -9,6 +9,12 @@ export const colors = {
     success: '#2ECC71',
     warning: '#F1C40F',
     error: '#E74C3C',
+    gradients: {
+      primary: ['#F29057', '#FE6E1B'],
+      success: ['#2ECC71', '#27AE60'],
+      warning: ['#F1C40F', '#F39C12'],
+      error: ['#E74C3C', '#C0392B'],
+    },
     text: {
       primary: '#F29057',
       secondary: '#888888',

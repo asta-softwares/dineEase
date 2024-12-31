@@ -28,6 +28,7 @@ import Footer from './Layout/Footer';
 import LargeButton from '../Components/Buttons/LargeButton';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCart } from '../context/CartContext';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -169,7 +170,7 @@ export default function DetailScreen({ route, navigation }) {
               <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>{restaurant?.name}</Text>
               <View style={[styles.rating, { backgroundColor: colors.rating}]}>
                 <Ionicons name="star" size={14} color={colors.text.white} />
-                <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>{restaurant?.ratings}</Text>
+                <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>{restaurant?.ratings?.toFixed(1) || '0.0'}</Text>
               </View>
             </View>
 
@@ -221,6 +222,42 @@ export default function DetailScreen({ route, navigation }) {
                 {restaurant?.description}
               </Text>
             </View>
+
+            {restaurant?.promos?.length > 0 && (
+              <>
+                <Text style={[typography.h3, styles.sectionTitle]}>Available Deals</Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.promosContainer}
+                  contentContainerStyle={styles.promosContentContainer}
+                >
+                  {restaurant.promos
+                    .filter(promo => promo.status === 'active')
+                    .map((promo) => (
+                      <LinearGradient
+                        key={promo.id}
+                        colors={colors.gradients.primary}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.promoCard}
+                      >
+                        <View style={styles.promoContent}>
+                          <View style={styles.discountBadge}>
+                            <Text style={styles.discountText}>
+                              {promo.discount_type === 'percentage' 
+                                ? `${promo.discount}% OFF`
+                                : `$${promo.discount} OFF`}
+                            </Text>
+                          </View>
+                          <Text style={styles.promoTitle}>{promo.name}</Text>
+                          <Text style={styles.promoDescription}>{promo.description}</Text>
+                        </View>
+                      </LinearGradient>
+                    ))}
+                </ScrollView>
+              </>
+            )}
 
             <View style={styles.menuContainer}>
               <Text style={[typography.h3, styles.sectionTitle]}>Menu Items</Text>
@@ -340,14 +377,16 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   rating: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.rating,
     paddingHorizontal: 8,
     paddingVertical: 4,
+    borderRadius: 6,
+    gap: 4,
   },
   ratingText: {
-    marginLeft: 4,
+    marginLeft: 2,
   },
   infoContainer: {
     marginBottom: 16,
@@ -440,5 +479,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.background,
     padding: 20,
+  },
+  promosContainer: {
+    marginBottom: 24,
+  },
+  promosContentContainer: {
+    paddingHorizontal: 16,
+  },
+  promoCard: {
+    width: 280,
+    marginRight: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  promoContent: {
+    padding: 16,
+  },
+  discountBadge: {
+    backgroundColor: colors.text.white,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  discountText: {
+    color: colors.primary,
+    fontFamily: 'PlusJakartaSans-Bold',
+    fontSize: 14,
+  },
+  promoTitle: {
+    color: colors.text.white,
+    fontFamily: 'PlusJakartaSans-Bold',
+    fontSize: 18,
+    marginBottom: 8,
+  },
+  promoDescription: {
+    color: colors.text.white,
+    fontFamily: 'PlusJakartaSans-Medium',
+    fontSize: 14,
+    opacity: 0.9,
   },
 });
