@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Image, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { View, StyleSheet, Text, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import TopNav from '../Components/TopNav';
 import Footer from './Layout/Footer';
@@ -68,14 +68,14 @@ const OrderDetailScreen = ({ route, navigation }) => {
   const OrderItem = ({ menu_item, quantity, price }) => (
     <View style={styles.orderItem}>
       <View style={styles.itemInfo}>
-        <Text style={[typography.labelLarge, { color: colors.text.primary }]}>
+        <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>
           {quantity}x {menu_item.name}
         </Text>
         <Text style={[typography.bodySmall, { color: colors.text.secondary }]}>
-          {menu_item.description}
+          ${parseFloat(menu_item.cost).toFixed(2)} each
         </Text>
       </View>
-      <Text style={[typography.labelLarge, { color: colors.text.primary }]}>
+      <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>
         ${parseFloat(price).toFixed(2)}
       </Text>
     </View>
@@ -164,82 +164,71 @@ const OrderDetailScreen = ({ route, navigation }) => {
       />
       
       <ScrollView 
-        bounces={false}
-        overScrollMode="never"
+        style={styles.scrollContent}
+        contentContainerStyle={styles.contentPadding}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.contentContainer}
       >
-        <Image
-          source={{
-            uri: restaurant?.image || 'https://via.placeholder.com/400',
-          }}
-          style={styles.headerImage}
-        />
-
-        <View style={styles.orderInfo}>
-          <Text style={[typography.h2, styles.sectionTitle]}>Order from</Text>
-          <View style={styles.restaurantInfo}>
-            <View style={styles.restaurantHeader}>
-              <Text style={typography.h3}>{restaurant?.name}</Text>
-              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) }]}>
-                <Text style={[typography.labelMedium, styles.statusText]}>
-                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                </Text>
-              </View>
-            </View>
-            
-            {orderDetails?.verification_code && order.status.toLowerCase() !== 'completed' && (
-              <View style={styles.verificationContainer}>
-                <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Verification Code</Text>
-                <Text style={styles.verificationCode}>{orderDetails.verification_code}</Text>
-              </View>
-            )}
-
-            <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
-              Order Time: {new Date(orderDetails?.order_time).toLocaleString()}
-            </Text>
+        {/* Restaurant Info */}
+        <View style={styles.section}>
+          <Text style={[typography.h2, styles.sectionTitle, { color: colors.text.primary }]}>{restaurant?.name}</Text>
+          {orderDetails?.verification_code && order.status.toLowerCase() !== 'completed' && (
+          <View style={styles.verificationContainer}>
+            <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Verification Code</Text>
+            <Text style={styles.verificationCode}>{orderDetails?.verification_code}</Text>
           </View>
+          )}
+        </View>
 
-          <Text style={[typography.h2, styles.sectionTitle]}>Order Summary</Text>
+        {/* Order Items */}
+        <View style={styles.section}>
+          <Text style={[typography.h2, styles.sectionTitle]}>Order Items</Text>
           <View style={styles.orderItems}>
-            {orderDetails?.items.map((item, index) => (
+            {orderDetails?.items?.map((item, index) => (
               <OrderItem key={index} {...item} />
             ))}
           </View>
+        </View>
 
-          {orderDetails?.promos?.length > 0 && (
-            <View style={styles.promosSection}>
-              <Text style={[typography.h3, styles.sectionTitle]}>Applied Promos</Text>
-              {orderDetails.promos.map((promo, index) => (
-                <View key={promo.id} style={[
-                  styles.promoItem,
-                  index !== orderDetails.promos.length - 1 && styles.promoItemBorder
-                ]}>
-                  <View style={styles.promoInfo}>
-                    <Text style={typography.bodyLarge}>{promo.name}</Text>
-                    <Text style={[typography.bodyMedium, { color: colors.success }]}>
-                      {promo.discount_type === 'percentage' 
-                        ? `${promo.discount}% off`
-                        : `$${parseFloat(promo.discount).toFixed(2)} off`}
-                    </Text>
+        {/* Order Summary */}
+        <View style={styles.section}>
+          <Text style={[typography.h2, styles.sectionTitle]}>Order Summary</Text>
+          <View style={styles.orderSummary}>
+            {orderDetails?.promos?.length > 0 && (
+              <View>
+                <Text style={[typography.h3, styles.sectionTitle]}>Applied Promos</Text>
+                {orderDetails.promos.map((promo, index) => (
+                  <View key={promo.id} style={[
+                    styles.promoItem,
+                    index !== orderDetails.promos.length - 1 && styles.promoItemBorder
+                  ]}>
+                    <View style={styles.promoInfo}>
+                      <Text style={typography.bodyLarge}>{promo.name}</Text>
+                      <Text style={[typography.bodyMedium, { color: colors.success }]}>
+                        {promo.discount_type === 'percentage' 
+                          ? `${promo.discount}% off`
+                          : `$${parseFloat(promo.discount).toFixed(2)} off`}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              ))}
-            </View>
-          )}
-
-          <View style={styles.totals}>
-            <TotalRow label="Subtotal" value={parseFloat(orderDetails?.order_total)} />
-            {parseFloat(orderDetails?.discount) > 0 && (
-              <TotalRow label="Discount" value={parseFloat(orderDetails?.discount)} />
+                ))}
+              </View>
             )}
-            <TotalRow label="Tax" value={parseFloat(orderDetails?.tax_amount)} />
-            <TotalRow label="Service Fee" value={parseFloat(orderDetails?.service_fee)} />
-            <View style={styles.divider} />
-            <TotalRow label="Total" value={parseFloat(orderDetails?.total)} isTotal />
+            <View style={styles.totals}>
+              <TotalRow label="Subtotal" value={parseFloat(orderDetails?.order_total)} />
+              {parseFloat(orderDetails?.discount) > 0 && (
+                <TotalRow label="Discount" value={parseFloat(orderDetails?.discount)} />
+              )}
+              <TotalRow label="Tax" value={parseFloat(orderDetails?.tax_amount)} />
+              <TotalRow label="Service Fee" value={parseFloat(orderDetails?.service_fee)} />
+              <View style={styles.divider} />
+              <TotalRow label="Total" value={parseFloat(orderDetails?.total)} isTotal />
+            </View>
           </View>
+        </View>
 
-          <Text style={[typography.h2, styles.sectionTitle]}>Payment Details </Text>
+        {/* Payment Details */}
+        <View style={styles.section}>
+          <Text style={[typography.h2, styles.sectionTitle]}>Payment Details</Text>
           <View style={styles.paymentInfo}>
             <TotalRow label="Payment Status" value={orderDetails?.payment?.payment_status} type="status" />
             <TotalRow label="Payment Method" value= {orderDetails?.payment.card_last4} type="payment_method" />
@@ -270,20 +259,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  contentContainer: {
-    paddingTop: Platform.OS === 'ios' ? 120 : 100,
-    paddingBottom: 120,
-  },
-  headerImage: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-  },
-  orderInfo: {
+  contentPadding: {
     padding: 16,
+    paddingTop: Platform.OS === 'ios' ? 130 : 100,
+    paddingBottom: 100,
+  },
+  scrollContent: {
+    flex: 1,
+  },
+  section: {
+    marginBottom: 12,
   },
   sectionTitle: {
-    marginTop: 24,
     marginBottom: 16,
   },
   restaurantInfo: {
@@ -291,42 +278,29 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
   },
-  restaurantHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  statusText: {
-    color: colors.text.white,
-    textTransform: 'capitalize',
-    fontSize: 12,
-    fontFamily: 'PlusJakartaSans-Medium',
-  },
   orderItems: {
     backgroundColor: colors.background.secondary,
-    padding: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 12,
   },
   orderItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
+    alignItems: 'center',
+    paddingVertical: 8,
   },
   itemInfo: {
     flex: 1,
     marginRight: 16,
   },
-  totals: {
+  orderSummary: {
     backgroundColor: colors.background.secondary,
     padding: 16,
+    borderRadius: 12,
+  },
+  totals: {
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     marginTop: 16,
   },
@@ -353,6 +327,30 @@ const styles = StyleSheet.create({
   cardIcon: {
     marginRight: 8,
   },
+  promoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  promoItemBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  promoInfo: {
+    flex: 1,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  statusText: {
+    color: colors.text.white,
+    textTransform: 'capitalize',
+    fontSize: 12,
+    fontFamily: 'PlusJakartaSans-Medium',
+  },
   verificationContainer: {
     marginVertical: 16,
     alignItems: 'center',
@@ -366,21 +364,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     letterSpacing: 2,
     marginTop: 8,
-  },
-  promosSection: {
-    paddingHorizontal: 16,
-  },
-  promoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  promoItemBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  promoInfo: {
-    flex: 1,
   },
 });
 
