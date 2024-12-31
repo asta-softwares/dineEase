@@ -21,7 +21,7 @@ const ProfileScreen = () => {
     const setStoredUser = useUserStore((state) => state.setUser);
 
     // Use stored user data immediately
-    const [user, setUser] = useState(storedUser);
+    const [user, setUser] = useState(storedUser || {});
 
     const fetchUserData = async () => {
         try {
@@ -35,7 +35,9 @@ const ProfileScreen = () => {
 
     // Background refresh only
     useEffect(() => {
-        fetchUserData();
+        if (!storedUser) {
+            fetchUserData();
+        }
     }, []);
 
     // Listen for updates from EditProfile
@@ -73,7 +75,7 @@ const ProfileScreen = () => {
                             // Reset navigation to splash screen
                             navigation.reset({
                                 index: 0,
-                                routes: [{ name: 'SplashScreen' }],
+                                routes: [{ name: 'Landing' }],
                             });
                         } catch (error) {
                             console.error('Error during logout:', error);

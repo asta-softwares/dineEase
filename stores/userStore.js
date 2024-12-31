@@ -6,7 +6,14 @@ export const useUserStore = create((set) => ({
   authToken: null,
   refreshToken: null,
 
-  setUser: (user) => set({ user }),
+  setUser: async (user) => {
+    set({ user });
+    // Store user data in AsyncStorage
+    if (user) {
+      await AsyncStorage.setItem('userData', JSON.stringify(user));
+    }
+  },
+
   setTokens: (authToken, refreshToken) => {
     set({ authToken, refreshToken });
     // Store tokens in AsyncStorage
@@ -14,22 +21,38 @@ export const useUserStore = create((set) => ({
     if (refreshToken) AsyncStorage.setItem('refreshToken', refreshToken);
   },
 
-  clearUser: () => {
+  clearUser: async () => {
     set({ user: null, authToken: null, refreshToken: null });
-    // Clear tokens from AsyncStorage
-    AsyncStorage.removeItem('authToken');
-    AsyncStorage.removeItem('refreshToken');
+    // Clear all data from AsyncStorage
+    await Promise.all([
+      AsyncStorage.removeItem('authToken'),
+      AsyncStorage.removeItem('refreshToken'),
+      AsyncStorage.removeItem('userData'),
+    ]);
   },
 
-  // Initialize tokens from AsyncStorage
+  // Initialize data from AsyncStorage
   initializeAuth: async () => {
     try {
-      const [authToken, refreshToken] = await Promise.all([
+      const [authToken, refreshToken, userData] = await Promise.all([
         AsyncStorage.getItem('authToken'),
         AsyncStorage.getItem('refreshToken'),
+        AsyncStorage.getItem('userData'),
       ]);
+      
+      const initialState = {};
+      
       if (authToken && refreshToken) {
-        set({ authToken, refreshToken });
+        initialState.authToken = authToken;
+        initialState.refreshToken = refreshToken;
+      }
+      
+      if (userData) {
+        initialState.user = JSON.parse(userData);
+      }
+      
+      if (Object.keys(initialState).length > 0) {
+        set(initialState);
         return true;
       }
     } catch (error) {
