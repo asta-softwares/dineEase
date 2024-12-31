@@ -372,24 +372,28 @@ export default function HomeScreen({ navigation }) {
                       marginHorizontal: layout.spacing.md,
                       marginBottom: layout.spacing.sm
                     }]}>
-                      FEATURED OFFERS
+                      FEATURED PROMOS
                     </Text>
                   )}
                    <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    style={styles.featuresContainer}
-                    contentContainerStyle={styles.featuresContentContainer}
+                    style={styles.promosContainer}
+                    contentContainerStyle={styles.promosContentContainer}
                   >
                     {promos.map((promo) => (
-                      <View key={promo.id} style={styles.featureCardWrapper}>
+                      <TouchableOpacity
+                        key={promo.id}
+                        onPress={() => handleDetail(promo.restaurant_details)}
+                        style={styles.promoCardWrapper}
+                      >
                         <FeatureCard
                           title={promo.name}
                           description={promo.description}
                           imageUrl={promo.restaurantImage || 'https://via.placeholder.com/600'}
                           price={promo.discount_type === 'percentage' ? `${promo.discount}% off` : `$${promo.discount}`}
                         />
-                      </View>
+                      </TouchableOpacity>
                     ))}
                   </ScrollView> 
 
@@ -538,7 +542,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  featuresContainer: {
+  promosContainer: {
     paddingLeft: layout.spacing.md,
     marginBottom: layout.spacing.md,
   },
@@ -546,7 +550,7 @@ const styles = StyleSheet.create({
     paddingLeft: layout.spacing.md,
     marginBottom: layout.spacing.md,
   },
-  featureCardWrapper: {
+  promoCardWrapper: {
     marginRight: layout.spacing.sm,
   },
   cuisinesCardWrapper: {
