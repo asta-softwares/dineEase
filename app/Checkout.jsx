@@ -213,7 +213,7 @@ const CheckoutScreen = ({ navigation }) => {
               text: 'OK',
               onPress: () => {
                 clearCart();
-                navigation.navigate('OrderDetailScreen', { order: orderDetailsData, restaurant: restaurant });
+                navigation.navigate('OrderDetailScreen', { order: orderDetailsData, restaurant: restaurant, fromCheckout: true });
               },
             },
           ]
@@ -311,7 +311,7 @@ const CheckoutScreen = ({ navigation }) => {
                       {promo.name} ({promo.discount_type === 'percentage' ? `${promo.discount}%` : `$${promo.discount}`} off)
                     </Text>
                     <TouchableOpacity 
-                      onPress={() => setSelectedPromos(selectedPromos.filter(p => p.id !== promo.id))}
+                      onPress={() => handlePromoSelect(promo)}
                       style={styles.removePromo}
                     >
                       <Ionicons name="close-circle" size={20} color={colors.primary} />
@@ -346,23 +346,18 @@ const CheckoutScreen = ({ navigation }) => {
                         key={promo.id}
                         style={styles.promoOption}
                         onPress={() => {
-                          setSelectedPromos([...selectedPromos, promo]);
+                          handlePromoSelect(promo);
                           setShowPromoDropdown(false);
                         }}
                       >
-                        <View>
-                          <Text style={typography.bodyLarge}>{promo.name}</Text>
-                          <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
-                            {promo.discount_type === 'percentage'
-                              ? `${promo.discount}% off`
-                              : `$${promo.discount} off`}
-                          </Text>
-                        </View>
+                        <Text style={typography.bodyMedium}>
+                          {promo.name} ({promo.discount_type === 'percentage' ? `${promo.discount}%` : `$${promo.discount}`} off)
+                        </Text>
                       </TouchableOpacity>
                     ))
                 ) : (
-                  <Text style={[typography.bodyMedium, styles.noPromos]}>
-                    No promos available for this order
+                  <Text style={[typography.bodyMedium, { textAlign: 'center', padding: 16 }]}>
+                    No promos available
                   </Text>
                 )}
               </View>

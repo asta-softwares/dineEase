@@ -46,7 +46,7 @@ const getCardIcon = (brand) => {
 };
 
 const OrderDetailScreen = ({ route, navigation }) => {
-  const { order, restaurant } = route.params;
+  const { order, restaurant, fromCheckout } = route.params;
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -85,10 +85,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
     if (type === 'status') {
       return (
         <View style={styles.totalRow}>
-          <Text style={[
-            typography.bodyLarge,
-            { color: colors.text.secondary }
-          ]}>
+          <Text style={[typography.bodyLarge, { color: colors.text.secondary }]}>
             {label}
           </Text>
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(value) }]}>
@@ -103,20 +100,17 @@ const OrderDetailScreen = ({ route, navigation }) => {
     if (type === 'payment_method') {
       return (
         <View style={styles.totalRow}>
-          <Text style={[
-            typography.bodyLarge,
-            { color: colors.text.secondary }
-          ]}>
+          <Text style={[typography.bodyLarge, { color: colors.text.secondary }]}>
             {label}
           </Text>
           <View style={styles.paymentMethod}>
             <FontAwesome5 
               name={getCardIcon(orderDetails?.payment.card_brand)} 
-              size={16} 
-              color={colors.text.primary} 
+              size={32} 
+              color={colors.text.black} 
               style={styles.cardIcon}
             />
-            <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>
+            <Text style={[typography.bodyLarge, { color: colors.text.black }]}>
               •••• {value}
             </Text>
           </View>
@@ -126,27 +120,31 @@ const OrderDetailScreen = ({ route, navigation }) => {
 
     return (
       <View style={styles.totalRow}>
-        <Text style={[
-          typography.bodyLarge,
-          { color: colors.text.secondary }
-        ]}>
+        <Text style={[typography.bodyLarge, { color: colors.text.secondary }]}>
           {label}
         </Text>
         {label === 'Discount' ? (
           <Text style={[typography.bodyLarge, { color: colors.success }]}>
             -${parseFloat(value || 0).toFixed(2)}
           </Text>
+        ) : type === 'transaction' ? (
+          <Text style={[typography.bodyMedium, { color: colors.text.black }]}>
+            {value}
+          </Text>
+        ) : type === 'date' ? (
+          <Text style={[typography.bodyLarge, { color: colors.text.black }]}>
+            {new Date(value).toLocaleString()}
+          </Text>
         ) : (
-          <Text style={[
-            typography.bodyLarge,
-            isTotal && { color: colors.text.primary }
-          ]}>
+          <Text style={[typography.bodyLarge, isTotal && { color: colors.text.primary }]}>
             ${parseFloat(value || 0).toFixed(2)}
           </Text>
         )}
       </View>
     );
   };
+
+  const isFromOrders = !fromCheckout;
 
   if (loading) {
     return (
@@ -162,6 +160,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
         handleGoBack={() => navigation.goBack()}
         title={`Order #${orderDetails?.id || ''}`}
         variant="solid"
+        showBack={!fromCheckout}
       />
       
       <ScrollView 
@@ -245,17 +244,19 @@ const OrderDetailScreen = ({ route, navigation }) => {
             <TotalRow label="Payment Status" value={orderDetails?.payment?.payment_status} type="status" />
             <TotalRow label="Payment Method" value= {orderDetails?.payment.card_last4} type="payment_method" />
             <TotalRow label="Transaction ID" value={orderDetails?.payment?.transaction_id} type="transaction" />
-            <TotalRow label="Payment Date" value={new Date(orderDetails?.payment?.payment_date).toLocaleString()} />
+            <TotalRow label="Payment Date" value={orderDetails?.payment?.payment_date} type="date" />
           </View>
         </View>
       </ScrollView>
 
-      <Footer>
-        <LargeButton
-          title="Back to Home"
-          onPress={() => navigation.navigate('Home')}
-        />
-      </Footer>
+      {!isFromOrders && (
+        <Footer>
+          <LargeButton
+            title="Back to Home"
+            onPress={() => navigation.navigate('Home')}
+          />
+        </Footer>
+      )}
     </View>
   );
 };
@@ -367,7 +368,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   promosSection: {
-    marginBottom: 24,
     paddingHorizontal: 16,
   },
   promoItem: {

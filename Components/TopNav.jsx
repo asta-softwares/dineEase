@@ -11,18 +11,22 @@ import Animated, {
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 
-const TopNav = ({ handleGoBack, title = "The Flavorful Fork", scrollY, variant = 'transparent' }) => {
+const TopNav = ({ handleGoBack, title = "The Flavorful Fork", scrollY, variant = 'transparent', showBack = true }) => {
     if (variant === 'solid') {
         return (
             <View style={[styles.topNavContainer, { backgroundColor: colors.background }]}>
                 <SafeAreaView edges={['top']} style={styles.safeArea}>
                     <View style={styles.topNav}>
-                        <TouchableOpacity 
-                            style={[styles.backButton, { backgroundColor: colors.background.secondary }]} 
-                            onPress={handleGoBack}
-                        >
-                            <Ionicons name="arrow-back" size={24} color={colors.text.black} />
-                        </TouchableOpacity>
+                        {showBack ? (
+                            <TouchableOpacity 
+                                style={[styles.backButton, { backgroundColor: colors.background.secondary }]} 
+                                onPress={handleGoBack}
+                            >
+                                <Ionicons name="arrow-back" size={24} color={colors.text.black} />
+                            </TouchableOpacity>
+                        ) : (
+                            <View style={styles.placeholder} />
+                        )}
                         <View style={styles.titleContainer}>
                             <Text style={[typography.h3, styles.title]}>
                                 {title}
@@ -75,13 +79,17 @@ const TopNav = ({ handleGoBack, title = "The Flavorful Fork", scrollY, variant =
         <Animated.View style={[styles.topNavContainer, containerStyle]}>
             <SafeAreaView edges={['top']} style={styles.safeArea}>
                 <View style={styles.topNav}>
-                    <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-                        <AnimatedIcon 
-                            name="arrow-back" 
-                            size={24} 
-                            style={iconStyle}
-                        />
-                    </TouchableOpacity>
+                    {showBack ? (
+                        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+                            <AnimatedIcon 
+                                name="arrow-back" 
+                                size={24} 
+                                style={iconStyle}
+                            />
+                        </TouchableOpacity>
+                    ) : (
+                        <View style={styles.placeholder} />
+                    )}
                     <Animated.View style={[styles.titleContainer, titleStyle]}>
                         <Animated.Text style={[typography.h3, styles.title]}>
                             {title}
