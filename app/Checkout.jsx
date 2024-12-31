@@ -42,7 +42,7 @@ const CheckoutScreen = ({ navigation }) => {
   const [orderTotals, setOrderTotals] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [availablePromos, setAvailablePromos] = useState([]);
-  const [selectedPromo, setSelectedPromo] = useState(null);
+  const [selectedPromos, setSelectedPromos] = useState([]);
   const [showPromoDropdown, setShowPromoDropdown] = useState(false);
   const scrollY = useSharedValue(0);
   const { initPaymentSheet, presentPaymentSheet, retrievePaymentIntent } = useStripe();
@@ -54,10 +54,11 @@ const CheckoutScreen = ({ navigation }) => {
       if (cart.restaurantId && subtotal > 0) {
         try {
           setCalculating(true);
+          const promoIds = selectedPromos.map(promo => promo.id);
           const calculateTotal = await restaurantService.getOrderTotal({
             order_total: subtotal.toFixed(2),
             restaurant_id: cart.restaurantId,
-            promo_ids: selectedPromo ? [selectedPromo.id] : [],
+            promo_ids: promoIds,
           });
           setOrderTotals(calculateTotal);
         } catch (error) {
@@ -69,7 +70,7 @@ const CheckoutScreen = ({ navigation }) => {
       }
     };
     calculateOrderTotal();
-  }, [cart.restaurantId, subtotal, selectedPromo]);
+  }, [cart.restaurantId, subtotal, selectedPromos]);
 
   useEffect(() => {
     const loadRestaurant = async () => {
@@ -101,8 +102,11 @@ const CheckoutScreen = ({ navigation }) => {
   }, []);
 
   const handlePromoSelect = (promo) => {
-    setSelectedPromo(promo);
-    setShowPromoDropdown(false);
+    if (selectedPromos.some(p => p.id === promo.id)) {
+      setSelectedPromos(selectedPromos.filter(p => p.id !== promo.id));
+    } else {
+      setSelectedPromos([...selectedPromos, promo]);
+    }
   };
 
   const handlePayment = async () => {
@@ -135,7 +139,7 @@ const CheckoutScreen = ({ navigation }) => {
           menu_item_id: item.id,
           quantity: quantity,
         })),
-        promo_ids: selectedPromo ? [selectedPromo.id] : [],
+        promo_ids: selectedPromos.map(promo => promo.id),
         owner_id: cart.owner_id
       };
 
@@ -294,31 +298,57 @@ const CheckoutScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.promoSection}>
-              <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
-                 Promos
-              </Text>
-              <TouchableOpacity
-                style={styles.promoSelector}
-                onPress={() => setShowPromoDropdown(!showPromoDropdown)}
-              >
-                <Text style={typography.bodyMedium}>
-                  {selectedPromo ? selectedPromo.name : 'Select a promo'}
-                </Text>
-                <Ionicons
-                  name={showPromoDropdown ? 'chevron-up' : 'chevron-down'}
-                  size={24}
-                  color={colors.text.secondary}
-                />
-              </TouchableOpacity>
+            <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
+              Promos
+            </Text>
+            
+            {/* Selected Promos Tags */}
+            {selectedPromos.length > 0 && (
+              <View style={styles.promoList}>
+                {selectedPromos.map((promo) => (
+                  <View key={promo.id} style={styles.promoTag}>
+                    <Text style={[typography.bodyMedium, { color: colors.primary }]}>
+                      {promo.name} ({promo.discount_type === 'percentage' ? `${promo.discount}%` : `$${promo.discount}`} off)
+                    </Text>
+                    <TouchableOpacity 
+                      onPress={() => setSelectedPromos(selectedPromos.filter(p => p.id !== promo.id))}
+                      style={styles.removePromo}
+                    >
+                      <Ionicons name="close-circle" size={20} color={colors.primary} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
 
-              {showPromoDropdown && (
-                <View style={styles.promoDropdown}>
-                  {availablePromos.length > 0 ? (
-                    availablePromos.map((promo) => (
+            {/* Promo Selector Dropdown */}
+            <TouchableOpacity
+              style={styles.promoSelector}
+              onPress={() => setShowPromoDropdown(!showPromoDropdown)}
+            >
+              <Text style={typography.bodyMedium}>
+                Select a promo
+              </Text>
+              <Ionicons
+                name={showPromoDropdown ? 'chevron-up' : 'chevron-down'}
+                size={24}
+                color={colors.text.secondary}
+              />
+            </TouchableOpacity>
+
+            {showPromoDropdown && (
+              <View style={styles.promoDropdown}>
+                {availablePromos.length > 0 ? (
+                  availablePromos
+                    .filter(promo => !selectedPromos.some(p => p.id === promo.id))
+                    .map((promo) => (
                       <TouchableOpacity
                         key={promo.id}
                         style={styles.promoOption}
-                        onPress={() => handlePromoSelect(promo)}
+                        onPress={() => {
+                          setSelectedPromos([...selectedPromos, promo]);
+                          setShowPromoDropdown(false);
+                        }}
                       >
                         <View>
                           <Text style={typography.bodyLarge}>{promo.name}</Text>
@@ -328,20 +358,16 @@ const CheckoutScreen = ({ navigation }) => {
                               : `$${promo.discount} off`}
                           </Text>
                         </View>
-                        {selectedPromo?.id === promo.id && (
-                          <Ionicons name="checkmark" size={24} color={colors.primary} />
-                        )}
                       </TouchableOpacity>
                     ))
-                  ) : (
-                    <Text style={[typography.bodyMedium, styles.noPromos]}>
-                      No promos available for this order
-                    </Text>
-                  )}
-                </View>
-              )}
-            </View>
-
+                ) : (
+                  <Text style={[typography.bodyMedium, styles.noPromos]}>
+                    No promos available for this order
+                  </Text>
+                )}
+              </View>
+            )}
+          </View>
 
           <View style={styles.section}>
             <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
@@ -495,55 +521,50 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 32,
   },
+  promoList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  promoTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary + '10',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  removePromo: {
+    marginLeft: 4,
+  },
   promoSelector: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: colors.light,
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  promoDropdown: {
-    marginTop: 8,
-    backgroundColor: colors.background,
-    borderRadius: 12,
+    backgroundColor: colors.white,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    overflow: 'hidden',
+  },
+  promoDropdown: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginTop: 8,
   },
   promoOption: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
   noPromos: {
     padding: 16,
-    textAlign: 'center',
-    color: colors.text.secondary,
-  },
-  summaryContainer: {
-    padding: 16,
-    backgroundColor: colors.light,
-    borderRadius: 12,
-    marginBottom: 24,
-  },
-  summaryTitle: {
-    marginBottom: 16,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  totalRow: {
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
 });
 
