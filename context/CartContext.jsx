@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUserStore } from '../stores/userStore';
 
 const CartContext = createContext({
   cart: { restaurantId: null, items: {}, promos: [], owner_id: null },
@@ -26,14 +27,30 @@ export const CartProvider = ({ children }) => {
     items: {},  // { itemId: { item: {}, quantity: number } }
     owner_id: null,
   });
+  const [lastUserId, setLastUserId] = useState(null);
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
-    loadCart();
-  }, []);
+    if (!user) {
+      // Clear cart when user logs out
+      handleClearCart();
+      setLastUserId(null);
+    } else if (user.id !== lastUserId) {
+      // Clear cart when different user logs in
+      handleClearCart();
+      setLastUserId(user.id);
+    } else {
+      // Load cart for current user
+      loadCart();
+    }
+  }, [user]);
 
   const loadCart = async () => {
     try {
-      const savedCart = await AsyncStorage.getItem('cart');
+      if (!user) return;
+      
+      const cartKey = `cart_${user.id}`;
+      const savedCart = await AsyncStorage.getItem(cartKey);
       if (savedCart) {
         setCart(JSON.parse(savedCart));
       }
@@ -44,9 +61,31 @@ export const CartProvider = ({ children }) => {
 
   const saveCart = async (newCart) => {
     try {
-      await AsyncStorage.setItem('cart', JSON.stringify(newCart));
+      if (!user) return;
+      
+      const cartKey = `cart_${user.id}`;
+      await AsyncStorage.setItem(cartKey, JSON.stringify(newCart));
     } catch (error) {
       console.error('Error saving cart:', error);
+    }
+  };
+
+  const handleClearCart = async () => {
+    const emptyCart = {
+      restaurantId: null,
+      promos: [],
+      items: {},
+      owner_id: null,
+    };
+    setCart(emptyCart);
+    
+    if (lastUserId) {
+      try {
+        const cartKey = `cart_${lastUserId}`;
+        await AsyncStorage.removeItem(cartKey);
+      } catch (error) {
+        console.error('Error clearing cart from storage:', error);
+      }
     }
   };
 
@@ -232,15 +271,8 @@ export const CartProvider = ({ children }) => {
     return cart.promos;
   };
 
-  const clearCart = () => {
-    const emptyCart = {
-      restaurantId: null,
-      items: {},
-      promos: [],
-      owner_id: null
-    };
-    setCart(emptyCart);
-    saveCart(emptyCart);
+  const clearCart = async () => {
+    await handleClearCart();
   };
 
   const getItemQuantity = (itemId) => {
