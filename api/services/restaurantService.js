@@ -281,9 +281,9 @@ export const restaurantService = {
     }
   },
 
-  getOrders: async () => {
+  getOrders: async (page = 1) => {
     try {
-      const response = await apiClient.get('/payments/orders/');
+      const response = await apiClient.get('/payments/orders/', { params: { page } });
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 
@@ -291,7 +291,7 @@ export const restaurantService = {
                           error.response?.data?.detail ||
                           error.message;
       
-      console.error('Error fetching payment orders:', {
+      console.error('Error fetching orders:', {
         status: error.response?.status,
         message: errorMessage,
         data: error.response?.data

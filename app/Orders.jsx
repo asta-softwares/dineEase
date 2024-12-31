@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Platform, RefreshControl } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import TopNav from '../Components/TopNav';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
@@ -89,20 +88,24 @@ const OrderCard = ({ order, onPress }) => {
 
 const OrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [nextPage, setNextPage] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const fetchOrders = async () => {
+  const fetchOrders = async (page = 1, shouldRefresh = false) => {
     try {
-      const response = await restaurantService.getOrders();
-      const sortedOrders = response.results.sort((a, b) => 
-        new Date(b.order_time) - new Date(a.order_time)
-      );
-      setOrders(sortedOrders);
+      setLoading(true);
+      const response = await restaurantService.getOrders(page);
+      
+      if (shouldRefresh) {
+        setOrders(response.results);
+      } else {
+        setOrders(prevOrders => [...prevOrders, ...response.results]);
+      }
+      
+      setNextPage(response.next ? page + 1 : null);
+      setHasMore(!!response.next);
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
@@ -113,8 +116,14 @@ const OrdersScreen = ({ navigation }) => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchOrders();
+    fetchOrders(1, true);
   }, []);
+
+  const loadMore = () => {
+    if (!loading && hasMore && nextPage) {
+      fetchOrders(nextPage);
+    }
+  };
 
   const handleOrderPress = (order) => {
     navigation.navigate('OrderDetailScreen', { 
@@ -123,46 +132,61 @@ const OrdersScreen = ({ navigation }) => {
     });
   };
 
-  if (loading) {
+  useEffect(() => {
+    fetchOrders(1, true);
+  }, []);
+
+  const renderFooter = () => {
+    if (!loading || refreshing) return null;
     return (
-      <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="small" color={colors.primary} />
       </View>
     );
-  }
+  };
+
+  const renderEmpty = () => (
+    <View style={styles.emptyContainer}>
+      <Ionicons name="receipt-outline" size={64} color={colors.text.secondary} />
+      <Text style={[typography.h3, styles.emptyText]}>No orders yet</Text>
+      <Text style={[typography.bodyMedium, styles.emptySubtext]}>
+        Your order history will appear here
+      </Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={[{ backgroundColor: colors.background }, styles.header]}>
+      <View style={styles.header}>
         <TopNav 
-          title="My Orders"
+          title="My Orders" 
           handleGoBack={() => navigation.goBack()}
           variant="solid"
         />
-      </SafeAreaView>
-      
+      </View>
       <FlatList
-        style={styles.list}
         data={orders}
-        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <OrderCard
             order={item}
             onPress={() => handleOrderPress(item)}
           />
         )}
-        contentContainerStyle={styles.listContainer}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
+        keyExtractor={item => item.id.toString()}
+        contentContainerStyle={styles.contentPadding}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.primary}
             colors={[colors.primary]}
+            tintColor={colors.primary}
           />
         }
+        ListEmptyComponent={renderEmpty}
+        ListFooterComponent={renderFooter}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
       />
     </View>
   );
@@ -173,13 +197,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
+  header: {
+    backgroundColor: colors.background,
+    paddingTop: Platform.OS === 'ios' ? 120 : 100,
+    zIndex: 10,
   },
-  listContainer: {
+  contentPadding: {
     padding: 16,
-    paddingTop: Platform.OS === 'ios' ? 130 : 100,
+    paddingBottom: 32,
   },
   menuItem: {
     width: '100%',
@@ -247,16 +272,23 @@ const styles = StyleSheet.create({
   date: {
     color: colors.text.secondary,
   },
-  header: {
-    zIndex: 10,
-    elevation: 10,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
+  footerLoader: {
+    paddingVertical: 16,
+    alignItems: 'center',
   },
-  list: {
+  emptyContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 64,
+  },
+  emptyText: {
+    color: colors.text.secondary,
+    marginTop: 16,
+  },
+  emptySubtext: {
+    color: colors.text.secondary,
+    marginTop: 8,
   },
 });
 

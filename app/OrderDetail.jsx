@@ -204,10 +204,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
               <View>
                 <Text style={[typography.h3, styles.sectionTitle]}>Applied Promos</Text>
                 {orderDetails.promos.map((promo, index) => (
-                  <View key={promo.id} style={[
-                    styles.promoItem,
-                    index !== orderDetails.promos.length - 1 && styles.promoItemBorder
-                  ]}>
+                  <View key={promo.id} style={styles.promoItem}>
                     <View style={styles.promoInfo}>
                       <Text style={typography.bodyLarge}>{promo.name}</Text>
                       <Text style={[typography.bodyMedium, { color: colors.success }]}>
@@ -218,6 +215,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
                     </View>
                   </View>
                 ))}
+                <View style={styles.divider} />
               </View>
             )}
             <View style={styles.totals}>
@@ -326,7 +324,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: colors.border,
-    marginVertical: 8,
+    marginVertical: 16,
   },
   paymentInfo: {
     backgroundColor: colors.background.secondary,
@@ -344,10 +342,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-  },
-  promoItemBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   promoInfo: {
     flex: 1,
