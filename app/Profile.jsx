@@ -17,26 +17,23 @@ const ProfileScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const logout = useUserStore((state) => state.logout);
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const storedUser = useUserStore((state) => state.user);
+    const setStoredUser = useUserStore((state) => state.setUser);
+
+    // Use stored user data immediately
+    const [user, setUser] = useState(storedUser);
 
     const fetchUserData = async () => {
         try {
-            setLoading(true);
             const userData = await authService.fetchUser();
             setUser(userData);
+            setStoredUser(userData);
         } catch (error) {
             console.error('Error fetching user data:', error);
-            Alert.alert(
-                'Error',
-                'Unable to load profile data. Please try again later.',
-                [{ text: 'OK' }]
-            );
-        } finally {
-            setLoading(false);
         }
     };
 
+    // Background refresh only
     useEffect(() => {
         fetchUserData();
     }, []);
@@ -44,13 +41,13 @@ const ProfileScreen = () => {
     // Listen for updates from EditProfile
     useEffect(() => {
         if (route.params?.updatedUserData) {
-            setUser(route.params.updatedUserData);
-            // Show success message
+            const updatedData = route.params.updatedUserData;
+            setUser(updatedData);
+            setStoredUser(updatedData);
             Alert.alert('Success', 'Profile updated successfully');
-            // Clear the params to prevent duplicate alerts
             navigation.setParams({ updatedUserData: null, timestamp: null });
         }
-    }, [route.params?.timestamp]);
+    }, [route.params?.updatedUserData]);
 
     const handleGoBack = () => {
         navigation.goBack();
@@ -156,16 +153,16 @@ const ProfileScreen = () => {
                     <View style={styles.profile}>
                         <View style={styles.profileInfo}>
                             <Text style={[typography.h3, styles.name]}>
-                                {loading ? 'Loading...' : `${user?.first_name} ${user?.last_name}`}
+                                {`${user?.first_name} ${user?.last_name}`}
                             </Text>
                             <Text style={[typography.bodyMedium, styles.email]}>
-                                {loading ? 'Loading...' : user?.email}
+                                {user?.email}
                             </Text>
                             <Text style={[typography.bodyMedium, styles.phone]}>
-                                {loading ? 'Loading...' : user?.profile?.phone}
+                                {user?.profile?.phone}
                             </Text>
                             <Text style={[typography.bodyMedium, styles.address]}>
-                                {loading ? 'Loading...' : `${user?.profile?.address}, ${user?.profile?.city}, ${user?.profile?.province}`}
+                                {`${user?.profile?.address}, ${user?.profile?.city}, ${user?.profile?.province}`}
                             </Text>
                             <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
                                 <Text style={[typography.labelMedium, styles.editButtonText]}>

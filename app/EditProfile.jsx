@@ -113,13 +113,13 @@ const EditProfile = ({ route }) => {
       />
       
       <KeyboardAvoidingView 
-        style={styles.keyboardView}
+        style={styles.content}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
       >
         <ScrollView 
           style={styles.content}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, styles.contentPadding]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -258,16 +258,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  keyboardView: {
-    flex: 1,
-    marginTop: Platform.OS === 'ios' ? 100 : 120,
-  },
   content: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: layout.spacing.md,
-    paddingBottom: Platform.OS === 'ios' ? 120 : 140,
+    flexGrow: 1,
+    padding: 20,
+    paddingTop: 0,
+    paddingBottom: 120,
+  },
+  contentPadding: {
+    paddingTop: Platform.OS === 'ios' ? 120 : 100,
   },
   section: {
     paddingVertical: layout.spacing.sm,
