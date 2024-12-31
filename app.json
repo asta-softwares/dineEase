@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
+    "plugins": ["react-native-edge-to-edge"],
     "splash": {
       "image": "./assets/splash-new.png",
       "resizeMode": "contain",
@@ -30,7 +31,9 @@
       "permissions": ["INTERNET"],
       "networkSecurityConfig": {
         "cleartextTrafficPermitted": true
-      }
+      },
+      "softwareKeyboardLayoutMode": "pan",
+      "windowSoftInputMode": "adjustResize"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -43,9 +46,6 @@
     "owner": "mendozarain",
     "experiments": {
       "newArchEnabled": true
-    },
-    "plugins": [
-      "expo-font"
-    ]
+    }
   }
 }

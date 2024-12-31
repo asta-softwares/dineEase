@@ -11,6 +11,8 @@ import React, { useEffect, useState } from 'react';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ActivityIndicator, View } from 'react-native';
+import { enableScreens } from 'react-native-screens';
+import { SystemBars } from 'react-native-edge-to-edge';
 import CheckoutScreen from './app/Checkout';
 import DetailScreen from './app/Details';
 import HomeScreen from './app/Home';
@@ -29,9 +31,14 @@ import { useUserStore } from './stores/userStore';
 // Initialize reanimated
 import 'react-native-reanimated';
 
+enableScreens();
+
 const Stack = createNativeStackNavigator(); 
 
 export default function App() {
+  useEffect(() => {
+  }, []);
+
   const [fontsLoaded, fontError] = useFonts({
     'PlusJakartaSans-Regular': PlusJakartaSans_400Regular,
     'PlusJakartaSans-Medium': PlusJakartaSans_500Medium,
@@ -71,11 +78,12 @@ export default function App() {
   }
 
   return (
-    <StripeProvider
-      publishableKey="pk_test_51QMpBEAECjFQcoAiIBBR2ytlseH5Ztrp19gx9RWhTox7fzADahNcnjrnyLz0a4N3cv0xp63wx2daPuf3TXWaBSRE00muGzaBD0"
-      merchantIdentifier="merchant.com.dineease"
-    >
-      <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SystemBars style="auto" />
+      <StripeProvider
+        publishableKey="pk_test_51QMpBEAECjFQcoAiIBBR2ytlseH5Ztrp19gx9RWhTox7fzADahNcnjrnyLz0a4N3cv0xp63wx2daPuf3TXWaBSRE00muGzaBD0"
+        merchantIdentifier="merchant.com.dineease"
+      >
         <CartProvider>
           <NavigationContainer>
             <Stack.Navigator
@@ -125,7 +133,7 @@ export default function App() {
             </Stack.Navigator>
           </NavigationContainer>
         </CartProvider>
-      </GestureHandlerRootView>
-    </StripeProvider>
+      </StripeProvider>
+    </GestureHandlerRootView>
   );
 }
