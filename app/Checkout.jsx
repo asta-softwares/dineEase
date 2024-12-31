@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 70 : 120,
   },
   section: {
-    marginBottom: 32,
+    marginBottom: 12,
   },
   emptyCart: {
     flex: 1,

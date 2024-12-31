@@ -65,7 +65,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
     fetchOrderDetails();
   }, [order.id]);
 
-  const OrderItem = ({ menu_item, quantity, price }) => (
+  const OrderItem = ({ menu_item, quantity, subtotal }) => (
     <View style={styles.orderItem}>
       <View style={styles.itemInfo}>
         <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>
@@ -76,7 +76,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
         </Text>
       </View>
       <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>
-        ${parseFloat(price).toFixed(2)}
+        ${parseFloat(subtotal).toFixed(2)}
       </Text>
     </View>
   );
@@ -170,7 +170,14 @@ const OrderDetailScreen = ({ route, navigation }) => {
       >
         {/* Restaurant Info */}
         <View style={styles.section}>
-          <Text style={[typography.h2, styles.sectionTitle, { color: colors.text.primary }]}>{restaurant?.name}</Text>
+          <View style={styles.restaurantHeader}>
+            <Text style={[typography.h2, styles.sectionTitle, { color: colors.text.primary }]}>{restaurant?.name}</Text>
+            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) }]}>
+              <Text style={[typography.labelMedium, styles.statusText]}>
+                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+              </Text>
+            </View>
+          </View>
           {orderDetails?.verification_code && order.status.toLowerCase() !== 'completed' && (
           <View style={styles.verificationContainer}>
             <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Verification Code</Text>
@@ -273,6 +280,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     marginBottom: 16,
   },
+  restaurantHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   restaurantInfo: {
     backgroundColor: colors.background.secondary,
     padding: 16,
@@ -343,13 +356,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
-    alignSelf: 'flex-start',
   },
   statusText: {
     color: colors.text.white,
     textTransform: 'capitalize',
-    fontSize: 12,
-    fontFamily: 'PlusJakartaSans-Medium',
   },
   verificationContainer: {
     marginVertical: 16,
