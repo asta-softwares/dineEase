@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Modal } from 'react-na
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import { useCart } from '../context/CartContext';
+import { useUserStore } from '../stores/userStore';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 const QuantitySelector = ({ quantity, onIncrease, onDecrease }) => (
@@ -28,6 +29,7 @@ const MenuDetails = ({ item, restaurantId, visible, onClose }) => {
   const { addToCart, getItemQuantity, updateQuantity } = useCart();
   const [quantity, setQuantity] = useState(1);
   const imageUrl = item?.images?.[0]?.image || 'https://via.placeholder.com/400';
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     if (visible) {
@@ -82,27 +84,29 @@ const MenuDetails = ({ item, restaurantId, visible, onClose }) => {
               </Text>
               <Text style={[typography.h4, styles.price]}>${item?.cost}</Text>
             </View>
-            <View style={styles.footer}>
-              <QuantitySelector
-                quantity={quantity}
-                onIncrease={() => handleQuantityChange(quantity + 1)}
-                onDecrease={() => handleQuantityChange(Math.max(0, quantity - 1))}
-              />
-              <TouchableOpacity 
-                style={[
-                  styles.addToCartButton,
-                  styles.addButton,
-                ]}
-                onPress={handleAddToCart}
-              >
-                <Text style={styles.addButtonText}>
-                  {getItemQuantity(item.id) > 0 
-                    ? `Update Cart - $${(parseFloat(item?.discounted_cost) * quantity).toFixed(2)}`
-                    : `Add to Cart - $${(parseFloat(item?.discounted_cost) * quantity).toFixed(2)}`
-                  }
-                </Text>
-              </TouchableOpacity>
-            </View>
+            {user && (
+              <View style={styles.footer}>
+                <QuantitySelector
+                  quantity={quantity}
+                  onIncrease={() => handleQuantityChange(quantity + 1)}
+                  onDecrease={() => handleQuantityChange(Math.max(0, quantity - 1))}
+                />
+                <TouchableOpacity 
+                  style={[
+                    styles.addToCartButton,
+                    styles.addButton,
+                  ]}
+                  onPress={handleAddToCart}
+                >
+                  <Text style={styles.addButtonText}>
+                    {getItemQuantity(item.id) > 0 
+                      ? `Update Cart - $${(parseFloat(item?.discounted_cost) * quantity).toFixed(2)}`
+                      : `Add to Cart - $${(parseFloat(item?.discounted_cost) * quantity).toFixed(2)}`
+                    }
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </Animated.View>
       </View>
