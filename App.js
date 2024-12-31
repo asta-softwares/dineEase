@@ -7,7 +7,7 @@ import {
   PlusJakartaSans_600SemiBold,
   PlusJakartaSans_700Bold,
 } from '@expo-google-fonts/plus-jakarta-sans';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ActivityIndicator, View } from 'react-native';
@@ -15,7 +15,7 @@ import CheckoutScreen from './app/Checkout';
 import DetailScreen from './app/Details';
 import HomeScreen from './app/Home';
 import LoginScreen from './app/Login';
-import SplashScreen from './app/SplashScreen';
+import Landing from './app/Landing';
 import ProfileScreen from './app/Profile';
 import EditProfileScreen from './app/EditProfile';
 import RegisterScreen from './app/Register';
@@ -24,6 +24,8 @@ import { CartProvider } from './context/CartContext';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import OrderDetailScreen from './app/OrderDetail';
 import OrdersScreen from './app/Orders';
+import { tokenStorage } from './utils/tokenStorage';
+import { useUserStore } from './stores/userStore';
 // Initialize reanimated
 import 'react-native-reanimated';
 
@@ -36,8 +38,31 @@ export default function App() {
     'PlusJakartaSans-SemiBold': PlusJakartaSans_600SemiBold,
     'PlusJakartaSans-Bold': PlusJakartaSans_700Bold,
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const setUser = useUserStore((state) => state.setUser);
 
-  if (!fontsLoaded && !fontError) {
+  useEffect(() => {
+    checkAuthState();
+  }, []);
+
+  const checkAuthState = async () => {
+    try {
+      const token = await tokenStorage.getAccessToken();
+      if (token) {
+        setIsAuthenticated(true);
+        // You can also fetch user data here if needed
+        // const userData = await userService.getProfile();
+        // setUser(userData);
+      }
+    } catch (error) {
+      console.log('Auth check failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!fontsLoaded && !fontError || isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.primary }}>
         <ActivityIndicator size="large" color="#FFFFFF" />
@@ -47,18 +72,21 @@ export default function App() {
 
   return (
     <StripeProvider
-      publishableKey="pk_test_51QMpBEAECjFQcoAiIBBR2ytlseH5Ztrp19gx9RWhTox7fzADahNcnjrnyLz0a4N3cv0xp63wx2daPuf3TXWaBSRE00muGzaBD0" // Replace with your Stripe publishable key
-      merchantIdentifier="merchant.com.dineease" // Optional: Only required for Apple Pay
+      publishableKey="pk_test_51QMpBEAECjFQcoAiIBBR2ytlseH5Ztrp19gx9RWhTox7fzADahNcnjrnyLz0a4N3cv0xp63wx2daPuf3TXWaBSRE00muGzaBD0"
+      merchantIdentifier="merchant.com.dineease"
     >
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <NavigationContainer>
-          <CartProvider>
-            <Stack.Navigator 
-              initialRouteName="SplashScreen" 
-              screenOptions={{ headerShown: false }}>
+        <CartProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+              }}
+              initialRouteName={isAuthenticated ? "Home" : "Landing"}
+            >
               <Stack.Screen 
-                name="SplashScreen" 
-                component={SplashScreen} 
+                name="Landing" 
+                component={Landing} 
                 options={{
                   gestureEnabled: false,
                   headerBackVisible: false
@@ -95,8 +123,8 @@ export default function App() {
               <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} />
               <Stack.Screen name="OrdersScreen" component={OrdersScreen} />
             </Stack.Navigator>
-          </CartProvider>
-        </NavigationContainer>
+          </NavigationContainer>
+        </CartProvider>
       </GestureHandlerRootView>
     </StripeProvider>
   );
