@@ -1,33 +1,39 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const useUserStore = create((set) => ({
+export const useUserStore = create((set, get) => ({
   user: null,
   authToken: null,
   refreshToken: null,
+  isInitialized: false,
 
   setUser: async (user) => {
     set({ user });
-    // Store user data in AsyncStorage
     if (user) {
       await AsyncStorage.setItem('userData', JSON.stringify(user));
     }
   },
 
-  setTokens: (authToken, refreshToken) => {
+  setTokens: async (authToken, refreshToken) => {
     set({ authToken, refreshToken });
-    // Store tokens in AsyncStorage
-    if (authToken) AsyncStorage.setItem('authToken', authToken);
-    if (refreshToken) AsyncStorage.setItem('refreshToken', refreshToken);
+    if (authToken) await AsyncStorage.setItem('authToken', authToken);
+    if (refreshToken) await AsyncStorage.setItem('refreshToken', refreshToken);
   },
 
   clearUser: async () => {
-    set({ user: null, authToken: null, refreshToken: null });
+    // Clear cart and other app state here
+    set({ 
+      user: null, 
+      authToken: null, 
+      refreshToken: null,
+    });
+    
     // Clear all data from AsyncStorage
     await Promise.all([
       AsyncStorage.removeItem('authToken'),
       AsyncStorage.removeItem('refreshToken'),
       AsyncStorage.removeItem('userData'),
+      AsyncStorage.removeItem('cart'), // Also clear cart data
     ]);
   },
 
@@ -40,7 +46,9 @@ export const useUserStore = create((set) => ({
         AsyncStorage.getItem('userData'),
       ]);
       
-      const initialState = {};
+      const initialState = {
+        isInitialized: true
+      };
       
       if (authToken && refreshToken) {
         initialState.authToken = authToken;
@@ -51,13 +59,18 @@ export const useUserStore = create((set) => ({
         initialState.user = JSON.parse(userData);
       }
       
-      if (Object.keys(initialState).length > 0) {
-        set(initialState);
-        return true;
-      }
+      set(initialState);
+      return initialState;
     } catch (error) {
       console.error('Error initializing auth:', error);
+      set({ isInitialized: true });
+      throw error;
     }
-    return false;
+  },
+
+  // Check if user is authenticated
+  isAuthenticated: () => {
+    const state = get();
+    return !!(state.user && state.authToken);
   },
 }));

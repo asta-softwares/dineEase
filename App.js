@@ -36,38 +36,61 @@ enableScreens();
 const Stack = createNativeStackNavigator(); 
 
 export default function App() {
-  useEffect(() => {
-  }, []);
-
   const [fontsLoaded, fontError] = useFonts({
     'PlusJakartaSans-Regular': PlusJakartaSans_400Regular,
     'PlusJakartaSans-Medium': PlusJakartaSans_500Medium,
     'PlusJakartaSans-SemiBold': PlusJakartaSans_600SemiBold,
     'PlusJakartaSans-Bold': PlusJakartaSans_700Bold,
   });
+  
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const setUser = useUserStore((state) => state.setUser);
+  const { setUser, setTokens, initializeAuth } = useUserStore();
 
   useEffect(() => {
-    checkAuthState();
+    const initApp = async () => {
+      try {
+        const tokens = await tokenStorage.getTokens();
+        if (tokens?.accessToken) {
+          setIsAuthenticated(true);
+          await initializeAuth(); // This will load user data and tokens
+          setTokens(tokens.accessToken, tokens.refreshToken);
+        }
+      } catch (error) {
+        console.error('Error initializing app:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initApp();
   }, []);
 
-  const checkAuthState = async () => {
-    try {
-      const token = await tokenStorage.getAccessToken();
-      if (token) {
-        setIsAuthenticated(true);
-        // You can also fetch user data here if needed
-        // const userData = await userService.getProfile();
-        // setUser(userData);
+  useEffect(() => {
+    const handleLogout = async () => {
+      try {
+        setIsAuthenticated(false);
+        await useUserStore.getState().clearUser();
+        await tokenStorage.clearTokens();
+      } catch (error) {
+        console.error('Error during logout:', error);
       }
-    } catch (error) {
-      console.log('Auth check failed:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+
+    // Subscribe to auth state changes
+    const unsubscribe = useUserStore.subscribe(
+      (state) => state.user,
+      (user) => {
+        if (!user) {
+          handleLogout();
+        }
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   if (!fontsLoaded && !fontError || isLoading) {
     return (

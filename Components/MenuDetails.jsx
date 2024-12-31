@@ -25,7 +25,7 @@ const QuantitySelector = ({ quantity, onIncrease, onDecrease }) => (
   </View>
 );
 
-const MenuDetails = ({ item, restaurantId, visible, onClose }) => {
+const MenuDetails = ({ item, restaurantId, visible, onClose, navigation }) => {
   const { addToCart, getItemQuantity, updateQuantity } = useCart();
   const [quantity, setQuantity] = useState(1);
   const imageUrl = item?.images?.[0]?.image || 'https://via.placeholder.com/400';
@@ -39,6 +39,11 @@ const MenuDetails = ({ item, restaurantId, visible, onClose }) => {
   }, [visible, item.id]);
 
   const handleAddToCart = () => {
+    const isAuth = useUserStore.getState().isAuthenticated();
+    if (!isAuth) {
+      navigation.navigate('Login');
+      return;
+    }
     if (quantity === 0) {
       updateQuantity(item.id, 0);
     } else {

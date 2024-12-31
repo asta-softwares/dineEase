@@ -14,6 +14,18 @@ export const tokenStorage = {
       ]);
     } catch (error) {
       console.error('Error storing tokens:', error);
+      throw error;
+    }
+  },
+
+  async getTokens() {
+    try {
+      const tokens = await AsyncStorage.multiGet([TOKEN_KEYS.ACCESS, TOKEN_KEYS.REFRESH]);
+      const [accessToken, refreshToken] = tokens.map(([_, value]) => value);
+      return { accessToken, refreshToken };
+    } catch (error) {
+      console.error('Error getting tokens:', error);
+      return null;
     }
   },
 
@@ -40,6 +52,7 @@ export const tokenStorage = {
       await AsyncStorage.multiRemove([TOKEN_KEYS.ACCESS, TOKEN_KEYS.REFRESH]);
     } catch (error) {
       console.error('Error clearing tokens:', error);
+      throw error;
     }
   },
 };
