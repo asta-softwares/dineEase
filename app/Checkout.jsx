@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   contentPadding: {
-    paddingTop: Platform.OS === 'ios' ? 70 : 100,
+    paddingTop: Platform.OS === 'ios' ? 70 : 120,
   },
   section: {
     marginBottom: 32,

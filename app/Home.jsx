@@ -93,17 +93,21 @@ export default function HomeScreen({ navigation }) {
       setLoading(false);
     }
   };
-
   const fetchPromos = async () => {
     try {
-      const promosData = await restaurantService.getPromos();
+      const promosData = await restaurantService.getAllPromos();
       const promosWithImages = await Promise.all(
         promosData.map(async (promo) => {
-          const restaurant = await restaurantService.getRestaurantById(promo.restaurant_details.id);
-          return {
-            ...promo,
-            restaurantImage: restaurant.image
-          };
+          if (promo.restaurant_details && promo.restaurant_details.id) {
+            const restaurant = await restaurantService.getRestaurantById(promo.restaurant_details.id);
+            return {
+              ...promo,
+              restaurantImage: restaurant.image
+            };
+          } else {
+            console.warn('Promo missing restaurant details:', promo);
+            return promo;
+          }
         })
       );
       setPromos(promosWithImages);
@@ -258,9 +262,9 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-        <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <View style={styles.container}>
+        <SafeAreaView style={{ backgroundColor: colors.background }}>
           <Animated.View style={[styles.header]}>
             <View style={styles.topHeader}>
               <TouchableOpacity style={styles.menuButton} onPress={handleProfilePress}>
@@ -311,54 +315,55 @@ export default function HomeScreen({ navigation }) {
               )}
             </Animated.View>
           </Animated.View>
+        </SafeAreaView>
 
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            onScroll={Animated.event(
-              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-              { useNativeDriver: false }
-            )}
-            scrollEventThrottle={16}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                tintColor={colors.primary}
-                colors={[colors.primary]}
-              />
-            }
-          >
-            <View style={styles.scrollContent}>
-              {!isSearching && (
-                <>
-                  <View style={styles.switchContainer}>
-                    <TouchableOpacity 
-                      style={isDineIn ? styles.switchButtonActive : styles.switchButton}
-                      onPress={() => handleModeSwitch(true)}
-                    >
-                      <Text style={[{ 
-                        fontFamily: 'PlusJakartaSans-Medium',
-                        fontSize: 14,
-                        color: isDineIn ? colors.text.white : colors.text.primary 
-                      }]}>
-                        Dine In
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                      style={!isDineIn ? styles.switchButtonActive : styles.switchButton}
-                      onPress={() => handleModeSwitch(false)}
-                    >
-                      <Text style={[{ 
-                        fontFamily: 'PlusJakartaSans-Medium',
-                        fontSize: 14,
-                        color: !isDineIn ? colors.text.white : colors.text.primary 
-                      }]}>
-                        Take Out
-                      </Text>
-                    </TouchableOpacity>
-                  </View> 
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          scrollEventThrottle={16}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
+        >
+          <View style={styles.scrollContent}>
+            {!isSearching && (
+              <>
+                <View style={styles.switchContainer}>
+                  <TouchableOpacity 
+                    style={isDineIn ? styles.switchButtonActive : styles.switchButton}
+                    onPress={() => handleModeSwitch(true)}
+                  >
+                    <Text style={[{ 
+                      fontFamily: 'PlusJakartaSans-Medium',
+                      fontSize: 14,
+                      color: isDineIn ? colors.text.white : colors.text.primary 
+                    }]}>
+                      Dine In
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={!isDineIn ? styles.switchButtonActive : styles.switchButton}
+                    onPress={() => handleModeSwitch(false)}
+                  >
+                    <Text style={[{ 
+                      fontFamily: 'PlusJakartaSans-Medium',
+                      fontSize: 14,
+                      color: !isDineIn ? colors.text.white : colors.text.primary 
+                    }]}>
+                      Take Out
+                    </Text>
+                  </TouchableOpacity>
+                </View> 
                      {promos.length > 0 && (
                     <Text style={[{
                       fontFamily: 'PlusJakartaSans-Bold',
@@ -381,7 +386,7 @@ export default function HomeScreen({ navigation }) {
                         <FeatureCard
                           title={promo.name}
                           description={promo.description}
-                          imageUrl={promo.restaurantImage}
+                          imageUrl={promo.restaurantImage || 'https://via.placeholder.com/600'}
                           price={promo.discount_type === 'percentage' ? `${promo.discount}% off` : `$${promo.discount}`}
                         />
                       </View>
@@ -457,16 +462,11 @@ export default function HomeScreen({ navigation }) {
             </View>
           </ScrollView>
         </View>
-      </SafeAreaView>
-    </GestureHandlerRootView>
+      </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     zIndex: 1,
     paddingHorizontal: layout.spacing.md,
-    paddingTop: Platform.OS === 'android' ? 20 : 0,
+    paddingTop: Platform.OS === 'android' ? 50 : 0,
     marginTop:  Platform.OS === 'android' ? 8: 0,
   },
   topHeader: {

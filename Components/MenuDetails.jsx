@@ -40,10 +40,8 @@ const MenuDetails = ({ item, restaurantId, visible, onClose }) => {
 
   const handleAddToCart = () => {
     if (quantity === 0) {
-      // Remove from cart if quantity is 0
       updateQuantity(item.id, 0);
     } else {
-      // Add or update cart
       addToCart(restaurantId, item, quantity);
     }
     onClose();
@@ -76,7 +74,7 @@ const MenuDetails = ({ item, restaurantId, visible, onClose }) => {
             resizeMode="cover"
           />
           
-          <View style={{ flex: 1, justifyContent: 'space-between' }}>
+          <View style={styles.detailsContainer}>
             <View style={styles.details}>
               <Text style={[typography.h4, styles.name]}>{item?.name}</Text>
               <Text style={[typography.bodyMedium, styles.description]}>
@@ -92,10 +90,7 @@ const MenuDetails = ({ item, restaurantId, visible, onClose }) => {
                   onDecrease={() => handleQuantityChange(Math.max(0, quantity - 1))}
                 />
                 <TouchableOpacity 
-                  style={[
-                    styles.addToCartButton,
-                    styles.addButton,
-                  ]}
+                  style={[styles.addToCartButton, styles.addButton]}
                   onPress={handleAddToCart}
                 >
                   <Text style={styles.addButtonText}>
@@ -119,12 +114,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
+    margin: 0,
   },
   content: {
     backgroundColor: colors.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     height: '90%',
+    overflow: 'hidden',
+    position: 'relative',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    margin: 0,
+    width: '100%',
   },
   closeButton: {
     position: 'absolute',
@@ -148,6 +156,10 @@ const styles = StyleSheet.create({
     height: 250,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+  },
+  detailsContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
   },
   details: {
     padding: 24,

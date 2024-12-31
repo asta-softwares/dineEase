@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   contentPadding: {
-    paddingTop: Platform.OS === 'ios' ? 120 : 100,
+    paddingTop: Platform.OS === 'ios' ? 120 : 120,
   },
   section: {
     paddingVertical: layout.spacing.sm,
