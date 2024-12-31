@@ -7,6 +7,43 @@ import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import LargeButton from '../Components/Buttons/LargeButton';
 import { restaurantService } from '../api/services/restaurantService';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'completed':
+      return colors.success;
+    case 'confirmed':
+      return colors.primary;
+    case 'preparing':
+      return colors.warning;
+    case 'delivered':
+      return colors.success;
+    case 'pending':
+      return colors.warning;
+    case 'cancelled':
+      return colors.error;
+    case 'failed':
+      return colors.error;
+    default:
+      return colors.text.secondary;
+  }
+};
+
+const getCardIcon = (brand) => {
+  switch (brand?.toLowerCase()) {
+    case 'visa':
+      return 'cc-visa';
+    case 'mastercard':
+      return 'cc-mastercard';
+    case 'amex':
+      return 'cc-amex';
+    case 'discover':
+      return 'cc-discover';
+    default:
+      return 'credit-card';
+  }
+};
 
 const OrderDetailScreen = ({ route, navigation }) => {
   const { order, restaurant } = route.params;
@@ -44,7 +81,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
     </View>
   );
 
-  const TotalRow = ({ label, value, isTotal }) => (
+  const TotalRow = ({ label, value, isTotal, type }) => (
     <View style={styles.totalRow}>
       <Text style={[
         typography.bodyLarge,
@@ -52,12 +89,36 @@ const OrderDetailScreen = ({ route, navigation }) => {
       ]}>
         {label}
       </Text>
-      <Text style={[
-        typography.labelLarge,
-        { color: isTotal ? colors.primary : colors.text.primary }
-      ]}>
-        {typeof value === 'number' ? `$${value.toFixed(2)}` : value}
-      </Text>
+      {type === 'status' ? (
+        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(value) }]}>
+          <Text style={[typography.labelMedium, styles.statusText]}>
+            {value?.charAt(0).toUpperCase() + value?.slice(1)}
+          </Text>
+        </View>
+      ) : type === 'payment_method' ? (
+        <View style={styles.paymentMethod}>
+          <FontAwesome5 
+            name={getCardIcon(orderDetails?.payment.card_brand)} 
+            size={16} 
+            color={colors.text.primary} 
+            style={styles.cardIcon}
+          />
+          <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>
+            •••• {value}
+          </Text>
+        </View>
+      ) : type === 'transaction' ? (
+        <Text style={[typography.bodySmall, { color: colors.text.primary }]}>
+          {value}
+        </Text>
+      ) : (
+        <Text style={[
+          typography.bodyLarge,
+          { color: isTotal ? colors.text.primary : colors.text.primary }
+        ]}>
+          {value}
+        </Text>
+      )}
     </View>
   );
 
@@ -95,12 +156,20 @@ const OrderDetailScreen = ({ route, navigation }) => {
           <View style={styles.restaurantInfo}>
             <View style={styles.restaurantHeader}>
               <Text style={typography.h3}>{restaurant?.name}</Text>
-              <View style={[styles.statusBadge, styles[`status_${order.status}`]]}>
+              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) }]}>
                 <Text style={[typography.labelMedium, styles.statusText]}>
                   {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                 </Text>
               </View>
             </View>
+            
+            {orderDetails?.verification_code && order.status.toLowerCase() !== 'completed' && (
+              <View style={styles.verificationContainer}>
+                <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Verification Code</Text>
+                <Text style={styles.verificationCode}>{orderDetails.verification_code}</Text>
+              </View>
+            )}
+
             <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
               Order Time: {new Date(orderDetails?.order_time).toLocaleString()}
             </Text>
@@ -122,11 +191,11 @@ const OrderDetailScreen = ({ route, navigation }) => {
             <TotalRow label="Total" value={parseFloat(orderDetails?.total)} isTotal />
           </View>
 
-          <Text style={[typography.h2, styles.sectionTitle]}>Payment Details</Text>
+          <Text style={[typography.h2, styles.sectionTitle]}>Payment Details </Text>
           <View style={styles.paymentInfo}>
-            <TotalRow label="Payment Status" value={orderDetails?.payment?.payment_status} />
-            <TotalRow label="Payment Method" value={orderDetails?.payment?.payment_method} />
-            <TotalRow label="Transaction ID" value={orderDetails?.payment?.transaction_id} />
+            <TotalRow label="Payment Status" value={orderDetails?.payment?.payment_status} type="status" />
+            <TotalRow label="Payment Method" value= {orderDetails?.payment.card_last4} type="payment_method" />
+            <TotalRow label="Transaction ID" value={orderDetails?.payment?.transaction_id} type="transaction" />
             <TotalRow label="Payment Date" value={new Date(orderDetails?.payment?.payment_date).toLocaleString()} />
           </View>
         </View>
@@ -179,36 +248,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
   },
   statusText: {
-    color: colors.white,
+    color: colors.text.white,
+    textTransform: 'capitalize',
     fontSize: 12,
-    fontFamily: 'PlusJakartaSans-SemiBold',
-    marginLeft: 2,
-  },
-  status_pending: {
-    backgroundColor: '#FFA500',
-  },
-  status_confirmed: {
-    backgroundColor: '#3498db',
-  },
-  status_preparing: {
-    backgroundColor: colors.primary,
-  },
-  status_delivered: {
-    backgroundColor: '#2ecc71',
-  },
-  status_completed: {
-    backgroundColor: '#2ecc71',
-  },
-  status_cancelled: {
-    backgroundColor: '#e74c3c',
+    fontFamily: 'PlusJakartaSans-Medium',
   },
   orderItems: {
     backgroundColor: colors.background.secondary,
@@ -246,6 +295,27 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     padding: 16,
     borderRadius: 12,
+  },
+  paymentMethod: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardIcon: {
+    marginRight: 8,
+  },
+  verificationContainer: {
+    marginVertical: 16,
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: colors.light,
+    borderRadius: 12,
+  },
+  verificationCode: {
+    fontSize: 32,
+    fontFamily: 'PlusJakartaSans-Bold',
+    color: colors.primary,
+    letterSpacing: 2,
+    marginTop: 8,
   },
 });
 

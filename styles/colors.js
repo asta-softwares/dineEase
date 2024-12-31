@@ -6,6 +6,9 @@ export const colors = {
     background: '#FFFFFF',
     light: '#F5F5F5',
     rating: '#EFBF04',
+    success: '#2ECC71',
+    warning: '#F1C40F',
+    error: '#E74C3C',
     text: {
       primary: '#F29057',
       secondary: '#888888',

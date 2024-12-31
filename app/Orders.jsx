@@ -1,11 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Platform, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import TopNav from '../Components/TopNav';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import { restaurantService } from '../api/services/restaurantService';
 import { Ionicons } from '@expo/vector-icons';
+
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'completed':
+      return colors.success;
+    case 'confirmed':
+      return colors.primary;
+    case 'preparing':
+      return colors.warning;
+    case 'delivered':
+      return colors.success;
+    case 'pending':
+      return colors.warning;
+    case 'cancelled':
+      return colors.error;
+    case 'failed':
+      return colors.error;
+    default:
+      return colors.text.secondary;
+  }
+};
 
 const OrderCard = ({ order, onPress }) => {
   const formattedDate = new Date(order.order_time).toLocaleDateString('en-US', {
@@ -15,17 +36,6 @@ const OrderCard = ({ order, onPress }) => {
     hour: '2-digit',
     minute: '2-digit',
   });
-
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return colors.success;
-      case 'pending':
-        return colors.warning;
-      default:
-        return colors.text.secondary;
-    }
-  };
 
   return (
     <TouchableOpacity 
@@ -39,7 +49,7 @@ const OrderCard = ({ order, onPress }) => {
             <Text style={[typography.labelLarge, styles.orderId]}>
               Order #{order.id}
             </Text>
-            <View style={[styles.statusBadge, styles[`status_${order.status}`]]}>
+            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) }]}>
               <Text style={[typography.labelMedium, styles.statusText]}>
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </Text>
@@ -80,6 +90,7 @@ const OrderCard = ({ order, onPress }) => {
 const OrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -96,8 +107,14 @@ const OrdersScreen = ({ navigation }) => {
       console.error('Error fetching orders:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchOrders();
+  }, []);
 
   const handleOrderPress = (order) => {
     navigation.navigate('OrderDetailScreen', { 
@@ -115,14 +132,17 @@ const OrdersScreen = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <TopNav 
-        title="My Orders"
-        handleGoBack={() => navigation.goBack()}
-        variant="solid"
-      />
+    <View style={styles.container}>
+      <SafeAreaView style={[{ backgroundColor: colors.background }, styles.header]}>
+        <TopNav 
+          title="My Orders"
+          handleGoBack={() => navigation.goBack()}
+          variant="solid"
+        />
+      </SafeAreaView>
       
       <FlatList
+        style={styles.list}
         data={orders}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
@@ -132,9 +152,19 @@ const OrdersScreen = ({ navigation }) => {
           />
         )}
         contentContainerStyle={styles.listContainer}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -149,7 +179,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 16,
-    paddingTop: Platform.OS === 'ios' ? 70 : 100,
+    paddingTop: Platform.OS === 'ios' ? 130 : 100,
   },
   menuItem: {
     width: '100%',
@@ -184,34 +214,15 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
   statusText: {
-    color: colors.white,
+    color: colors.text.white,
+    textTransform: 'capitalize',
     fontSize: 12,
-    fontFamily: 'PlusJakartaSans-SemiBold',
-  },
-  status_pending: {
-    backgroundColor: '#FFA500',
-  },
-  status_confirmed: {
-    backgroundColor: '#3498db',
-  },
-  status_preparing: {
-    backgroundColor: colors.primary,
-  },
-  status_delivered: {
-    backgroundColor: '#2ecc71',
-  },
-  status_completed: {
-    backgroundColor: '#2ecc71',
-  },
-  status_cancelled: {
-    backgroundColor: '#e74c3c',
+    fontFamily: 'PlusJakartaSans-Medium',
   },
   restaurantName: {
     color: colors.text.primary,
@@ -235,6 +246,17 @@ const styles = StyleSheet.create({
   },
   date: {
     color: colors.text.secondary,
+  },
+  header: {
+    zIndex: 10,
+    elevation: 10,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  list: {
+    flex: 1,
   },
 });
 
