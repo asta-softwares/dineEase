@@ -13,6 +13,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ActivityIndicator, View } from 'react-native';
 import { enableScreens } from 'react-native-screens';
 import { SystemBars } from 'react-native-edge-to-edge';
+import * as Notifications from 'expo-notifications';
 import CheckoutScreen from './app/Checkout';
 import DetailScreen from './app/Details';
 import HomeScreen from './app/Home';
@@ -29,12 +30,24 @@ import OrdersScreen from './app/Orders';
 import { tokenStorage } from './utils/tokenStorage';
 import { useUserStore } from './stores/userStore';
 import { STRIPE_PUBLISHABLE_KEY, MERCHANT_IDENTIFIER } from '@env';
+import { registerForPushNotificationsAsync, setupNotificationListeners } from './utils/notificationService';
+import { authService } from './api/services/authService';
+
 // Initialize reanimated
 import 'react-native-reanimated';
 
 enableScreens();
 
-const Stack = createNativeStackNavigator(); 
+const Stack = createNativeStackNavigator();
+
+// Configure notification handler
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -43,10 +56,11 @@ export default function App() {
     'PlusJakartaSans-SemiBold': PlusJakartaSans_600SemiBold,
     'PlusJakartaSans-Bold': PlusJakartaSans_700Bold,
   });
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { setUser, setTokens, initializeAuth } = useUserStore();
+  const [expoPushToken, setExpoPushToken] = useState('');
 
   useEffect(() => {
     const initApp = async () => {
@@ -54,8 +68,23 @@ export default function App() {
         const tokens = await tokenStorage.getTokens();
         if (tokens?.accessToken) {
           setIsAuthenticated(true);
-          await initializeAuth(); // This will load user data and tokens
+          await initializeAuth();
           setTokens(tokens.accessToken, tokens.refreshToken);
+        }
+
+        // Register for push notifications
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          setExpoPushToken(token);
+          // Send token to server
+          try {
+            await authService.updateUser({
+              notification_token: token
+            });
+            console.log('Push token sent to server successfully');
+          } catch (error) {
+            console.error('Failed to send push token to server:', error);
+          }
         }
       } catch (error) {
         console.error('Error initializing app:', error);
@@ -65,6 +94,23 @@ export default function App() {
     };
 
     initApp();
+
+    // Setup notification listeners
+    const listeners = setupNotificationListeners(
+      (notification) => {
+        console.log('Notification received:', notification);
+     
+        // Handle received notification
+      },
+      (response) => {
+        console.log('Notification response:', response);
+        // Handle notification response (when user taps notification)
+      }
+    );
+
+    return () => {
+      listeners.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -78,7 +124,6 @@ export default function App() {
       }
     };
 
-    // Subscribe to auth state changes
     const unsubscribe = useUserStore.subscribe(
       (state) => state.user,
       (user) => {
@@ -152,8 +197,8 @@ export default function App() {
               <Stack.Screen name="Checkout" component={CheckoutScreen} />
               <Stack.Screen name="Profile" component={ProfileScreen} />
               <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-              <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} />
-              <Stack.Screen name="OrdersScreen" component={OrdersScreen} />
+              <Stack.Screen name="Orders" component={OrdersScreen} />
+              <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </CartProvider>

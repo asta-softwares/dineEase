@@ -86,7 +86,16 @@ const authService = {
 
   updateUser: async (userData) => {
     try {
-      const response = await apiClient.patch('/update-user/', userData);
+      const authToken = useUserStore.getState().authToken;
+      const response = await apiClient.put('/update-user/', {
+        ...userData,
+        notification_token: userData.notification_token
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
       return response.data;
     } catch (error) {
       throw error;
