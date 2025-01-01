@@ -197,8 +197,8 @@ export default function App() {
               <Stack.Screen name="Checkout" component={CheckoutScreen} />
               <Stack.Screen name="Profile" component={ProfileScreen} />
               <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-              <Stack.Screen name="Orders" component={OrdersScreen} />
-              <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+              <Stack.Screen name="OrdersScreen" component={OrdersScreen} />
+              <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </CartProvider>
