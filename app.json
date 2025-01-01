@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.DineEase",
+      "bundleIdentifier": "ca.dineease.app",
       "icon": "./assets/logo.png",
       "infoPlist": {
         "NSAppTransportSecurity": {
@@ -27,7 +27,7 @@
         "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#F29057"
       },
-      "package": "com.anonymous.DineEase",
+      "package": "ca.dineease.app",
       "permissions": ["INTERNET"],
       "networkSecurityConfig": {
         "cleartextTrafficPermitted": true
