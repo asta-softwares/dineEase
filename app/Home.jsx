@@ -22,7 +22,6 @@ import { useNavigation, useNavigationState } from "@react-navigation/native";
 import { useFonts } from 'expo-font';
 import { PlusJakartaSans_400Regular, PlusJakartaSans_500Medium, PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans';
 import CuisinesCard from "../Components/CuisinesCard";
-import FeatureCard from "../Components/FeatureCard";
 import RestaurantCard from "../Components/RestaurantCard";
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
@@ -44,7 +43,6 @@ export default function HomeScreen({ navigation }) {
   const [categories, setCategories] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [promos, setPromos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -93,28 +91,6 @@ export default function HomeScreen({ navigation }) {
       setLoading(false);
     }
   };
-  const fetchPromos = async () => {
-    try {
-      const promosData = await restaurantService.getAllPromos();
-      const promosWithImages = await Promise.all(
-        promosData.map(async (promo) => {
-          if (promo.restaurant_details && promo.restaurant_details.id) {
-            const restaurant = await restaurantService.getRestaurantById(promo.restaurant_details.id);
-            return {
-              ...promo,
-              restaurantImage: restaurant.image
-            };
-          } else {
-            console.warn('Promo missing restaurant details:', promo);
-            return promo;
-          }
-        })
-      );
-      setPromos(promosWithImages);
-    } catch (error) {
-      console.error('Error fetching promos:', error);
-    }
-  };
 
   const fetchCategories = async () => {
     try {
@@ -128,14 +104,12 @@ export default function HomeScreen({ navigation }) {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      // Apply current filters when refreshing
       await Promise.all([
         fetchRestaurants({
           categoryId: selectedCategory,
           searchQuery: searchQuery
         }),
-        fetchCategories(),
-        fetchPromos()
+        fetchCategories()
       ]);
     } catch (error) {
       console.error('Error refreshing data:', error);
@@ -163,10 +137,6 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     fetchRestaurants();
   }, [isDineIn]); // Refetch when service type changes
-
-  useEffect(() => {
-    fetchPromos();
-  }, []);
 
   const handleCategoryPress = async (category) => {
     try {
@@ -363,110 +333,76 @@ export default function HomeScreen({ navigation }) {
                       Take Out
                     </Text>
                   </TouchableOpacity>
-                </View> 
-                     {promos.length > 0 && (
-                    <Text style={[{
-                      fontFamily: 'PlusJakartaSans-Bold',
-                      fontSize: 20,
-                      color: colors.text.primary,
-                      marginHorizontal: layout.spacing.md,
-                      marginBottom: layout.spacing.sm
-                    }]}>
-                      FEATURED PROMOS
-                    </Text>
-                  )}
-                   <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    style={styles.promosContainer}
-                    contentContainerStyle={styles.promosContentContainer}
-                  >
-                    {promos.map((promo) => (
-                      <TouchableOpacity
-                        key={promo.id}
-                        onPress={() => handleDetail(promo.restaurant_details)}
-                        style={styles.promoCardWrapper}
-                      >
-                        <FeatureCard
-                          title={promo.name}
-                          description={promo.description}
-                          imageUrl={promo.restaurantImage || 'https://via.placeholder.com/600'}
-                          price={promo.discount_type === 'percentage' ? `${promo.discount}% off` : `$${promo.discount}`}
-                        />
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView> 
-
-                  {categories.length > 0 && (
-                    <Text style={[{
-                      fontFamily: 'PlusJakartaSans-Bold',
-                      fontSize: 20,
-                      color: colors.text.primary,
-                      marginHorizontal: layout.spacing.md,
-                      marginBottom: layout.spacing.sm
-                    }]}>
-                      EXPLORE CRAVINGS
-                  </Text>
-                  )}
-
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    style={styles.cuisinesContainer}
-                    contentContainerStyle={styles.cuisinesContentContainer}
-                  >
-                    {categories.map((category) => (
-                      <View key={category.id} style={styles.cuisinesCardWrapper}>
-                        <CuisinesCard
-                          name={category.name}
-                          imageUrl={{ uri: category.image }}
-                          description={category.description}
-                          onPress={() => handleCategoryPress(category)}
-                          isSelected={selectedCategory === category.id}
-                        />
-                      </View>
-                    ))}
-                  </ScrollView>
-                </>
-              )}
-
-              <Text style={[{
-                fontFamily: 'PlusJakartaSans-Bold',
-                fontSize: 20,
-                color: colors.text.primary,
-                marginHorizontal: layout.spacing.md,
-                marginBottom: layout.spacing.sm
-              }]}>
-                {restaurants.length} restaurants to explore
-              </Text>
-              <View style={styles.restaurantsContainer}>
-                {loading ? (
-                  <ActivityIndicator size="large" color={colors.primary} />
-                ) : restaurants.length > 0 ? (
-                  restaurants.map((restaurant) => (
-                    <TouchableOpacity 
-                      key={restaurant.id} 
-                      onPress={() => handleDetail(restaurant)}
-                      style={styles.restaurantCardWrapper}
-                    >
-                      <RestaurantCard
-                        name={restaurant.name}
-                        rating={restaurant.ratings}
-                        address={restaurant.location}
-                        imageUrl={restaurant.image}
-                      />
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <Text style={[typography.bodyLarge, { textAlign: 'center', marginTop: 20 }]}>
-                    No restaurants found
+                </View>
+                {categories.length > 0 && (
+                  <Text style={[{
+                    fontFamily: 'PlusJakartaSans-Bold',
+                    fontSize: 20,
+                    color: colors.text.primary,
+                    marginHorizontal: layout.spacing.md,
+                    marginBottom: layout.spacing.sm
+                  }]}>
+                    EXPLORE CRAVINGS
                   </Text>
                 )}
-              </View>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.cuisinesContainer}
+                  contentContainerStyle={styles.cuisinesContentContainer}
+                >
+                  {categories.map((category) => (
+                    <View key={category.id} style={styles.cuisinesCardWrapper}>
+                      <CuisinesCard
+                        name={category.name}
+                        imageUrl={{ uri: category.image }}
+                        description={category.description}
+                        onPress={() => handleCategoryPress(category)}
+                        isSelected={selectedCategory === category.id}
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
+              </>
+            )}
+            <Text style={[{
+              fontFamily: 'PlusJakartaSans-Bold',
+              fontSize: 20,
+              color: colors.text.primary,
+              marginHorizontal: layout.spacing.md,
+              marginBottom: layout.spacing.sm
+            }]}>
+              {restaurants.length} restaurants to explore
+            </Text>
+            <View style={styles.restaurantsContainer}>
+              {loading ? (
+                <ActivityIndicator size="large" color={colors.primary} />
+              ) : restaurants.length > 0 ? (
+                restaurants.map((restaurant) => (
+                  <TouchableOpacity 
+                    key={restaurant.id} 
+                    onPress={() => handleDetail(restaurant)}
+                    style={styles.restaurantCardWrapper}
+                  >
+                    <RestaurantCard
+                      name={restaurant.name}
+                      rating={restaurant.ratings}
+                      address={restaurant.location}
+                      imageUrl={restaurant.image}
+                      promos={restaurant.promos}
+                    />
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={[typography.bodyLarge, { textAlign: 'center', marginTop: 20 }]}>
+                  No restaurants found
+                </Text>
+              )}
             </View>
-          </ScrollView>
-        </View>
-      </GestureHandlerRootView>
+          </View>
+        </ScrollView>
+      </View>
+    </GestureHandlerRootView>
   );
 }
 
@@ -542,16 +478,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  promosContainer: {
-    paddingLeft: layout.spacing.md,
-    marginBottom: layout.spacing.md,
-  },
   cuisinesContainer: {
     paddingLeft: layout.spacing.md,
     marginBottom: layout.spacing.md,
-  },
-  promoCardWrapper: {
-    marginRight: layout.spacing.sm,
   },
   cuisinesCardWrapper: {
     marginRight: layout.spacing.sm,
@@ -561,13 +490,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: layout.spacing.xl,
-  },
-  categoryButton: {
-    borderRadius: 45,
-    padding: 2,
-  },
-  selectedCategory: {
-    backgroundColor: colors.primary,
   },
   restaurantsContainer: {
     marginBottom: layout.spacing.md,

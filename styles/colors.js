@@ -14,6 +14,7 @@ export const colors = {
       success: ['#2ECC71', '#27AE60'],
       warning: ['#F1C40F', '#F39C12'],
       error: ['#E74C3C', '#C0392B'],
+      rating: ['#EFBF04', '#F39C12'],
     },
     text: {
       primary: '#F29057',

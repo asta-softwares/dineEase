@@ -168,9 +168,16 @@ export default function DetailScreen({ route, navigation }) {
           <View style={[styles.content, { backgroundColor: colors.background }]}>
             <View style={[styles.header, { backgroundColor: colors.background }]}>
               <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>{restaurant?.name}</Text>
-              <View style={[styles.rating, { backgroundColor: colors.rating}]}>
-                <Ionicons name="star" size={14} color={colors.text.white} />
-                <Text style={[typography.labelMedium, styles.ratingText, { color: colors.text.white }]}>{restaurant?.ratings?.toFixed(1) || '0.0'}</Text>
+              <View style={styles.ratingContainer}>
+                <LinearGradient
+                  colors={colors.gradients.rating}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.ratingBadge}
+                >
+                  <Ionicons name="star" size={14} color={colors.white} />
+                  <Text style={styles.ratingText}>{restaurant?.ratings?.toFixed(1) || '0.0'}</Text>
+                </LinearGradient>
               </View>
             </View>
 
@@ -237,7 +244,7 @@ export default function DetailScreen({ route, navigation }) {
                     .map((promo) => (
                       <LinearGradient
                         key={promo.id}
-                        colors={colors.gradients.primary}
+                        colors={colors.gradients.success}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={styles.promoCard}
@@ -376,17 +383,21 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 16,
   },
-  rating: {
+  ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.rating,
+  },
+  ratingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 6,
     gap: 4,
   },
   ratingText: {
     marginLeft: 2,
+    color: colors.white,
   },
   infoContainer: {
     marginBottom: 16,
@@ -499,12 +510,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.text.white,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 6,
     alignSelf: 'flex-start',
     marginBottom: 12,
   },
   discountText: {
-    color: colors.primary,
+    color: colors.success,
     fontFamily: 'PlusJakartaSans-Bold',
     fontSize: 14,
   },
