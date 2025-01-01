@@ -30,8 +30,7 @@ import OrdersScreen from './app/Orders';
 import { tokenStorage } from './utils/tokenStorage';
 import { useUserStore } from './stores/userStore';
 import { STRIPE_PUBLISHABLE_KEY, MERCHANT_IDENTIFIER } from '@env';
-import { registerForPushNotificationsAsync, setupNotificationListeners } from './utils/notificationService';
-import { authService } from './api/services/authService';
+import { setupNotificationListeners } from './utils/notificationService';
 
 // Initialize reanimated
 import 'react-native-reanimated';
@@ -70,21 +69,6 @@ export default function App() {
           setIsAuthenticated(true);
           await initializeAuth();
           setTokens(tokens.accessToken, tokens.refreshToken);
-        }
-
-        // Register for push notifications
-        const token = await registerForPushNotificationsAsync();
-        if (token) {
-          setExpoPushToken(token);
-          // Send token to server
-          try {
-            await authService.updateUser({
-              notification_token: token
-            });
-            console.log('Push token sent to server successfully');
-          } catch (error) {
-            console.error('Failed to send push token to server:', error);
-          }
         }
       } catch (error) {
         console.error('Error initializing app:', error);

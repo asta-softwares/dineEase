@@ -20,6 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import authService from '../api/services/authService';
 import { tokenStorage } from '../utils/tokenStorage';
 import { useUserStore } from '../stores/userStore';
+import { registerForPushNotificationsAsync } from '../utils/notificationService';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -33,8 +34,8 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
       const response = await authService.login(email, password);
       
       // Store tokens securely
@@ -43,6 +44,20 @@ export default function LoginScreen({ navigation }) {
       // Set user in global state if needed
       if (response.user) {
         setUser(response.user);
+      }
+
+      // Get and send push token after successful login
+      try {
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          await authService.updateUser({
+            notification_token: token
+          });
+          console.log('Push token sent after login:', token);
+        }
+      } catch (error) {
+        console.error('Failed to send push token:', error);
+        // Continue with login even if token update fails
       }
 
       navigation.replace('Home'); // Replace login screen with home screen
