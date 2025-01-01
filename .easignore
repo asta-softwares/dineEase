@@ -1,0 +1,67 @@
+# Development
+node_modules/
+.git/
+.gitignore
+.env
+.env.*
+!.env.example
+
+# Build
+build/
+dist/
+web-build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Testing
+coverage/
+__tests__/
+*.test.js
+*.spec.js
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Development configs
+.prettierrc
+.eslintrc
+.babelrc
+*.config.js
+!app.config.js
+!babel.config.js
+!metro.config.js
+!webpack.config.js
+
+# Source control
+.git*
+.svn/
+.hg/
+
+firebase-service-account-key.json
+google-services.json

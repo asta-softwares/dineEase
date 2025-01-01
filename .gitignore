@@ -47,4 +47,6 @@ storybook-static/
 
 ios/
 android/
-DineEase App Firebase Admin SDK.json
+
+firebase-service-account-key.json
+google-services.json

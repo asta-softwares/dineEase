@@ -28,6 +28,7 @@ import OrderDetailScreen from './app/OrderDetail';
 import OrdersScreen from './app/Orders';
 import { tokenStorage } from './utils/tokenStorage';
 import { useUserStore } from './stores/userStore';
+import { STRIPE_PUBLISHABLE_KEY, MERCHANT_IDENTIFIER } from '@env';
 // Initialize reanimated
 import 'react-native-reanimated';
 
@@ -104,8 +105,8 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SystemBars style="auto" />
       <StripeProvider
-        publishableKey="pk_test_51QMpBEAECjFQcoAiIBBR2ytlseH5Ztrp19gx9RWhTox7fzADahNcnjrnyLz0a4N3cv0xp63wx2daPuf3TXWaBSRE00muGzaBD0"
-        merchantIdentifier="merchant.com.dineease"
+        publishableKey={STRIPE_PUBLISHABLE_KEY}
+        merchantIdentifier={MERCHANT_IDENTIFIER}
       >
         <CartProvider>
           <NavigationContainer>
