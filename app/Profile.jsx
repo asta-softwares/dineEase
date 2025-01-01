@@ -124,9 +124,6 @@ const ProfileScreen = () => {
             case 'About':
                 await handleOpenURL('https://www.dineease.ca/');
                 break;
-            case 'Orders':
-                navigation.navigate('OrdersScreen');
-                break;
             case 'Partnership':
                 await handleOpenURL('https://www.dineease.ca/partners');
                 break;
@@ -135,7 +132,6 @@ const ProfileScreen = () => {
     };
 
     const menuItems = [
-        { icon: 'time-outline', label: 'Orders' },
         // { icon: 'gift-outline', label: 'Offers' },
         { icon: 'help-circle-outline', label: 'Help / Contact Us' },
         { icon: 'people-outline', label: 'Partnership' },

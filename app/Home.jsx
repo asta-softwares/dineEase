@@ -29,6 +29,7 @@ import { layout } from '../styles/layout';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { restaurantService } from '../api/services/restaurantService';
 import { tokenStorage } from '../utils/tokenStorage';
+import { useUserStore } from '../stores/userStore';
 
 export default function HomeScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -48,6 +49,7 @@ export default function HomeScreen({ navigation }) {
   const [isSearching, setIsSearching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
+  const { user } = useUserStore();
 
   const searchHeight = scrollY.interpolate({
     inputRange: [0, 50],
@@ -246,8 +248,11 @@ export default function HomeScreen({ navigation }) {
                   style={styles.logo}
                 />
               </View>
-              <TouchableOpacity>
-                <Ionicons name="notifications-outline" size={24} color={colors.text.primary} />
+              <TouchableOpacity 
+                onPress={() => user && navigation.navigate('OrdersScreen')}
+                style={{ opacity: user ? 1 : 0 }}
+              >
+                <Ionicons name="receipt-outline" size={24} color={colors.text.primary} />
               </TouchableOpacity>
             </View>
 
