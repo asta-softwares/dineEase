@@ -139,6 +139,7 @@ export default function HomeScreen({ navigation }) {
     fetchRestaurants();
   }, [isDineIn]); // Refetch when service type changes
 
+
   const handleCategoryPress = async (category) => {
     try {
       if (selectedCategory === category.id) {
@@ -228,13 +229,17 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <StatusBar 
+        barStyle="dark-content"
+        backgroundColor={colors.primary}
+        translucent={true}
+      />
       <View style={styles.container}>
-        <SafeAreaView style={{ backgroundColor: colors.background }}>
+        <SafeAreaView style={{ backgroundColor: colors.primary }}>
           <Animated.View style={[styles.header]}>
             <View style={styles.topHeader}>
               <TouchableOpacity style={styles.menuButton} onPress={handleProfilePress}>
-                <Ionicons name="person-outline" size={24} color={colors.text.primary} />
+                <Ionicons name="person-outline" size={24} color={colors.text.white} />
               </TouchableOpacity>
               <View style={styles.logoContainer}>
                 <Image
@@ -246,7 +251,7 @@ export default function HomeScreen({ navigation }) {
                 onPress={() => user && navigation.navigate('OrdersScreen')}
                 style={{ opacity: user ? 1 : 0 }}
               >
-                <Ionicons name="receipt-outline" size={24} color={colors.text.primary} />
+                <Ionicons name="receipt-outline" size={24} color={colors.text.white} />
               </TouchableOpacity>
             </View>
 
@@ -411,7 +416,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.primary,
     zIndex: 1,
     paddingHorizontal: layout.spacing.md,
     paddingTop: Platform.OS === 'android' ? 50 : 0,
@@ -460,6 +465,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.getResponsiveSpacing(layout.spacing.xxl),
     marginHorizontal: -layout.spacing.md,
     marginBottom: layout.spacing.md,
+    marginTop:  Platform.OS === 'ios' ? 8: 0,
   },
   switchButton: {
     width: '48%',
