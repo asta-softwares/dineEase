@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ca.dineease.app",
-      "icon": "./assets/logo.png",
+      "icon": "./assets/logo-ios.png",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
@@ -24,8 +24,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
-        "backgroundColor": "#F29057"
+        "foregroundImage": "./assets/logo-android.png"
       },
       "package": "ca.dineease.app",
       "permissions": ["INTERNET"],

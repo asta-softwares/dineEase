@@ -7,23 +7,30 @@ import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import LargeButton from '../Components/Buttons/LargeButton';
 import { restaurantService } from '../api/services/restaurantService';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import Badge from '../Components/Badge';
-
-
+import { PaymentIcon } from 'react-native-payment-icons';
 
 const getCardIcon = (brand) => {
   switch (brand?.toLowerCase()) {
     case 'visa':
-      return 'cc-visa';
+      return 'visa';
     case 'mastercard':
-      return 'cc-mastercard';
+      return 'master';
     case 'amex':
-      return 'cc-amex';
+    case 'american-express':
+      return 'american-express';
     case 'discover':
-      return 'cc-discover';
+      return 'discover';
+    case 'diners':
+    case 'diners-club':
+      return 'diners-club';
+    case 'jcb':
+      return 'jcb';
+    case 'unionpay':
+      return 'unionpay';
     default:
-      return 'credit-card';
+      return 'generic';
   }
 };
 
@@ -85,13 +92,12 @@ const OrderDetailScreen = ({ route, navigation }) => {
             {label}
           </Text>
           <View style={styles.paymentMethod}>
-            <FontAwesome5 
-              name={getCardIcon(orderDetails?.payment.card_brand)} 
-              size={32} 
-              color={colors.text.black} 
-              style={styles.cardIcon}
+            <PaymentIcon 
+              type={getCardIcon(orderDetails?.payment.card_brand)}
+              width={40}
+              height={25}
             />
-            <Text style={[typography.bodyLarge, { color: colors.text.black }]}>
+            <Text style={[typography.bodyLarge, { color: colors.text.black, marginLeft: 8 }]}>
               •••• {value}
             </Text>
           </View>
@@ -109,7 +115,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
             -${parseFloat(value || 0).toFixed(2)}
           </Text>
         ) : type === 'transaction' ? (
-          <Text style={[typography.bodyMedium, { color: colors.text.black }]}>
+          <Text style={[typography.bodySmall, { color: colors.text.black }]}>
             {value}
           </Text>
         ) : type === 'date' ? (
