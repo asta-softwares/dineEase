@@ -68,6 +68,12 @@ export default function HomeScreen({ navigation }) {
     extrapolate: 'clamp'
   });
 
+  const serviceTypeMargin = scrollY.interpolate({
+    inputRange: [0, 50],
+    outputRange: [Platform.OS === 'ios' ? 70 : 0, 0],
+    extrapolate: 'clamp',
+  });
+
   const handleDetail = (restaurant) => {
     navigation.navigate("Details", { restaurantId: restaurant.id });
   };
@@ -158,9 +164,6 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  const handleModeSwitch = (dineIn) => {
-    setIsDineIn(dineIn);
-  };
 
   const handleProfilePress = async () => {
     const user = useUserStore.getState().user;
@@ -265,28 +268,74 @@ export default function HomeScreen({ navigation }) {
                 },
               ]}
             >
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search for restaurants"
-                placeholderTextColor={colors.secondary}
-                value={searchQuery}
-                onChangeText={handleSearch}
-              />
-              {searchQuery ? (
-                <TouchableOpacity 
-                  style={styles.clearButton} 
-                  onPress={handleClearSearch}
-                >
-                  <Ionicons name="close-circle" size={20} color={colors.text.secondary} />
-                </TouchableOpacity>
-              ) : (
-                <Ionicons
-                  name="search"
-                  size={15}
-                  color={colors.secondary}
-                  style={styles.searchIcon}
+              <View style={styles.searchInputContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search Restaurant, Cuisine, Location..."
+                  placeholderTextColor={colors.text.secondary}
+                  value={searchQuery}
+                  onChangeText={handleSearch}
                 />
-              )}
+                {searchQuery ? (
+                  <TouchableOpacity 
+                    style={styles.clearButton} 
+                    onPress={handleClearSearch}
+                  >
+                    <Ionicons name="close-circle" size={20} color={colors.text.secondary} />
+                  </TouchableOpacity>
+                ) : (
+                  <Ionicons name="search" size={20} color={colors.text.secondary} />
+                )}
+              </View>
+              <Image 
+                source={require('../assets/holiday-text.png')} 
+                style={styles.holidayText}
+                resizeMode="contain"
+              />
+            </Animated.View>
+
+            <Image 
+              source={require('../assets/christmas-tree.png')} 
+              style={styles.christmasTree}
+              resizeMode="contain"
+            />
+
+            <Image 
+              source={require('../assets/gift.png')} 
+              style={styles.gift}
+              resizeMode="contain"
+            />
+
+            <Animated.View
+              style={[
+                styles.serviceTypeContainer,
+                {
+                  marginTop: serviceTypeMargin,
+                }
+              ]}
+            >
+              <TouchableOpacity
+                style={[
+                  styles.switchButton,
+                  isDineIn && styles.activeButton,
+                ]}
+                onPress={() => setIsDineIn(true)}
+              >
+                <Text style={[styles.switchText, isDineIn && styles.activeText]}>
+                  Dine in
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.switchButton,
+                  !isDineIn && styles.activeButton,
+                ]}
+                onPress={() => setIsDineIn(false)}
+              >
+                <Text style={[styles.switchText, !isDineIn && styles.activeText]}>
+                  Grab & Go
+                </Text>
+              </TouchableOpacity>
             </Animated.View>
           </Animated.View>
         </SafeAreaView>
@@ -312,43 +361,15 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.scrollContent}>
             {!isSearching && (
               <>
-                <View style={styles.switchContainer}>
-                  <TouchableOpacity 
-                    style={isDineIn ? styles.switchButtonActive : styles.switchButton}
-                    onPress={() => handleModeSwitch(true)}
-                  >
-                    <Text style={[{ 
-                      fontFamily: 'PlusJakartaSans-Medium',
-                      fontSize: 14,
-                      color: isDineIn ? colors.text.white : colors.text.primary 
-                    }]}>
-                      Dine In
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={!isDineIn ? styles.switchButtonActive : styles.switchButton}
-                    onPress={() => handleModeSwitch(false)}
-                  >
-                    <Text style={[{ 
-                      fontFamily: 'PlusJakartaSans-Medium',
-                      fontSize: 14,
-                      color: !isDineIn ? colors.text.white : colors.text.primary 
-                    }]}>
-                      Take Out
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-                {categories.length > 0 && (
-                  <Text style={[{
-                    fontFamily: 'PlusJakartaSans-Bold',
-                    fontSize: 20,
-                    color: colors.text.primary,
-                    marginHorizontal: layout.spacing.md,
-                    marginBottom: layout.spacing.sm
-                  }]}>
-                    EXPLORE CRAVINGS
-                  </Text>
-                )}
+                <Text style={[{
+                  fontFamily: 'PlusJakartaSans-Bold',
+                  fontSize: 20,
+                  color: colors.text.primary,
+                  marginHorizontal: layout.spacing.md,
+                  marginBottom: layout.spacing.sm
+                }]}>
+                  EXPLORE CRAVINGS
+                </Text>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
@@ -420,7 +441,8 @@ const styles = StyleSheet.create({
     zIndex: 1,
     paddingHorizontal: layout.spacing.md,
     paddingTop: Platform.OS === 'android' ? 50 : 0,
-    marginTop:  Platform.OS === 'android' ? 8: 0,
+    marginTop: Platform.OS === 'android' ? 8 : 0,
+    overflow: 'hidden',
   },
   topHeader: {
     flexDirection: 'row',
@@ -437,12 +459,15 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   searchContainer: {
+    position: 'relative',
+    marginBottom: layout.spacing.sm,
+  },
+  searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.light,
     borderRadius: layout.card.borderRadius,
     paddingHorizontal: layout.spacing.sm,
-    marginBottom: layout.spacing.sm,
   },
   searchInput: {
     flex: 1,
@@ -453,35 +478,60 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusJakartaSans-Regular',
     color: colors.text.primary,
   },
-  searchIcon: {
-    marginRight: layout.spacing.sm,
-  },
-  clearButton: {
+  searchButton: {
     padding: layout.spacing.xs,
   },
-  switchContainer: {
+  holidayText: {
+    width: '80%',
+    height: 80,
+    alignSelf: 'center',
+    marginTop: layout.spacing.sm,
+  },
+  christmasTree: {
+    position: 'absolute',
+    left: -100,
+    top: 20,
+    width: 200,
+    height: 200,
+    transform: [{ scaleX: -1 }],
+    zIndex: -1,
+  },
+  gift: {
+    position: 'absolute',
+    right: -40,
+    top: 60,
+    width: 150,
+    height: 150,
+    zIndex: -1,
+  },
+  serviceTypeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: layout.getResponsiveSpacing(layout.spacing.xxl),
     marginHorizontal: -layout.spacing.md,
     marginBottom: layout.spacing.md,
-    marginTop:  Platform.OS === 'ios' ? 8: 0,
   },
   switchButton: {
     width: '48%',
     height: 40,
-    backgroundColor: colors.light,
+    backgroundColor: 'transparent',
     borderRadius: layout.card.borderRadius,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.text.white,
   },
-  switchButtonActive: {
-    width: '48%',
-    height: 40,
-    backgroundColor: colors.primary,
-    borderRadius: layout.card.borderRadius,
-    justifyContent: 'center',
-    alignItems: 'center',
+  activeButton: {
+    backgroundColor: colors.text.white,
+    borderWidth: 0,
+  },
+  switchText: {
+    fontFamily: 'PlusJakartaSans-Medium',
+    fontSize: 14,
+    color: colors.text.white,
+  },
+  activeText: {
+    color: colors.primary,
   },
   cuisinesContainer: {
     paddingLeft: layout.spacing.md,
@@ -495,6 +545,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: layout.spacing.xl,
+    paddingTop: layout.spacing.sm,
   },
   restaurantsContainer: {
     marginBottom: layout.spacing.md,
@@ -502,5 +553,8 @@ const styles = StyleSheet.create({
   restaurantCardWrapper: {
     width: '100%',
     paddingHorizontal: layout.spacing.md,
+  },
+  clearButton: {
+    padding: layout.spacing.xs,
   }
 });
