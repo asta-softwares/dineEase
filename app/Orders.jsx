@@ -194,7 +194,7 @@ const OrdersScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
   header: {
     backgroundColor: colors.background,
@@ -210,8 +210,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: colors.white,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
+ 
     overflow: 'hidden',
     shadowColor: "#000",
     shadowOffset: {
@@ -224,6 +223,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
+    backgroundColor: colors.white,
   },
   textContainer: {
     flex: 1,

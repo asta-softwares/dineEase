@@ -122,7 +122,13 @@ const OrderDetailScreen = ({ route, navigation }) => {
           <Text style={[typography.bodyLarge, { color: colors.text.black }]}>
             {new Date(value).toLocaleString()}
           </Text>
-        ) : (
+        ) 
+        : type === 'default' ? (
+          <Text style={[typography.bodyLarge, { color: colors.text.black }]}>
+            {value}
+          </Text>
+        )
+        : (
           <Text style={[typography.bodyLarge, isTotal && { color: colors.text.primary }]}>
             ${parseFloat(value || 0).toFixed(2)}
           </Text>
@@ -149,83 +155,79 @@ const OrderDetailScreen = ({ route, navigation }) => {
         variant="solid"
         showBack={!fromCheckout}
       />
-      
       <ScrollView 
-        style={styles.scrollContent}
-        contentContainerStyle={styles.contentPadding}
+        style={styles.content}
+        contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Restaurant Info */}
+        {/* Restaurant Information */}
         <View style={styles.section}>
           <View style={styles.restaurantHeader}>
-            <Text style={[typography.h2, styles.sectionTitle, { color: colors.text.primary }]}>{restaurant?.name}</Text>
+            <Ionicons name="location" size={24} color={colors.text.primary} />
+            <View style={styles.restaurantInfo}>
+              <Text style={[typography.titleMedium, { color: colors.text.primary }]}>
+                {restaurant?.name}
+              </Text>
+              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
+                {restaurant?.address}
+              </Text>
+            </View>
             <Badge 
               text={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               type={order.status.toLowerCase()}
             />
           </View>
+          
           {orderDetails?.verification_code && order.status.toLowerCase() !== 'completed' && (
-          <View style={styles.verificationContainer}>
-            <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Verification Code</Text>
-            <Text style={styles.verificationCode}>{orderDetails?.verification_code}</Text>
-          </View>
+            <View style={styles.verificationContainer}>
+              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
+                Verification Code
+              </Text>
+              <Text style={styles.verificationCode}>
+                {orderDetails?.verification_code}
+              </Text>
+            </View>
           )}
-        </View>
-
-        {/* Order Items */}
-        <View style={styles.section}>
-          <Text style={[typography.h2, styles.sectionTitle]}>Order Items</Text>
-          <View style={styles.orderItems}>
-            {orderDetails?.items?.map((item, index) => (
-              <OrderItem key={index} {...item} />
-            ))}
-          </View>
         </View>
 
         {/* Order Summary */}
         <View style={styles.section}>
-          <Text style={[typography.h2, styles.sectionTitle]}>Order Summary</Text>
-          <View style={styles.orderSummary}>
-            {orderDetails?.promos?.length > 0 && (
-              <View>
-                <Text style={[typography.h3, styles.sectionTitle]}>Applied Promos</Text>
-                {orderDetails.promos.map((promo, index) => (
-                  <View key={promo.id} style={styles.promoItem}>
-                    <View style={styles.promoInfo}>
-                      <Text style={typography.bodyLarge}>{promo.name}</Text>
-                      <Text style={[typography.bodyMedium, { color: colors.success }]}>
-                        {promo.discount_type === 'percentage' 
-                          ? `${promo.discount}% off`
-                          : `$${parseFloat(promo.discount).toFixed(2)} off`}
-                      </Text>
-                    </View>
-                  </View>
-                ))}
-                <View style={styles.divider} />
-              </View>
-            )}
-            <View style={styles.totals}>
-              <TotalRow label="Subtotal" value={parseFloat(orderDetails?.order_total)} />
-              {parseFloat(orderDetails?.discount) > 0 && (
-                <TotalRow label="Discount" value={parseFloat(orderDetails?.discount)} />
-              )}
-              <TotalRow label="Tax" value={parseFloat(orderDetails?.tax_amount)} />
-              <TotalRow label="Service Fee" value={parseFloat(orderDetails?.service_fee)} />
-              <View style={styles.divider} />
-              <TotalRow label="Total" value={parseFloat(orderDetails?.total)} isTotal />
+          <Text style={[typography.titleMedium, styles.sectionTitle]}>Order Summary</Text>
+          {orderDetails?.items.map((item, index) => (
+            <OrderItem key={index} {...item} />
+          ))}
+          
+          {/* Promos */}
+          {orderDetails?.promos && orderDetails.promos.length > 0 && (
+            <View style={styles.promosContainer}>
+              {orderDetails.promos.map((promo) => (
+                <View key={promo.id} style={styles.promoTag}>
+                  <Text style={[typography.bodySmall, styles.promoText]}>
+                    {promo.name} ({promo.discount_type === 'percentage' ? `${promo.discount}% off` : `$${promo.discount} off`})
+                  </Text>
+                </View>
+              ))}
             </View>
-          </View>
+          )}
+          
+          <View style={styles.divider} />
+          <TotalRow label="Subtotal" value={orderDetails?.order_total} />
+          <TotalRow label="Discount" value={orderDetails?.discount} />
+          <TotalRow label="Tax Rate" type="default" value={`${orderDetails?.tax_rate}%`} />
+          <TotalRow label="Tax Amount" value={orderDetails?.tax_amount} />
+          <TotalRow label="Service Fee" value={orderDetails?.service_fee} />
+          <TotalRow label="Service Fee Tax" value={orderDetails?.service_fee_tax} />
+          <View style={styles.divider} />
+          <TotalRow label="Total" value={orderDetails?.total} isTotal />
         </View>
 
         {/* Payment Details */}
         <View style={styles.section}>
-          <Text style={[typography.h2, styles.sectionTitle]}>Payment Details</Text>
-          <View style={styles.paymentInfo}>
-            <TotalRow label="Payment Status" value={orderDetails?.payment?.payment_status} type="status" />
-            <TotalRow label="Payment Method" value= {orderDetails?.payment.card_last4} type="payment_method" />
-            <TotalRow label="Transaction ID" value={orderDetails?.payment?.transaction_id} type="transaction" />
-            <TotalRow label="Payment Date" value={orderDetails?.payment?.payment_date} type="date" />
-          </View>
+          <Text style={[typography.titleMedium, styles.sectionTitle]}>Payment Details</Text>
+          <TotalRow label="Payment Status" value={orderDetails?.payment?.payment_status} type="status" />
+          <TotalRow label="Payment Method" value={orderDetails?.payment?.card_last4} type="payment_method" />
+          <TotalRow label="Transaction ID" value={orderDetails?.payment?.transaction_id} type="transaction" />
+          <TotalRow label="Payment Date" value={orderDetails?.payment?.payment_date} type="date" />
         </View>
       </ScrollView>
 
@@ -244,105 +246,36 @@ const OrderDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
-  centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  contentPadding: {
-    padding: 16,
-    paddingTop: Platform.OS === 'ios' ? 130 : 100,
-    paddingBottom: 100,
-  },
-  scrollContent: {
+  content: {
     flex: 1,
   },
+  contentContainer: {
+    padding: 16,
+    paddingTop: Platform.OS === 'ios' ? 140 : 100,
+    paddingBottom: 32,
+  },
   section: {
-    marginBottom: 12,
+    backgroundColor: colors.white,
+    padding: 16,
+    marginBottom: 16,
+    borderRadius: 12,
   },
   sectionTitle: {
     marginBottom: 16,
+    color: colors.text.primary,
   },
   restaurantHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    alignItems: 'flex-start',
+    gap: 12,
   },
   restaurantInfo: {
-    backgroundColor: colors.background.secondary,
-    padding: 16,
-    borderRadius: 12,
-  },
-  orderItems: {
-    backgroundColor: colors.background.secondary,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-  },
-  orderItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  itemInfo: {
     flex: 1,
-    marginRight: 16,
-  },
-  orderSummary: {
-    backgroundColor: colors.background.secondary,
-    padding: 16,
-    borderRadius: 12,
-  },
-  totals: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: 12,
-    marginTop: 16,
-  },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: 16,
-  },
-  paymentInfo: {
-    backgroundColor: colors.background.secondary,
-    padding: 16,
-    borderRadius: 12,
-  },
-  paymentMethod: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardIcon: {
-    marginRight: 8,
-  },
-  promoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  promoInfo: {
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  statusText: {
-    color: colors.text.white,
-    textTransform: 'capitalize',
   },
   verificationContainer: {
-    marginVertical: 16,
+    marginTop: 16,
     alignItems: 'center',
     padding: 16,
     backgroundColor: colors.light,
@@ -354,6 +287,52 @@ const styles = StyleSheet.create({
     color: colors.primary,
     letterSpacing: 2,
     marginTop: 8,
+  },
+  orderItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  itemInfo: {
+    flex: 1,
+    marginRight: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginVertical: 16,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  paymentMethod: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  paymentInfo: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: 12,
+  },
+  promosContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 12,
+  },
+  promoTag: {
+    backgroundColor: colors.primary + '10',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    borderColor: colors.primary,
+    borderWidth: 0.5,
+  },
+  promoText: {
+    color: colors.primary,
   },
 });
 
