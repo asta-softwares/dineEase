@@ -45,7 +45,20 @@ const authService = {
         user: userData
       };
     } catch (error) {
-      throw error;
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        if (error.response.status === 401) {
+          throw new Error('Invalid email or password');
+        } else if (error.response.data && error.response.data.detail) {
+          throw new Error(error.response.data.detail);
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        throw new Error('No response from server. Please check your internet connection.');
+      }
+      // Something happened in setting up the request that triggered an Error
+      throw new Error('An unexpected error occurred. Please try again later.');
     }
   },
 

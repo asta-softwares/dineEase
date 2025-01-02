@@ -5,10 +5,11 @@ const ACCESS_TOKEN_KEY = '@access_token';
 const REFRESH_TOKEN_KEY = '@refresh_token';
 const USER_DATA_KEY = '@user_data';
 
-export const useUserStore = create((set) => ({
+export const useUserStore = create((set, get) => ({
   user: null,
   authToken: null,
   refreshToken: null,
+  isInitialized: false,
 
   setUser: async (user) => {
     set({ user });
@@ -38,8 +39,8 @@ export const useUserStore = create((set) => ({
     await AsyncStorage.multiRemove([ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_DATA_KEY]);
   },
 
-  // Initialize state from storage
-  initialize: async () => {
+  // Initialize data from AsyncStorage
+  initializeAuth: async () => {
     try {
       const [[, authToken], [, refreshToken], [, userData]] = await AsyncStorage.multiGet([
         ACCESS_TOKEN_KEY,
@@ -47,16 +48,31 @@ export const useUserStore = create((set) => ({
         USER_DATA_KEY
       ]);
 
-      set({
-        authToken: authToken || null,
-        refreshToken: refreshToken || null,
-        user: userData ? JSON.parse(userData) : null
-      });
+      const initialState = {
+        isInitialized: true
+      };
 
-      return true;
+      if (authToken && refreshToken) {
+        initialState.authToken = authToken;
+        initialState.refreshToken = refreshToken;
+      }
+
+      if (userData) {
+        initialState.user = JSON.parse(userData);
+      }
+
+      set(initialState);
+      return initialState;
     } catch (error) {
-      console.error('Error initializing from storage:', error);
-      return false;
+      console.error('Error initializing auth:', error);
+      set({ isInitialized: true });
+      throw error;
     }
-  }
+  },
+
+  // Check if user is authenticated
+  isAuthenticated: () => {
+    const state = get();
+    return !!(state.user && state.authToken);
+  },
 }));
