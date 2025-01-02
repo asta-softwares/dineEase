@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from './config';
-import { tokenStorage } from '../utils/tokenStorage';
 import { useUserStore } from '../stores/userStore';
+import { tokenService } from './services/tokenService';
 
 const apiClient = axios.create({
   baseURL: config.BASE_URL,
@@ -26,9 +26,9 @@ const processQueue = (error, token = null) => {
 // Request interceptor
 apiClient.interceptors.request.use(
   async (config) => {
-    const token = await tokenStorage.getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const authToken = useUserStore.getState().authToken;
+    if (authToken) {
+      config.headers.Authorization = `Bearer ${authToken}`;
     }
     return config;
   },
@@ -63,18 +63,15 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const refreshToken = await tokenStorage.getRefreshToken();
+      const refreshToken = useUserStore.getState().refreshToken;
       if (!refreshToken) {
         throw new Error('No refresh token available');
       }
 
-      const response = await apiClient.post('/token/refresh/', {
-        refresh: refreshToken
-      });
-
-      const { access: newAccessToken, refresh: newRefreshToken } = response.data;
+      const response = await tokenService.refreshAccessToken();
+      const { access: newAccessToken } = response;
       
-      await tokenStorage.storeTokens(newAccessToken, newRefreshToken);
+      await useUserStore.getState().setTokens(newAccessToken, refreshToken);
       
       // Update authorization header
       apiClient.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
@@ -85,8 +82,7 @@ apiClient.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       // Clear tokens and user state
-      await tokenStorage.clearTokens();
-      useUserStore.getState().clearUser();
+      await useUserStore.getState().clearUser();
       // Emit an event instead of navigating
       globalThis.dispatchEvent(new CustomEvent('tokenExpired'));
       return Promise.reject(refreshError);

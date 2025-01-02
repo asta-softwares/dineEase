@@ -18,7 +18,6 @@ import LargeButton from '../Components/Buttons/LargeButton';
 import CustomInput from '../Components/CustomInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import authService from '../api/services/authService';
-import { tokenStorage } from '../utils/tokenStorage';
 import { useUserStore } from '../stores/userStore';
 import { registerForPushNotificationsAsync } from '../utils/notificationService';
 
@@ -37,10 +36,7 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     try {
       const response = await authService.login(email, password);
-      
-      // Store tokens securely
-      await tokenStorage.storeTokens(response.access, response.refresh);
-      
+
       // Set user in global state if needed
       if (response.user) {
         setUser(response.user);
@@ -51,7 +47,7 @@ export default function LoginScreen({ navigation }) {
         const token = await registerForPushNotificationsAsync();
         if (token) {
           await authService.updateUser({
-            notification_token: token
+            profile: {notification_token: token}
           });
           console.log('Push token sent after login:', token);
         }

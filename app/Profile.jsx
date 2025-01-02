@@ -10,24 +10,18 @@ import { useUserStore } from '../stores/userStore';
 import { Ionicons } from '@expo/vector-icons';
 import { typography } from '../styles/typography';
 import authService from '../api/services/authService';
-import { tokenStorage } from '../utils/tokenStorage';
-import apiClient from '../api/client';
+
 
 const ProfileScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const logout = useUserStore((state) => state.logout);
-    const storedUser = useUserStore((state) => state.user);
-    const setStoredUser = useUserStore((state) => state.setUser);
-
-    // Use stored user data immediately
-    const [user, setUser] = useState(storedUser || {});
+    const [user] = useState(useUserStore.getState().user);
+    const clearUser = useUserStore(state => state.clearUser);
 
     const fetchUserData = async () => {
         try {
             const userData = await authService.fetchUser();
-            setUser(userData);
-            setStoredUser(userData);
+            useUserStore.getState().setUser(userData);
         } catch (error) {
             console.error('Error fetching user data:', error);
         }
@@ -35,7 +29,7 @@ const ProfileScreen = () => {
 
     // Background refresh only
     useEffect(() => {
-        if (!storedUser) {
+        if (!useUserStore.getState().user) {
             fetchUserData();
         }
     }, []);
@@ -44,8 +38,7 @@ const ProfileScreen = () => {
     useEffect(() => {
         if (route.params?.updatedUserData) {
             const updatedData = route.params.updatedUserData;
-            setUser(updatedData);
-            setStoredUser(updatedData);
+            useUserStore.getState().setUser(updatedData);
             Alert.alert('Success', 'Profile updated successfully');
             navigation.setParams({ updatedUserData: null, timestamp: null });
         }
@@ -68,20 +61,13 @@ const ProfileScreen = () => {
                     text: 'Logout',
                     onPress: async () => {
                         try {
-                            await authService.updateUser({
-                                notification_token: null
-                              });
-                              
-                            // Call the logout API
                             await authService.logout();
-                            // Clear tokens from storage
-                            await tokenStorage.clearTokens();
+                            
                             // Reset navigation to splash screen
                             navigation.reset({
                                 index: 0,
                                 routes: [{ name: 'Landing' }],
                             });
-                           
                         } catch (error) {
                             console.error('Error during logout:', error);
                             Alert.alert('Error', 'Failed to logout. Please try again.');

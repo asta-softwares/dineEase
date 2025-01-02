@@ -18,7 +18,6 @@ import LargeButton from '../Components/Buttons/LargeButton';
 import CustomInput from '../Components/CustomInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import authService from '../api/services/authService';
-import { tokenStorage } from '../utils/tokenStorage';
 import { useUserStore } from '../stores/userStore';
 
 export default function RegisterScreen({ navigation }) {
@@ -30,6 +29,7 @@ export default function RegisterScreen({ navigation }) {
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore(state => state.setUser);
+  const setTokens = useUserStore(state => state.setTokens);
 
   const handleRegister = async () => {
     if (!email || !phone || !password || !confirmPassword || !firstName || !lastName) {
@@ -52,11 +52,14 @@ export default function RegisterScreen({ navigation }) {
         lastName,
         'customer'
       );
-      
-      await tokenStorage.storeTokens(response.access, response.refresh);
-      
+      // Set user data
       if (response.user) {
         setUser(response.user);
+      }
+
+      // Store tokens securely
+      if (response.tokens) {
+        setTokens(response.tokens.accessToken, response.tokens.refreshToken);
       }
 
       navigation.replace('Home');

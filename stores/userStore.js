@@ -1,76 +1,62 @@
-import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from 'zustand';
 
-export const useUserStore = create((set, get) => ({
+const ACCESS_TOKEN_KEY = '@access_token';
+const REFRESH_TOKEN_KEY = '@refresh_token';
+const USER_DATA_KEY = '@user_data';
+
+export const useUserStore = create((set) => ({
   user: null,
   authToken: null,
   refreshToken: null,
-  isInitialized: false,
 
   setUser: async (user) => {
     set({ user });
     if (user) {
-      await AsyncStorage.setItem('userData', JSON.stringify(user));
+      await AsyncStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
+    } else {
+      await AsyncStorage.removeItem(USER_DATA_KEY);
     }
   },
 
   setTokens: async (authToken, refreshToken) => {
     set({ authToken, refreshToken });
-    if (authToken) await AsyncStorage.setItem('authToken', authToken);
-    if (refreshToken) await AsyncStorage.setItem('refreshToken', refreshToken);
-  },
-
-  clearUser: async () => {
-    // Clear cart and other app state here
-    set({ 
-      user: null, 
-      authToken: null, 
-      refreshToken: null,
-    });
-    
-    // Clear all data from AsyncStorage
-    await Promise.all([
-      AsyncStorage.removeItem('authToken'),
-      AsyncStorage.removeItem('refreshToken'),
-      AsyncStorage.removeItem('userData'),
-      AsyncStorage.removeItem('cart'), // Also clear cart data
-    ]);
-  },
-
-  // Initialize data from AsyncStorage
-  initializeAuth: async () => {
-    try {
-      const [authToken, refreshToken, userData] = await Promise.all([
-        AsyncStorage.getItem('authToken'),
-        AsyncStorage.getItem('refreshToken'),
-        AsyncStorage.getItem('userData'),
-      ]);
-      
-      const initialState = {
-        isInitialized: true
-      };
-      
-      if (authToken && refreshToken) {
-        initialState.authToken = authToken;
-        initialState.refreshToken = refreshToken;
-      }
-      
-      if (userData) {
-        initialState.user = JSON.parse(userData);
-      }
-      
-      set(initialState);
-      return initialState;
-    } catch (error) {
-      console.error('Error initializing auth:', error);
-      set({ isInitialized: true });
-      throw error;
+    if (authToken) {
+      await AsyncStorage.setItem(ACCESS_TOKEN_KEY, authToken);
+    }
+    if (refreshToken) {
+      await AsyncStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
     }
   },
 
-  // Check if user is authenticated
-  isAuthenticated: () => {
-    const state = get();
-    return !!(state.user && state.authToken);
+  clearUser: async () => {
+    set({
+      user: undefined,
+      authToken: undefined,
+      refreshToken: undefined
+    });
+    await AsyncStorage.multiRemove([ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, USER_DATA_KEY]);
   },
+
+  // Initialize state from storage
+  initialize: async () => {
+    try {
+      const [[, authToken], [, refreshToken], [, userData]] = await AsyncStorage.multiGet([
+        ACCESS_TOKEN_KEY,
+        REFRESH_TOKEN_KEY,
+        USER_DATA_KEY
+      ]);
+
+      set({
+        authToken: authToken || null,
+        refreshToken: refreshToken || null,
+        user: userData ? JSON.parse(userData) : null
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error initializing from storage:', error);
+      return false;
+    }
+  }
 }));

@@ -27,7 +27,6 @@ import { CartProvider } from './context/CartContext';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import OrderDetailScreen from './app/OrderDetail';
 import OrdersScreen from './app/Orders';
-import { tokenStorage } from './utils/tokenStorage';
 import { useUserStore } from './stores/userStore';
 import { STRIPE_PUBLISHABLE_KEY, MERCHANT_IDENTIFIER } from '@env';
 import { setupNotificationListeners } from './utils/notificationService';
@@ -48,27 +47,26 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export default function App() {
-  const [fontsLoaded, fontError] = useFonts({
-    'PlusJakartaSans-Regular': PlusJakartaSans_400Regular,
-    'PlusJakartaSans-Medium': PlusJakartaSans_500Medium,
-    'PlusJakartaSans-SemiBold': PlusJakartaSans_600SemiBold,
-    'PlusJakartaSans-Bold': PlusJakartaSans_700Bold,
-  });
-
+const App = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { setUser, setTokens, initializeAuth } = useUserStore();
-  const [expoPushToken, setExpoPushToken] = useState('');
+  const initialize = useUserStore(state => state.initialize);
+  const clearUser = useUserStore(state => state.clearUser);
+  const user = useUserStore(state => state.user);
 
   useEffect(() => {
     const initApp = async () => {
       try {
-        const tokens = await tokenStorage.getTokens();
-        if (tokens?.accessToken) {
-          setIsAuthenticated(true);
-          await initializeAuth();
-          setTokens(tokens.accessToken, tokens.refreshToken);
+        // Initialize user state from storage
+        await initialize();
+        
+        // Register for push notifications if user is logged in
+        if (useUserStore.getState().user) {
+          const token = await registerForPushNotificationsAsync();
+          if (token) {
+            await authService.updateUser({
+              profile: { notification_token: token }
+            });
+          }
         }
       } catch (error) {
         console.error('Error initializing app:', error);
@@ -78,54 +76,26 @@ export default function App() {
     };
 
     initApp();
-
-    // Setup notification listeners
-    const listeners = setupNotificationListeners(
-      (notification) => {
-        console.log('Notification received:', notification);
-     
-        // Handle received notification
-      },
-      (response) => {
-        console.log('Notification response:', response);
-        // Handle notification response (when user taps notification)
-      }
-    );
-
-    return () => {
-      listeners.remove();
-    };
-  }, []);
+  }, [initialize]);
 
   useEffect(() => {
     const handleLogout = async () => {
       try {
-        setIsAuthenticated(false);
-        await useUserStore.getState().clearUser();
-        await tokenStorage.clearTokens();
+        await clearUser();
       } catch (error) {
         console.error('Error during logout:', error);
       }
     };
 
-    const unsubscribe = useUserStore.subscribe(
-      (state) => state.user,
-      (user) => {
-        if (!user) {
-          handleLogout();
-        }
-      }
-    );
-
     return () => {
-      unsubscribe();
+      // Cleanup
     };
-  }, []);
+  }, [clearUser]);
 
-  if (!fontsLoaded && !fontError || isLoading) {
+  if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.primary }}>
-        <ActivityIndicator size="large" color="#FFFFFF" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -143,7 +113,7 @@ export default function App() {
               screenOptions={{
                 headerShown: false,
               }}
-              initialRouteName={isAuthenticated ? "Home" : "Landing"}
+              initialRouteName={user ? "Home" : "Landing"}
             >
               <Stack.Screen 
                 name="Landing" 
@@ -189,4 +159,6 @@ export default function App() {
       </StripeProvider>
     </GestureHandlerRootView>
   );
-}
+};
+
+export default App;

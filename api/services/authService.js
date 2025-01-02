@@ -26,16 +26,24 @@ const authService = {
     try {
       const response = await apiClient.post('/token/', {
         username: identifier,
-        password,
+        password: password,
       });
 
       const { access, refresh } = response.data;
+      
+      // Store tokens in userStore
       useUserStore.getState().setTokens(access, refresh);
       
       // Load user data after successful login
-      await authService.fetchUser();
+      const userData = await authService.fetchUser();
       
-      return response.data;
+      return {
+        tokens: {
+          accessToken: access,
+          refreshToken: refresh
+        },
+        user: userData
+      };
     } catch (error) {
       throw error;
     }
@@ -53,43 +61,15 @@ const authService = {
       useUserStore.getState().setUser(userData);
       return userData;
     } catch (error) {
-      if (error.response?.status === 401) {
-        const success = await authService.refreshAccessToken();
-        if (success) {
-          return await authService.fetchUser();
-        }
-      }
       throw error;
-    }
-  },
-
-  refreshAccessToken: async () => {
-    const refreshToken = useUserStore.getState().refreshToken;
-    if (!refreshToken) {
-      console.error('No refresh token found. Please log in again.');
-      return false;
-    }
-
-    try {
-      const response = await apiClient.post('/token/refresh/', {
-        refresh: refreshToken,
-      });
-
-      const { access } = response.data;
-      useUserStore.getState().setTokens(access, refreshToken);
-      return true;
-    } catch (error) {
-      console.error('Error refreshing access token:', error);
-      return false;
     }
   },
 
   updateUser: async (userData) => {
     try {
       const authToken = useUserStore.getState().authToken;
-      const response = await apiClient.put('/update-user/', {
+      const response = await apiClient.patch('/update-user/', {
         ...userData,
-        notification_token: userData.notification_token
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -103,22 +83,31 @@ const authService = {
   },
 
   logout: async () => {
-    const authToken = useUserStore.getState().authToken;
-    if (!authToken) {
-      console.error('No auth token found. Cannot log out.');
-      return;
-    }
-
     try {
-      await apiClient.post('/token/logout/', null, {
+      const authToken = useUserStore.getState().authToken;
+      
+      // Clear notification token first
+      await authService.updateUser({
+        profile: { notification_token: "" }
+      });
+
+      // Logout from server
+      const response = await apiClient.post('/logout/', {}, {
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${authToken}`,
         },
       });
+
+      // Clear user state and storage
+      await useUserStore.getState().clearUser();
+
+      return response.data;
     } catch (error) {
-      console.error('Error logging out on server:', error);
-    } finally {
-      useUserStore.getState().clearUser();
+      console.error('Error logging out:', error);
+      // Still clear local data even if server logout fails
+      await useUserStore.getState().clearUser();
+      return { success: true };
     }
   },
 };

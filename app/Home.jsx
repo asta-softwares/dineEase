@@ -28,7 +28,6 @@ import { typography } from '../styles/typography';
 import { layout } from '../styles/layout';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { restaurantService } from '../api/services/restaurantService';
-import { tokenStorage } from '../utils/tokenStorage';
 import { useUserStore } from '../stores/userStore';
 
 export default function HomeScreen({ navigation }) {
@@ -163,15 +162,10 @@ export default function HomeScreen({ navigation }) {
   };
 
   const handleProfilePress = async () => {
-    try {
-      const token = await tokenStorage.getAccessToken();
-      if (token) {
-        navigation.navigate('Profile');
-      } else {
-        navigation.navigate('Login');
-      }
-    } catch (error) {
-      console.log('Token check failed:', error);
+    const user = useUserStore.getState().user;
+    if (user) {
+      navigation.navigate('Profile');
+    } else {
       navigation.navigate('Login');
     }
   };
