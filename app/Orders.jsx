@@ -5,6 +5,7 @@ import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import { restaurantService } from '../api/services/restaurantService';
 import { Ionicons } from '@expo/vector-icons';
+import Badge from '../Components/Badge';
 
 const getStatusColor = (status) => {
   switch (status?.toLowerCase()) {
@@ -22,8 +23,29 @@ const getStatusColor = (status) => {
       return colors.error;
     case 'failed':
       return colors.error;
+    case 'rejected':
+      return colors.error;
     default:
       return colors.text.secondary;
+  }
+};
+
+const getStatusType = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'pending':
+      return 'pending';
+    case 'confirmed':
+      return 'confirmed';
+    case 'preparing':
+      return 'preparing';
+    case 'delivered':
+      return 'delivered';
+    case 'cancelled':
+      return 'cancelled';
+    case 'rejected':
+      return 'rejected';
+    default:
+      return 'pending';
   }
 };
 
@@ -48,11 +70,11 @@ const OrderCard = ({ order, onPress }) => {
             <Text style={[typography.labelLarge, styles.orderId]}>
               Order #{order.id}
             </Text>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) }]}>
-              <Text style={[typography.labelMedium, styles.statusText]}>
-                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-              </Text>
-            </View>
+            <Badge 
+              text={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+              type={getStatusType(order.status)}
+            />
+          
           </View>
           
           <Text style={[typography.labelLarge, styles.restaurantName]}>
