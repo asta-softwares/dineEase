@@ -68,6 +68,10 @@ const ProfileScreen = () => {
                     text: 'Logout',
                     onPress: async () => {
                         try {
+                            await authService.updateUser({
+                                notification_token: null
+                              });
+                              
                             // Call the logout API
                             await authService.logout();
                             // Clear tokens from storage
@@ -77,9 +81,7 @@ const ProfileScreen = () => {
                                 index: 0,
                                 routes: [{ name: 'Landing' }],
                             });
-                            await authService.updateUser({
-                                notification_token: null
-                              });
+                           
                         } catch (error) {
                             console.error('Error during logout:', error);
                             Alert.alert('Error', 'Failed to logout. Please try again.');
