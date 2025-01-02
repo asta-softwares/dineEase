@@ -8,27 +8,9 @@ import { typography } from '../styles/typography';
 import LargeButton from '../Components/Buttons/LargeButton';
 import { restaurantService } from '../api/services/restaurantService';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import Badge from '../Components/Badge';
 
-const getStatusColor = (status) => {
-  switch (status?.toLowerCase()) {
-    case 'completed':
-      return colors.success;
-    case 'confirmed':
-      return colors.primary;
-    case 'preparing':
-      return colors.warning;
-    case 'delivered':
-      return colors.success;
-    case 'pending':
-      return colors.warning;
-    case 'cancelled':
-      return colors.error;
-    case 'failed':
-      return colors.error;
-    default:
-      return colors.text.secondary;
-  }
-};
+
 
 const getCardIcon = (brand) => {
   switch (brand?.toLowerCase()) {
@@ -86,13 +68,12 @@ const OrderDetailScreen = ({ route, navigation }) => {
       return (
         <View style={styles.totalRow}>
           <Text style={[typography.bodyLarge, { color: colors.text.secondary }]}>
-            {label}
+            {label} 
           </Text>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(value) }]}>
-            <Text style={[typography.labelMedium, styles.statusText]}>
-              {value?.charAt(0).toUpperCase() + value?.slice(1)}
-            </Text>
-          </View>
+          <Badge 
+            text={value?.charAt(0).toUpperCase() + value?.slice(1)}
+            type={value?.toLowerCase()}
+          />
         </View>
       );
     }
@@ -172,11 +153,10 @@ const OrderDetailScreen = ({ route, navigation }) => {
         <View style={styles.section}>
           <View style={styles.restaurantHeader}>
             <Text style={[typography.h2, styles.sectionTitle, { color: colors.text.primary }]}>{restaurant?.name}</Text>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.status) }]}>
-              <Text style={[typography.labelMedium, styles.statusText]}>
-                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-              </Text>
-            </View>
+            <Badge 
+              text={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+              type={order.status.toLowerCase()}
+            />
           </View>
           {orderDetails?.verification_code && order.status.toLowerCase() !== 'completed' && (
           <View style={styles.verificationContainer}>

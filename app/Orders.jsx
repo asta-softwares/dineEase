@@ -7,29 +7,6 @@ import { restaurantService } from '../api/services/restaurantService';
 import { Ionicons } from '@expo/vector-icons';
 import Badge from '../Components/Badge';
 
-const getStatusColor = (status) => {
-  switch (status?.toLowerCase()) {
-    case 'completed':
-      return colors.success;
-    case 'confirmed':
-      return colors.primary;
-    case 'preparing':
-      return colors.warning;
-    case 'delivered':
-      return colors.success;
-    case 'pending':
-      return colors.warning;
-    case 'cancelled':
-      return colors.error;
-    case 'failed':
-      return colors.error;
-    case 'rejected':
-      return colors.error;
-    default:
-      return colors.text.secondary;
-  }
-};
-
 const getStatusType = (status) => {
   switch (status?.toLowerCase()) {
     case 'pending':

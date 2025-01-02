@@ -5,8 +5,8 @@ import { colors } from '../constants/colors';
 import { layout } from '../constants/layout';
 
 const Badge = ({ text, type = 'pending', icon, style }) => {
-  const getBadgeStyle = () => {
-    switch (type) {
+  const getBadgeStyle = (type, icon) => {
+    switch (type?.toLowerCase()) {
       case 'pending':
         return {
           backgroundColor: colors.warning.light,
@@ -21,38 +21,50 @@ const Badge = ({ text, type = 'pending', icon, style }) => {
         };
       case 'preparing':
         return {
-          backgroundColor: '#FFF8E1', // Light amber
-          color: '#FF8F00', // Dark amber
+          backgroundColor: colors.warning.light,
+          color: colors.warning.dark,
           icon: icon || 'restaurant-outline',
         };
       case 'delivered':
         return {
           backgroundColor: colors.success.light,
           color: colors.success.dark,
-          icon: icon || 'checkmark-done-circle',
+          icon: icon || 'bicycle-outline',
         };
       case 'cancelled':
         return {
           backgroundColor: colors.error.light,
           color: colors.error.dark,
-          icon: icon || 'close-circle',
+          icon: icon || 'close-circle-outline',
         };
       case 'rejected':
         return {
-          backgroundColor: '#FFCDD2', // Light red
-          color: '#B71C1C', // Dark red
+          backgroundColor: colors.error.light,
+          color: colors.error.dark,
           icon: icon || 'ban-outline',
+        };
+      case 'completed':
+        return {
+          backgroundColor: colors.success.light,
+          color: colors.success.dark,
+          icon: icon || 'checkmark-done-circle',
+        };
+      case 'failed':
+        return {
+          backgroundColor: colors.error.light,
+          color: colors.error.dark,
+          icon: icon || 'alert-circle-outline',
         };
       default:
         return {
-          backgroundColor: colors.warning.light,
-          color: colors.warning.dark,
-          icon: 'time-outline',
+          backgroundColor: colors.text.secondary + '20',
+          color: colors.text.secondary,
+          icon: icon || 'help-circle-outline',
         };
     }
   };
 
-  const badgeStyle = getBadgeStyle();
+  const badgeStyle = getBadgeStyle(type, icon);
 
   return (
     <View style={[styles.badge, { backgroundColor: badgeStyle.backgroundColor }, style]}>
