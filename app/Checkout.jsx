@@ -143,7 +143,7 @@ const CheckoutScreen = ({ navigation }) => {
         owner_id: cart.owner_id
       };
 
-      const { clientSecret } = await restaurantService.createPaymentIntent({
+      const { clientSecret, customerId, ephemeralKey } = await restaurantService.createPaymentIntent({
         amount: orderTotals.total.toFixed(2),
         restaurant_id: restaurant.id 
       }).catch(error => {
@@ -154,6 +154,12 @@ const CheckoutScreen = ({ navigation }) => {
       const { error: initError } = await initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: 'DineEase',
+        customerId: customerId,
+        customerEphemeralKeySecret: ephemeralKey,
+        defaultBillingDetails: {
+          email: user?.email,
+        },
+        allowsDelayedPaymentMethods: false,
       }).catch(error => {
         Alert.alert('Payment Error', error.message);
         throw error;
