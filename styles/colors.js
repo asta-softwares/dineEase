@@ -9,6 +9,7 @@ export const colors = {
     success: '#2ECC71',
     warning: '#F1C40F',
     error: '#E74C3C',
+    winter_bg: '#004D7A',
     gradients: {
       primary: ['#F29057', '#FE6E1B'],
       success: ['#2ECC71', '#27AE60'],

@@ -29,6 +29,7 @@ import { layout } from '../styles/layout';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { restaurantService } from '../api/services/restaurantService';
 import { useUserStore } from '../stores/userStore';
+import Snow from 'react-native-snowflakes';
 
 export default function HomeScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -238,8 +239,9 @@ export default function HomeScreen({ navigation }) {
         translucent={true}
       />
       <View style={styles.container}>
-        <SafeAreaView style={{ backgroundColor: colors.primary }}>
+        <SafeAreaView style={{ backgroundColor: colors.winter_bg }}>
           <Animated.View style={[styles.header]}>
+          <Snow fullScreen snowflakesCount={300} fallSpeed="fast" />
             <View style={styles.topHeader}>
               <TouchableOpacity style={styles.menuButton} onPress={handleProfilePress}>
                 <Ionicons name="person-outline" size={24} color={colors.text.white} />
@@ -301,8 +303,8 @@ export default function HomeScreen({ navigation }) {
             />
 
             <Image 
-              source={require('../assets/gift.png')} 
-              style={styles.gift}
+              source={require('../assets/meal.png')} 
+              style={styles.meal}
               resizeMode="contain"
             />
 
@@ -434,10 +436,10 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
   header: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.winter_bg,
     zIndex: 1,
     paddingHorizontal: layout.spacing.md,
     paddingTop: Platform.OS === 'android' ? 50 : 0,
@@ -489,19 +491,18 @@ const styles = StyleSheet.create({
   },
   christmasTree: {
     position: 'absolute',
-    left: -100,
+    left: -60,
     top: 20,
     width: 200,
     height: 200,
-    transform: [{ scaleX: -1 }],
     zIndex: -1,
   },
-  gift: {
+  meal: {
     position: 'absolute',
-    right: -40,
+    right: -50,
     top: 60,
-    width: 150,
-    height: 150,
+    width: 250,
+    height: 250,
     zIndex: -1,
   },
   serviceTypeContainer: {
