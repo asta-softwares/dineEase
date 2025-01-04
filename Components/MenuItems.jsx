@@ -106,15 +106,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    backgroundColor: colors.background,
   },
   menuItem: {
     width: '100%',
     marginBottom: 12,
     backgroundColor: colors.white,
-    borderRadius: 12,
-    borderWidth: 1,
     borderColor: colors.border,
+    borderWidth: 1,
+    borderRadius: 12,
     overflow: 'hidden',
     shadowColor: "#000",
     shadowOffset: {

@@ -165,53 +165,64 @@ export default function DetailScreen({ route, navigation }) {
             />
           </TouchableOpacity>
 
-          <View style={[styles.content, { backgroundColor: colors.background }]}>
-            <View style={[styles.header, { backgroundColor: colors.background }]}>
-              <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>{restaurant?.name}</Text>
-              <View style={styles.ratingContainer}>
-                <LinearGradient
-                  colors={colors.gradients.rating}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.ratingBadge}
-                >
-                  <Ionicons name="star" size={14} color={colors.white} />
-                  <Text style={styles.ratingText}>{restaurant?.ratings?.toFixed(1) || '0.0'}</Text>
-                </LinearGradient>
+          <View style={[styles.content, { backgroundColor: colors.light }]}>
+         
+              <View style={[styles.header]}>
+                <Text style={[typography.h2, styles.title, { color: colors.text.black }]}>{restaurant?.name}</Text>
+                <View style={styles.ratingContainer}>
+                  <LinearGradient
+                    colors={colors.gradients.rating}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.ratingBadge}
+                  >
+                    <Ionicons name="star" size={14} color={colors.white} />
+                    <Text style={styles.ratingText}>{restaurant?.ratings?.toFixed(1) || '0.0'}</Text>
+                  </LinearGradient>
+                </View>
               </View>
-            </View>
+             
+             <View style={styles.contentWrapper}>
+              <View style={styles.infoContainer}>
+                {restaurant?.categories?.length > 0 && (
+                  <View style={styles.infoItem}>
+                    <Ionicons name="restaurant-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                    <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                      {restaurant.categories.map(cat => cat.name).join(', ')}
+                    </Text>
+                  </View>
+                )}
 
-            <View style={styles.infoContainer}>
-              <View style={styles.infoItem}>
-                <Ionicons name="restaurant-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
-                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                  {restaurant?.categories?.map(cat => cat.name).join(', ')}
-                </Text>
-              </View>
+                {restaurant?.location && (
+                  <View style={styles.infoItem}>
+                    <Ionicons name="location-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                    <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                      {restaurant.location}
+                    </Text>
+                  </View>
+                )}
 
-              <View style={styles.infoItem}>
-                <Ionicons name="location-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
-                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                  {restaurant?.location}
-                </Text>
-              </View>
+                {restaurant?.operating_hours && Object.keys(restaurant.operating_hours).length > 0 && (
+                  <View style={styles.infoItem}>
+                    <Ionicons name="time-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                    <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                      {Object.entries(restaurant.operating_hours)
+                        .map(([day, hours]) => `${day}: ${hours}`)
+                        .join('\n')}
+                    </Text>
+                  </View>
+                )}
 
-              <View style={styles.infoItem}>
-                <Ionicons name="time-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
-                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                  {Object.entries(restaurant?.operating_hours || {})
-                    .map(([day, hours]) => `${day}: ${hours}`)
-                    .join('\n')}
-                </Text>
+                {restaurant?.telephone && (
+                  <View style={styles.infoItem}>
+                    <Ionicons name="call-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
+                    <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
+                      {restaurant.telephone}
+                    </Text>
+                  </View>
+                )}
               </View>
-
-              <View style={styles.infoItem}>
-                <Ionicons name="call-outline" size={14} color={colors.text.primary} style={styles.infoIcon} />
-                <Text style={[typography.bodyMedium, styles.infoText, { color: colors.text.secondary }]}>
-                  {restaurant?.telephone}
-                </Text>
-              </View>
-            </View>
+           
 
             <View style={styles.descriptionContainer}>
               <Text 
@@ -229,6 +240,7 @@ export default function DetailScreen({ route, navigation }) {
                 {restaurant?.description}
               </Text>
             </View>
+          </View>
 
             {restaurant?.promos?.length > 0 && (
               <>
@@ -239,18 +251,22 @@ export default function DetailScreen({ route, navigation }) {
                   style={styles.promosContainer}
                   contentContainerStyle={styles.promosContentContainer}
                 >
+                  <View style={styles.promoSpacer} />
                   {restaurant.promos
                     .filter(promo => promo.status === 'active')
                     .map((promo) => (
-                      <LinearGradient
+                      <View
                         key={promo.id}
-                        colors={colors.gradients.success}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
                         style={styles.promoCard}
                       >
                         <View style={styles.promoContent}>
-                          <View style={styles.discountBadge}>
+                          <View style={styles.discountContainer}>
+                            <Ionicons
+                              name={promo.discount_type === 'percentage' ? 'pricetag' : 'cash-outline'}
+                              size={20}
+                              color={colors.success}
+                              style={styles.discountIcon}
+                            />
                             <Text style={styles.discountText}>
                               {promo.discount_type === 'percentage' 
                                 ? `${promo.discount}% OFF`
@@ -258,10 +274,10 @@ export default function DetailScreen({ route, navigation }) {
                             </Text>
                           </View>
                           <Text style={styles.promoTitle}>{promo.name}</Text>
-                          <Text style={styles.promoDescription}>{promo.description}</Text>
                         </View>
-                      </LinearGradient>
+                      </View>
                     ))}
+                  <View style={styles.promoSpacer} />
                 </ScrollView>
               </>
             )}
@@ -341,8 +357,6 @@ const styles = StyleSheet.create({
     height: 252,
   },
   content: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
     marginTop: -24,
     padding: 20,
     paddingTop: 24,
@@ -356,6 +370,14 @@ const styles = StyleSheet.create({
     elevation: 4,
     width: '100%',
     alignSelf: 'stretch',
+  },
+  contentWrapper: {
+    backgroundColor: colors.white,
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderColor: colors.border,
+    borderWidth: 1,
   },
   customHeaderContainer: {
     position: 'absolute',
@@ -402,6 +424,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     marginBottom: 16,
     width: '100%',
+
   },
   infoItem: {
     flexDirection: "row",
@@ -493,37 +516,44 @@ const styles = StyleSheet.create({
   },
   promosContainer: {
     marginBottom: 24,
+    marginLeft: -20,
+    marginRight: -20,
   },
   promosContentContainer: {
-    paddingHorizontal: 16,
+    flexGrow: 1,
+  },
+  promoSpacer: {
+    width: 20,
   },
   promoCard: {
-    width: 280,
+    width: 200,
     marginRight: 12,
-    borderRadius: 16,
+    borderRadius: 8,
     overflow: 'hidden',
+    backgroundColor: colors.successLight,
+    borderWidth: 1,
+    borderColor: colors.success,
   },
   promoContent: {
     padding: 16,
   },
-  discountBadge: {
-    backgroundColor: colors.text.white,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-    marginBottom: 12,
+  discountContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  discountIcon: {
+    marginRight: 6,
   },
   discountText: {
-    color: colors.success,
-    fontFamily: 'PlusJakartaSans-Bold',
-    fontSize: 14,
-  },
-  promoTitle: {
-    color: colors.text.white,
+    color: colors.black,
     fontFamily: 'PlusJakartaSans-Bold',
     fontSize: 18,
-    marginBottom: 8,
+  },
+  promoTitle: {
+    color: colors.secondary,
+    fontFamily: 'PlusJakartaSans',
+    fontSize: 12,
+
   },
   promoDescription: {
     color: colors.text.white,

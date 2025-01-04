@@ -110,6 +110,9 @@ const styles = StyleSheet.create({
   restaurantCard: {
     backgroundColor: colors.background,
     borderRadius: layout.card.borderRadius,
+    backgroundColor: colors.white,
+    borderColor: colors.border,
+    borderWidth: 1,
 
     overflow: 'hidden',
   },

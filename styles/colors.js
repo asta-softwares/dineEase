@@ -7,6 +7,7 @@ export const colors = {
     light: '#F5F5F5',
     rating: '#EFBF04',
     success: '#2ECC71',
+    successLight: '#DAFFEC',
     warning: '#F1C40F',
     error: '#E74C3C',
     winter_bg: '#004D7A',

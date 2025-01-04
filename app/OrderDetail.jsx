@@ -260,7 +260,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     padding: 16,
     marginBottom: 16,
-    borderRadius: 12,
+    backgroundColor: colors.white,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderradius: 12,
+  
   },
   sectionTitle: {
     marginBottom: 16,
@@ -279,7 +283,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     backgroundColor: colors.light,
-    borderRadius: 12,
+    backgroundColor: colors.white,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderradius: 12,
   },
   verificationCode: {
     fontSize: 32,
@@ -315,7 +322,10 @@ const styles = StyleSheet.create({
   },
   paymentInfo: {
     backgroundColor: colors.background.secondary,
-    borderRadius: 12,
+    backgroundColor: colors.white,
+    borderColor: colors.border,
+    borderWidth: 1,
+    borderradius: 12,
   },
   promosContainer: {
     flexDirection: 'row',
