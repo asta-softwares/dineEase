@@ -10,6 +10,7 @@ export const colors = {
     warning: '#F1C40F',
     error: '#E74C3C',
     winter_bg: '#004D7A',
+    night_sky_bg: '#192A37',
     gradients: {
       primary: ['#F29057', '#FE6E1B'],
       success: ['#2ECC71', '#27AE60'],

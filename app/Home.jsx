@@ -15,7 +15,8 @@ import {
   BackHandler,
   Alert,
   ActivityIndicator,
-  RefreshControl
+  RefreshControl,
+  ImageBackground
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useNavigationState } from "@react-navigation/native";
@@ -29,7 +30,6 @@ import { layout } from '../styles/layout';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { restaurantService } from '../api/services/restaurantService';
 import { useUserStore } from '../stores/userStore';
-import Snow from 'react-native-snowflakes';
 
 export default function HomeScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -71,7 +71,7 @@ export default function HomeScreen({ navigation }) {
 
   const serviceTypeMargin = scrollY.interpolate({
     inputRange: [0, 50],
-    outputRange: [Platform.OS === 'ios' ? 70 : 0, 0],
+    outputRange: [Platform.OS === 'ios' ? 120 : 70, 0],
     extrapolate: 'clamp',
   });
 
@@ -233,15 +233,20 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar 
-        barStyle="dark-content"
-        backgroundColor={colors.primary}
-        translucent={true}
+      <StatusBar
+        animated={true}
+        barStyle="light-content"
+        translucent 
+        backgroundColor="transparent"
       />
       <View style={styles.container}>
-        <SafeAreaView style={{ backgroundColor: colors.winter_bg }}>
-          <Animated.View style={[styles.header]}>
-          <Snow fullScreen snowflakesCount={300} fallSpeed="fast" />
+
+          <ImageBackground 
+            source={require('../assets/new_year_header_bg.png')}
+            style={styles.header}
+            resizeMode="cover"
+          >
+         <SafeAreaView >
             <View style={styles.topHeader}>
               <TouchableOpacity style={styles.menuButton} onPress={handleProfilePress}>
                 <Ionicons name="person-outline" size={24} color={colors.text.white} />
@@ -290,21 +295,21 @@ export default function HomeScreen({ navigation }) {
                 )}
               </View>
               <Image 
-                source={require('../assets/holiday-text.png')} 
-                style={styles.holidayText}
+                source={require('../assets/new_year_text.png')} 
+                style={styles.centerHeaderImg}
                 resizeMode="contain"
               />
             </Animated.View>
 
             <Image 
-              source={require('../assets/christmas-tree.png')} 
-              style={styles.christmasTree}
+              source={require('../assets/new_year_text.png')} 
+              style={styles.leftHeaderImg}
               resizeMode="contain"
             />
 
             <Image 
               source={require('../assets/meal.png')} 
-              style={styles.meal}
+              style={styles.rightHeaderImg}
               resizeMode="contain"
             />
 
@@ -335,12 +340,13 @@ export default function HomeScreen({ navigation }) {
                 onPress={() => setIsDineIn(false)}
               >
                 <Text style={[styles.switchText, !isDineIn && styles.activeText]}>
-                  Grab & Go
+                 Take out
                 </Text>
               </TouchableOpacity>
             </Animated.View>
-          </Animated.View>
-        </SafeAreaView>
+            </SafeAreaView>
+          </ImageBackground>
+       
 
         <ScrollView
           style={styles.scrollView}
@@ -439,18 +445,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.light,
   },
   header: {
-    backgroundColor: colors.winter_bg,
     zIndex: 1,
     paddingHorizontal: layout.spacing.md,
     paddingTop: Platform.OS === 'android' ? 50 : 0,
-    marginTop: Platform.OS === 'android' ? 8 : 0,
-    overflow: 'hidden',
+    paddingBottom: 16,
+    overflow: 'hidden'
   },
   topHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: layout.spacing.sm,
+    alignItems: 'center',
+    marginBottom: 8,
   },
   logoContainer: {
     alignItems: 'center',
@@ -462,7 +467,8 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     position: 'relative',
-    marginBottom: layout.spacing.sm,
+    marginBottom: 8,
+    zIndex: 2,
   },
   searchInputContainer: {
     flexDirection: 'row',
@@ -470,6 +476,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.light,
     borderRadius: layout.card.borderRadius,
     paddingHorizontal: layout.spacing.sm,
+    zIndex: 2,
   },
   searchInput: {
     flex: 1,
@@ -483,34 +490,38 @@ const styles = StyleSheet.create({
   searchButton: {
     padding: layout.spacing.xs,
   },
-  holidayText: {
+  centerHeaderImg: {
     width: '80%',
-    height: 80,
+    height:100,
     alignSelf: 'center',
-    marginTop: layout.spacing.sm,
+    marginTop: 0,
+    display: 'none',
   },
-  christmasTree: {
+  leftHeaderImg: {
     position: 'absolute',
-    left: -60,
-    top: 20,
+    left: 20,
+    top: 80,
     width: 200,
     height: 200,
-    zIndex: -1,
+    zIndex: 1,
+    display: 'none',
   },
-  meal: {
+  rightHeaderImg: {
     position: 'absolute',
     right: -50,
     top: 60,
     width: 250,
     height: 250,
     zIndex: -1,
+    display: 'none',
   },
   serviceTypeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: layout.getResponsiveSpacing(layout.spacing.xxl),
     marginHorizontal: -layout.spacing.md,
-    marginBottom: layout.spacing.md,
+    marginBottom: 8,
+    zIndex: 2,
   },
   switchButton: {
     width: '48%',
