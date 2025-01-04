@@ -45,7 +45,7 @@ const CustomHeader = ({ onClose }) => (
 );
 
 export default function DetailScreen({ route, navigation }) {
-  const { restaurantId } = route.params;
+  const { restaurantId, isDineIn } = route.params;
   const { width } = useWindowDimensions();
   const scrollY = useSharedValue(0);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
@@ -115,7 +115,10 @@ export default function DetailScreen({ route, navigation }) {
   };
 
   const handleCheckout = () => {
-    navigation.navigate("Checkout");
+    navigation.navigate("Checkout", {
+      restaurantId,
+      isDineIn
+    });
   };
 
   const handleImageViewerClose = () => {
@@ -334,7 +337,7 @@ export default function DetailScreen({ route, navigation }) {
       <Animated.View style={[styles.footer, footerAnimatedStyle]}>
         <TouchableOpacity 
           style={styles.cartButton}
-          onPress={() => navigation.navigate('Checkout')}
+          onPress={handleCheckout}
         >
           <Text style={styles.cartButtonText}>
             View Cart ({totalItems} {totalItems === 1 ? 'item' : 'items'}) - Total: ${cartTotal.toFixed(2)}

@@ -16,6 +16,7 @@ import { typography } from '../styles/typography';
 import { useCart } from '../context/CartContext';
 import { useUserStore } from '../stores/userStore';
 import TopNav from '../Components/TopNav';
+import Badge from '../Components/Badge';
 import { restaurantService } from '../api/services/restaurantService';
 import Footer from './Layout/Footer';
 import LargeButton from '../Components/Buttons/LargeButton';
@@ -70,9 +71,10 @@ const TotalRow = ({ label, value, isTotal, type }) => {
   );
 };
 
-const CheckoutScreen = ({ navigation }) => {
+const CheckoutScreen = ({ route, navigation }) => {
   const { cart, getTotalCost, clearCart } = useCart();
   const user = useUserStore((state) => state.user);
+  const { restaurantId, isDineIn } = route.params;
   const [restaurant, setRestaurant] = useState(null);
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -171,18 +173,19 @@ const CheckoutScreen = ({ navigation }) => {
       // Prepare order data
       const orderData = {
         amount: orderTotals.total.toFixed(2),
-        restaurant_id: cart.restaurantId,
+        restaurant_id: restaurantId,
         menu_items: Object.values(cart.items).map(({ item, quantity }) => ({
           menu_item_id: item.id,
           quantity: quantity,
         })),
         promo_ids: selectedPromos.map(promo => promo.id),
-        owner_id: cart.owner_id
+        owner_id: cart.owner_id,
+        order_type: isDineIn ? 'dine_in' : 'takeaway',
       };
 
       const { clientSecret, customerId, ephemeralKey } = await restaurantService.createPaymentIntent({
         amount: orderTotals.total.toFixed(2),
-        restaurant_id: restaurant.id 
+        restaurant_id: restaurantId,
       }).catch(error => {
         Alert.alert('Payment Error', error.message);
         throw error;
@@ -306,6 +309,7 @@ const CheckoutScreen = ({ navigation }) => {
         contentContainerStyle={[styles.contentContainer, styles.contentPadding]}
         showsVerticalScrollIndicator={false}
       >
+
         {/* Restaurant Information */}
         <View style={styles.section}>
           <View style={styles.restaurantHeader}>
@@ -318,6 +322,11 @@ const CheckoutScreen = ({ navigation }) => {
                 {restaurant?.location}
               </Text>
             </View>
+            <Badge 
+              text={isDineIn ? 'Dine In' : 'Takeaway'} 
+              type={isDineIn ? 'pending' : 'confirmed'}
+              icon={isDineIn ? 'restaurant-outline' : 'bag-handle-outline'}
+            />
           </View>
         </View>
 
@@ -467,15 +476,16 @@ const styles = StyleSheet.create({
   },
   section: {
     backgroundColor: colors.white,
+    borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    borderRadius: 12,
-    borderColor: colors.border,
-    borderWidth: 1,
   },
   sectionTitle: {
     marginBottom: 16,
     color: colors.text.primary,
+  },
+  locationIcon: {
+    marginTop: 4
   },
   restaurantHeader: {
     flexDirection: 'row',
