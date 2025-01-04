@@ -52,25 +52,25 @@ export default function HomeScreen({ navigation }) {
   const { user } = useUserStore();
 
   const searchHeight = scrollY.interpolate({
-    inputRange: [0, 50],
+    inputRange: [0, 100],
     outputRange: [50, 0],
     extrapolate: 'clamp'
   });
 
   const searchOpacity = scrollY.interpolate({
-    inputRange: [0, 50],
+    inputRange: [0, 100],
     outputRange: [1, 0],
     extrapolate: 'clamp'
   });
 
   const searchMargin = scrollY.interpolate({
-    inputRange: [0, 50],
+    inputRange: [0, 100],
     outputRange: [16, 0],
     extrapolate: 'clamp'
   });
 
   const serviceTypeMargin = scrollY.interpolate({
-    inputRange: [0, 50],
+    inputRange: [0, 100],
     outputRange: [Platform.OS === 'ios' ? 120 : 70, 0],
     extrapolate: 'clamp',
   });
