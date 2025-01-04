@@ -59,16 +59,44 @@ export default function LoginScreen({ navigation }) {
       navigation.replace('Home'); // Replace login screen with home screen
     } catch (error) {
       console.error('Login error:', error);
-      console.log('Error response:', error.response);
-      console.log('Error response data:', error.response?.data);
-      console.log('Error response status:', error.response?.status);
-      let errorMessage = 'An error occurred during login';
+      console.log('Error details:', {
+        status: error?.response?.status,
+        message: error?.message,
+        detail: error?.response?.data?.detail
+      });
       
-      if (error.message) {
-        errorMessage = error.message;
+      // Check for unverified user error
+      const isUnverifiedError = error?.response?.data?.detail === 'User account is not verified. Please verify your email before logging in.';
+      
+      if (error?.response?.status === 401 && isUnverifiedError) {
+        console.log('Unverified user detected, showing alert...');
+        Alert.alert(
+          'Account Not Verified',
+          'Please verify your email to continue.',
+          [
+            {
+              text: 'Verify Now',
+              onPress: () => {
+                console.log('Navigating to VerifyEmail with email:', email);
+                navigation.replace('VerifyEmail', { email });
+              }
+            }
+          ]
+        );
+        return;
+      }
+      if (error?.response?.status === 401 && !isUnverifiedError) {
+        Alert.alert(
+          'Invalid Credentials',
+          'Please check your email and password and try again.',
+        );
+        return;
       }
       
-      Alert.alert('Login Failed', errorMessage);
+      Alert.alert(
+        'Login Failed',
+        error?.response?.data?.detail || error.message || 'An error occurred during login'
+      );
     } finally {
       setLoading(false);
     }

@@ -18,28 +18,43 @@ const authService = {
       useUserStore.getState().setTokens(access, refresh);
       return response.data;
     } catch (error) {
-      // Log the complete error object for debugging
       console.log('Auth service error:', {
-        status: error?.response?.status,
         data: error?.response?.data,
-        message: error?.message,
-        originalError: error
+        status: error?.response?.status,
+        detail: error?.response?.data?.detail
       });
       
-      // Handle 401 Unauthorized
+      // Handle 401 Unauthorized with specific messages
       if (error?.response?.status === 401) {
-        const errorMessage = error?.response?.data?.detail || 'Invalid credentials';
-        throw new Error(errorMessage);
+        // Pass through the original error response
+        throw error;
       }
       
-      // Handle network errors
-      if (error?.message === 'Network Error') {
-        throw new Error('No response from server. Please check your internet connection.');
+      // Handle validation errors
+      if (error?.response?.data && typeof error.response.data === 'object') {
+        const validationErrors = Object.entries(error.response.data)
+          .map(([field, errors]) => {
+            if (Array.isArray(errors)) {
+              return `${field}: ${errors[0]}`;
+            }
+            return null;
+          })
+          .filter(Boolean)
+          .join('\n');
+          
+        if (validationErrors) {
+          throw new Error(validationErrors);
+        }
       }
       
       // Handle other errors with detail
       if (error?.response?.data?.detail) {
         throw new Error(error.response.data.detail);
+      }
+      
+      // Handle network errors
+      if (error?.message === 'Network Error') {
+        throw new Error('No response from server. Please check your internet connection.');
       }
       
       // Fallback error
@@ -70,28 +85,43 @@ const authService = {
         user: userData
       };
     } catch (error) {
-      // Log the complete error object for debugging
       console.log('Auth service error:', {
-        status: error?.response?.status,
         data: error?.response?.data,
-        message: error?.message,
-        originalError: error
+        status: error?.response?.status,
+        detail: error?.response?.data?.detail
       });
       
-      // Handle 401 Unauthorized
+      // Handle 401 Unauthorized with specific messages
       if (error?.response?.status === 401) {
-        const errorMessage = 'Invalid credentials';
-        throw new Error(errorMessage);
+        // Pass through the original error response
+        throw error;
       }
       
-      // Handle network errors
-      if (error?.message === 'Network Error') {
-        throw new Error('No response from server. Please check your internet connection.');
+      // Handle validation errors
+      if (error?.response?.data && typeof error.response.data === 'object') {
+        const validationErrors = Object.entries(error.response.data)
+          .map(([field, errors]) => {
+            if (Array.isArray(errors)) {
+              return `${field}: ${errors[0]}`;
+            }
+            return null;
+          })
+          .filter(Boolean)
+          .join('\n');
+          
+        if (validationErrors) {
+          throw new Error(validationErrors);
+        }
       }
       
       // Handle other errors with detail
       if (error?.response?.data?.detail) {
         throw new Error(error.response.data.detail);
+      }
+      
+      // Handle network errors
+      if (error?.message === 'Network Error') {
+        throw new Error('No response from server. Please check your internet connection.');
       }
       
       // Fallback error
@@ -111,28 +141,43 @@ const authService = {
       useUserStore.getState().setUser(userData);
       return userData;
     } catch (error) {
-      // Log the complete error object for debugging
       console.log('Auth service error:', {
-        status: error?.response?.status,
         data: error?.response?.data,
-        message: error?.message,
-        originalError: error
+        status: error?.response?.status,
+        detail: error?.response?.data?.detail
       });
       
-      // Handle 401 Unauthorized
+      // Handle 401 Unauthorized with specific messages
       if (error?.response?.status === 401) {
-        const errorMessage = error?.response?.data?.detail || 'Invalid credentials';
-        throw new Error(errorMessage);
+        // Pass through the original error response
+        throw error;
       }
       
-      // Handle network errors
-      if (error?.message === 'Network Error') {
-        throw new Error('No response from server. Please check your internet connection.');
+      // Handle validation errors
+      if (error?.response?.data && typeof error.response.data === 'object') {
+        const validationErrors = Object.entries(error.response.data)
+          .map(([field, errors]) => {
+            if (Array.isArray(errors)) {
+              return `${field}: ${errors[0]}`;
+            }
+            return null;
+          })
+          .filter(Boolean)
+          .join('\n');
+          
+        if (validationErrors) {
+          throw new Error(validationErrors);
+        }
       }
       
       // Handle other errors with detail
       if (error?.response?.data?.detail) {
         throw new Error(error.response.data.detail);
+      }
+      
+      // Handle network errors
+      if (error?.message === 'Network Error') {
+        throw new Error('No response from server. Please check your internet connection.');
       }
       
       // Fallback error
@@ -153,23 +198,33 @@ const authService = {
       });
       return response.data;
     } catch (error) {
-      // Log the complete error object for debugging
       console.log('Auth service error:', {
-        status: error?.response?.status,
         data: error?.response?.data,
-        message: error?.message,
-        originalError: error
+        status: error?.response?.status,
+        detail: error?.response?.data?.detail
       });
       
-      // Handle 401 Unauthorized
+      // Handle 401 Unauthorized with specific messages
       if (error?.response?.status === 401) {
-        const errorMessage = error?.response?.data?.detail || 'Invalid credentials';
-        throw new Error(errorMessage);
+        // Pass through the original error response
+        throw error;
       }
       
-      // Handle network errors
-      if (error?.message === 'Network Error') {
-        throw new Error('No response from server. Please check your internet connection.');
+      // Handle validation errors
+      if (error?.response?.data && typeof error.response.data === 'object') {
+        const validationErrors = Object.entries(error.response.data)
+          .map(([field, errors]) => {
+            if (Array.isArray(errors)) {
+              return `${field}: ${errors[0]}`;
+            }
+            return null;
+          })
+          .filter(Boolean)
+          .join('\n');
+          
+        if (validationErrors) {
+          throw new Error(validationErrors);
+        }
       }
       
       // Handle other errors with detail
@@ -177,8 +232,32 @@ const authService = {
         throw new Error(error.response.data.detail);
       }
       
+      // Handle network errors
+      if (error?.message === 'Network Error') {
+        throw new Error('No response from server. Please check your internet connection.');
+      }
+      
       // Fallback error
       throw new Error(error?.message || 'An unexpected error occurred. Please try again later.');
+    }
+  },
+
+  verifyEmail: async (email, code) => {
+    try {
+      const response = await apiClient.post('/verify-code/', {
+        email,
+        code
+      });
+      return response.data;
+    } catch (error) {
+      console.log('Auth service error:', {
+        data: error?.response?.data,
+        status: error?.response?.status,
+        detail: error?.response?.data?.detail
+      });
+      
+      // Pass through the error
+      throw error;
     }
   },
 
@@ -204,13 +283,12 @@ const authService = {
 
       return response.data;
     } catch (error) {
-      // Log the complete error object for debugging
       console.log('Auth service error:', {
-        status: error?.response?.status,
         data: error?.response?.data,
-        message: error?.message,
-        originalError: error
+        status: error?.response?.status,
+        detail: error?.response?.data?.detail
       });
+      console.error('Error logging out:', error);
       
       // Still clear local data even if server logout fails
       await useUserStore.getState().clearUser();

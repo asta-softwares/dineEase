@@ -22,6 +22,7 @@ import Landing from './app/Landing';
 import ProfileScreen from './app/Profile';
 import EditProfileScreen from './app/EditProfile';
 import RegisterScreen from './app/Register';
+import VerifyEmailScreen from './app/VerifyEmail';
 import { colors } from './styles/colors';
 import { CartProvider } from './context/CartContext';
 import { StripeProvider } from '@stripe/stripe-react-native';
@@ -154,6 +155,14 @@ const App = () => {
               <Stack.Screen 
                 name="Register" 
                 component={RegisterScreen} 
+                options={{
+                  gestureEnabled: false,
+                  headerBackVisible: false
+                }}
+              />
+              <Stack.Screen 
+                name="VerifyEmail" 
+                component={VerifyEmailScreen} 
                 options={{
                   gestureEnabled: false,
                   headerBackVisible: false

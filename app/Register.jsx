@@ -52,6 +52,19 @@ export default function RegisterScreen({ navigation }) {
         lastName,
         'customer'
       );
+      
+      // Show success message and navigate to verify email
+      Alert.alert(
+        'Registration Successful',
+        'Please check your email for a verification code.',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.replace('VerifyEmail')
+          }
+        ]
+      );
+
       // Set user data
       if (response.user) {
         setUser(response.user);
@@ -61,17 +74,12 @@ export default function RegisterScreen({ navigation }) {
       if (response.tokens) {
         setTokens(response.tokens.accessToken, response.tokens.refreshToken);
       }
-
-      navigation.replace('Home');
     } catch (error) {
       console.error('Registration error:', error);
-      let errorMessage = 'An error occurred during registration';
-      
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      }
-      
-      Alert.alert('Registration Failed', errorMessage);
+      Alert.alert(
+        'Registration Failed',
+        error.message || 'An error occurred during registration'
+      );
     } finally {
       setLoading(false);
     }
