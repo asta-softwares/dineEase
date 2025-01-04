@@ -127,10 +127,12 @@ const CheckoutScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     const fetchAvailablePromos = async () => {
+      if (!orderTotals) return;
+      
       try {
         const promos = await restaurantService.getOrderPromos(
-          cart.owner_id,
-          cart.total
+          restaurantId,
+          orderTotals
         );
         setAvailablePromos(promos);
       } catch (error) {
@@ -138,7 +140,7 @@ const CheckoutScreen = ({ route, navigation }) => {
       }
     };
     fetchAvailablePromos();
-  }, []);
+  }, [orderTotals, restaurantId]);
 
   const handlePromoSelect = (promo) => {
     if (selectedPromos.some(p => p.id === promo.id)) {

@@ -202,6 +202,7 @@ export const restaurantService = {
   },
 
   getOrderPromos: async (restaurantId, orderTotal) => {
+    console.log(restaurantId, orderTotal);
     try {
       const response = await apiClient.get(`/promos/restaurant/${restaurantId}?order_total=${orderTotal}`);
       return response.data;
