@@ -26,6 +26,19 @@ const getStatusType = (status) => {
   }
 };
 
+const getOrderTypeIcon = (type) => {
+  switch (type?.toLowerCase()) {
+    case 'dine_in':
+      return 'restaurant-outline';
+    case 'takeaway':
+      return 'bag-handle-outline';
+    case 'delivery':
+      return 'bicycle-outline';
+    default:
+      return 'restaurant-outline';
+  }
+};
+
 const OrderCard = ({ order, onPress }) => {
   const formattedDate = new Date(order.order_time).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -42,6 +55,14 @@ const OrderCard = ({ order, onPress }) => {
       onPress={onPress}
     >
       <View style={styles.contentContainer}>
+        <View style={styles.backgroundIcon}>
+          <Ionicons 
+            name={getOrderTypeIcon(order.order_type)} 
+            size={150} 
+            color={colors.primary} 
+            style={{ opacity: 0.10 }} 
+          />
+        </View>
         <View style={styles.textContainer}>
           <View style={styles.orderHeader}>
             <Text style={[typography.labelLarge, styles.orderId]}>
@@ -51,7 +72,6 @@ const OrderCard = ({ order, onPress }) => {
               text={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               type={getStatusType(order.status)}
             />
-          
           </View>
           
           <Text style={[typography.labelLarge, styles.restaurantName]}>
@@ -226,9 +246,18 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
     backgroundColor: colors.white,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  backgroundIcon: {
+    position: 'absolute',
+    bottom: -30,
+    right: -20,
+    zIndex: 0,
   },
   textContainer: {
     flex: 1,
+    zIndex: 1,
   },
   orderHeader: {
     flexDirection: 'row',

@@ -204,11 +204,11 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.light,
     },
     mainContent: {
         flex: 1,
-        marginTop: 100,
+        marginTop: 120,
     },
     scrollContent: {
         paddingBottom: 80,
