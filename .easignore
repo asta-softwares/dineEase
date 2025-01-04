@@ -9,6 +9,8 @@ node_modules/
 # Build
 build/
 dist/
+/android/
+/ios/
 web-build/
 
 # IDE
@@ -64,4 +66,10 @@ docs/
 .hg/
 
 firebase-service-account-key.json
-google-services.json
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+*.pem

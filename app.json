@@ -2,16 +2,19 @@
   "expo": {
     "name": "DineEase",
     "slug": "dineease",
-    "version": "0.5",
+    "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "plugins": ["react-native-edge-to-edge"],
     "splash": {
       "image": "./assets/splash-new.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FFFF"
+      "backgroundColor": "#FFFFFF"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ca.dineease.app",
@@ -19,21 +22,21 @@
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
+        },
+        "config": {
+          "usesNonExemptEncryption": false
         }
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo-android.png"
+        "foregroundImage": "./assets/logo-android.png",
+        "backgroundColor": "#ffffff"
       },
       "package": "ca.dineease.app",
       "permissions": ["INTERNET"],
-      "networkSecurityConfig": {
-        "cleartextTrafficPermitted": true
-      },
       "googleServicesFile": "./google-services.json",
-      "softwareKeyboardLayoutMode": "pan",
-      "windowSoftInputMode": "adjustResize"
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -43,9 +46,6 @@
         "projectId": "bb93df51-05e6-4f7e-b143-45bac0194bb7"
       }
     },
-    "owner": "mendozarain",
-    "experiments": {
-      "newArchEnabled": true
-    }
+    "owner": "mendozarain"
   }
 }
