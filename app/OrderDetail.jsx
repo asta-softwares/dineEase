@@ -212,11 +212,11 @@ const OrderDetailScreen = ({ route, navigation }) => {
           
           <View style={styles.divider} />
           <TotalRow label="Subtotal" value={orderDetails?.order_total} />
-          <TotalRow label="Discount" value={orderDetails?.discount} />
-          <TotalRow label="Tax Rate" type="default" value={`${orderDetails?.tax_rate}%`} />
-          <TotalRow label="Tax Amount" value={orderDetails?.tax_amount} />
-          <TotalRow label="Service Fee" value={orderDetails?.service_fee} />
-          <TotalRow label="Service Fee Tax" value={orderDetails?.service_fee_tax} />
+          {orderDetails?.discount && <TotalRow label="Discount" value={orderDetails.discount} />}
+          {orderDetails?.tax_rate && <TotalRow label="Tax Rate" type="percentage" value={orderDetails.tax_rate} />}
+          {orderDetails?.tax_amount && <TotalRow label="Tax Amount" value={orderDetails.tax_amount} />}
+          {orderDetails?.service_fee && <TotalRow label="Service Fee" value={orderDetails.service_fee} />}
+          {orderDetails?.service_fee_tax && <TotalRow label="Service Fee Tax" value={orderDetails.service_fee_tax} />}
           <View style={styles.divider} />
           <TotalRow label="Total" value={orderDetails?.total} isTotal />
         </View>
@@ -263,8 +263,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderColor: colors.border,
     borderWidth: 1,
-    borderradius: 12,
-  
+   borderRadius: 12,
   },
   sectionTitle: {
     marginBottom: 16,
@@ -286,7 +285,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderColor: colors.border,
     borderWidth: 1,
-    borderradius: 12,
+   borderRadius: 12,
   },
   verificationCode: {
     fontSize: 32,
@@ -325,7 +324,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderColor: colors.border,
     borderWidth: 1,
-    borderradius: 12,
+   borderRadius: 12,
   },
   promosContainer: {
     flexDirection: 'row',

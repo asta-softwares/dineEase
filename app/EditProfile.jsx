@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -8,6 +8,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import TopNav from '../Components/TopNav';
@@ -17,6 +18,7 @@ import { colors } from '../styles/colors';
 import { layout } from '../styles/layout';
 import { typography } from '../styles/typography';
 import authService from '../api/services/authService';
+import * as Location from 'expo-location';
 
 const EditProfile = ({ route }) => {
   const navigation = useNavigation();
@@ -36,6 +38,32 @@ const EditProfile = ({ route }) => {
     new_password: '',
     confirm_password: '',
   });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert(
+            'Permission Denied',
+            'Please grant location permissions to update your address coordinates.'
+          );
+          return;
+        }
+
+        const location = await Location.getCurrentPositionAsync({});
+        setFormData(prev => ({
+          ...prev,
+          profile: {
+            ...prev.profile,
+            coordinates: [location.coords.longitude, location.coords.latitude],
+          },
+        }));
+      } catch (error) {
+        console.error('Error getting location:', error);
+      }
+    })();
+  }, []);
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -62,6 +90,28 @@ const EditProfile = ({ route }) => {
   const handleSubmit = async () => {
     try {
       setLoading(true);
+
+      // Validate required fields
+      const requiredFields = {
+        'First Name': formData.first_name,
+        'Last Name': formData.last_name,
+        'Email': formData.email,
+        'Street Address': formData.profile.address,
+        'City': formData.profile.city,
+        'Province': formData.profile.province
+      };
+
+      const emptyFields = Object.entries(requiredFields)
+        .filter(([_, value]) => !value || value.trim() === '')
+        .map(([field]) => field);
+
+      if (emptyFields.length > 0) {
+        Alert.alert(
+          'Required Fields',
+          `Please fill in the following required fields:\n${emptyFields.join('\n')}`,
+        );
+        return;
+      }
 
       // Validate passwords if attempting to change
       if (formData.new_password || formData.confirm_password || formData.current_password) {
@@ -126,7 +176,9 @@ const EditProfile = ({ route }) => {
           <Text style={[typography.bodyLarge, styles.sectionTitle]}>Personal Information</Text>
           <View style={styles.section}>
             <View style={styles.inputGroup}>
-              <Text style={[typography.labelMedium, styles.label]}>First Name</Text>
+              <Text style={[typography.labelMedium, styles.label]}>
+                First Name <Text style={styles.required}>*</Text>
+              </Text>
               <TextInput
                 style={styles.input}
                 value={formData.first_name}
@@ -137,7 +189,9 @@ const EditProfile = ({ route }) => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[typography.labelMedium, styles.label]}>Last Name</Text>
+              <Text style={[typography.labelMedium, styles.label]}>
+                Last Name <Text style={styles.required}>*</Text>
+              </Text>
               <TextInput
                 style={styles.input}
                 value={formData.last_name}
@@ -148,7 +202,9 @@ const EditProfile = ({ route }) => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[typography.labelMedium, styles.label]}>Email</Text>
+              <Text style={[typography.labelMedium, styles.label]}>
+                Email <Text style={styles.required}>*</Text>
+              </Text>
               <TextInput
                 style={styles.input}
                 value={formData.email}
@@ -164,7 +220,9 @@ const EditProfile = ({ route }) => {
           <Text style={[typography.bodyLarge, styles.sectionTitle]}>Address</Text>
           <View style={styles.section}>
             <View style={styles.inputGroup}>
-              <Text style={[typography.labelMedium, styles.label]}>Street Address</Text>
+              <Text style={[typography.labelMedium, styles.label]}>
+                Street Address <Text style={styles.required}>*</Text>
+              </Text>
               <TextInput
                 style={styles.input}
                 value={formData.profile.address}
@@ -175,7 +233,9 @@ const EditProfile = ({ route }) => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[typography.labelMedium, styles.label]}>City</Text>
+              <Text style={[typography.labelMedium, styles.label]}>
+                City <Text style={styles.required}>*</Text>
+              </Text>
               <TextInput
                 style={styles.input}
                 value={formData.profile.city}
@@ -186,7 +246,9 @@ const EditProfile = ({ route }) => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={[typography.labelMedium, styles.label]}>Province</Text>
+              <Text style={[typography.labelMedium, styles.label]}>
+                Province <Text style={styles.required}>*</Text>
+              </Text>
               <TextInput
                 style={styles.input}
                 value={formData.profile.province}
@@ -299,6 +361,9 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginBottom: layout.spacing.sm,
+  },
+  required: {
+    color: colors.error,
   },
 });
 

@@ -30,6 +30,8 @@ import { layout } from '../styles/layout';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { restaurantService } from '../api/services/restaurantService';
 import { useUserStore } from '../stores/userStore';
+import * as Location from 'expo-location';
+import authService from "../api/services/authService";
 
 export default function HomeScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
@@ -50,6 +52,7 @@ export default function HomeScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const { user } = useUserStore();
+  const [locationPermission, setLocationPermission] = useState(null);
 
   const searchHeight = scrollY.interpolate({
     inputRange: [0, 100],
@@ -229,6 +232,41 @@ export default function HomeScreen({ navigation }) {
 
     return () => backHandler.remove();
   }, [navigation]);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      setLocationPermission(status);
+
+      if (status !== 'granted') {
+        console.log('Location permission denied');
+        return;
+      }
+
+      // Start location updates
+      const locationInterval = setInterval(async () => {
+        try {
+          const location = await Location.getCurrentPositionAsync({});
+          const coordinates = [location.coords.longitude, location.coords.latitude];
+          await authService.updateCoordinates(coordinates);
+        } catch (error) {
+          console.error('Error updating location:', error);
+        }
+      }, 60000); // Update every minute
+
+      // Initial location update
+      try {
+        const location = await Location.getCurrentPositionAsync({});
+        const coordinates = [location.coords.longitude, location.coords.latitude];
+        await authService.updateCoordinates(coordinates);
+      } catch (error) {
+        console.error('Error getting initial location:', error);
+      }
+
+      // Cleanup interval on component unmount
+      return () => clearInterval(locationInterval);
+    })();
+  }, []);
 
   if (!fontsLoaded) {
     return null;

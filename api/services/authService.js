@@ -242,6 +242,25 @@ const authService = {
     }
   },
 
+  updateCoordinates: async (coordinates) => {
+    try {
+      const authToken = useUserStore.getState().authToken;
+      const response = await apiClient.patch('/update-user/', {
+        profile: {
+          coordinates
+        }
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating coordinates:', error);
+    }
+  },
+
   verifyEmail: async (email, code) => {
     try {
       const response = await apiClient.post('/verify-code/', {
@@ -271,7 +290,7 @@ const authService = {
       });
 
       // Logout from server
-      const response = await apiClient.post('/logout/', {}, {
+      const response = await apiClient.post('/token/logout/', {}, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${authToken}`,
