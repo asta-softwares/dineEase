@@ -259,14 +259,13 @@ export default function DetailScreen({ route, navigation }) {
                         key={promo.id}
                         style={styles.promoCard}
                       >
+                        <View style={styles.promoIconBackground}>
+                          <Text style={[styles.backgroundIconText, { opacity: 0.15 }]}>
+                            {promo.discount_type === 'percentage' ? '%' : '$'}
+                          </Text>
+                        </View>
                         <View style={styles.promoContent}>
                           <View style={styles.discountContainer}>
-                            <Ionicons
-                              name={promo.discount_type === 'percentage' ? 'pricetag' : 'cash-outline'}
-                              size={20}
-                              color={colors.success}
-                              style={styles.discountIcon}
-                            />
                             <Text style={styles.discountText}>
                               {promo.discount_type === 'percentage' 
                                 ? `${promo.discount}% OFF`
@@ -526,39 +525,49 @@ const styles = StyleSheet.create({
     width: 20,
   },
   promoCard: {
-    width: 200,
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 16,
     marginRight: 12,
-    borderRadius: 8,
+    elevation: 2,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    position: 'relative',
     overflow: 'hidden',
-    backgroundColor: colors.successLight,
+    borderColor: colors.border,
     borderWidth: 1,
-    borderColor: colors.success,
+    width: 200,
+    minHeight: 120,
+  },
+  promoIconBackground: {
+    position: 'absolute',
+    bottom: -25,
+    right: -25,
+    zIndex: 0,
+    transform: [{ rotate: '-10deg' }],
   },
   promoContent: {
-    padding: 16,
+    zIndex: 1,
+    alignItems: 'flex-start',
+    width: '85%',
   },
-  discountContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  backgroundIconText: {
+    fontSize: 120,
+    fontWeight: 'bold',
+    color: colors.success,
   },
-  discountIcon: {
+  promoIcon: {
     marginRight: 6,
   },
   discountText: {
-    color: colors.black,
+    color: colors.success,
     fontFamily: 'PlusJakartaSans-Bold',
     fontSize: 18,
   },
   promoTitle: {
-    color: colors.secondary,
-    fontFamily: 'PlusJakartaSans',
-    fontSize: 12,
-
-  },
-  promoDescription: {
-    color: colors.text.white,
-    fontFamily: 'PlusJakartaSans-Medium',
-    fontSize: 14,
-    opacity: 0.9,
+    ...typography.bodyMedium,
+    color: colors.text.secondary,
   },
 });
