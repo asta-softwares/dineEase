@@ -152,14 +152,14 @@ export default function LoginScreen({ navigation }) {
                   />
                 </View>
 
-                <TouchableOpacity 
+                {/* <TouchableOpacity 
                   style={styles.forgotPassword}
                   onPress={() => navigation.navigate('ForgotPassword')}
                 >
                   <Text style={[typography.labelMedium, { color: colors.text.primary }]}>
                     Forgot Password?
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <LargeButton
                   title={loading ? "Signing In..." : "Sign In"}

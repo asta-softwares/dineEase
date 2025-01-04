@@ -235,6 +235,13 @@ export default function HomeScreen({ navigation }) {
 
   useEffect(() => {
     (async () => {
+      // Check if user is authenticated
+      const authToken = useUserStore.getState().authToken;
+      if (!authToken) {
+        console.log('User not authenticated, skipping location updates');
+        return;
+      }
+
       const { status } = await Location.requestForegroundPermissionsAsync();
       setLocationPermission(status);
 
@@ -245,6 +252,14 @@ export default function HomeScreen({ navigation }) {
 
       // Start location updates
       const locationInterval = setInterval(async () => {
+        // Check authentication status before each update
+        const currentAuthToken = useUserStore.getState().authToken;
+        if (!currentAuthToken) {
+          console.log('User no longer authenticated, stopping location updates');
+          clearInterval(locationInterval);
+          return;
+        }
+
         try {
           const location = await Location.getCurrentPositionAsync({});
           const coordinates = [location.coords.longitude, location.coords.latitude];
@@ -266,7 +281,7 @@ export default function HomeScreen({ navigation }) {
       // Cleanup interval on component unmount
       return () => clearInterval(locationInterval);
     })();
-  }, []);
+  }, [useUserStore.getState().authToken]); // Re-run when auth status changes
 
   if (!fontsLoaded) {
     return null;
