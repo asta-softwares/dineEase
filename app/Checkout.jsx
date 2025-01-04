@@ -1,33 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Alert, Platform, ActivityIndicator, TextInput } from 'react-native';
+import { 
+  View, 
+  StyleSheet, 
+  Text, 
+  ScrollView, 
+  Platform, 
+  Alert, 
+  ActivityIndicator, 
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import { useCart } from '../context/CartContext';
 import { useUserStore } from '../stores/userStore';
 import TopNav from '../Components/TopNav';
-import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { restaurantService } from '../api/services/restaurantService';
 import Footer from './Layout/Footer';
 import LargeButton from '../Components/Buttons/LargeButton';
 import { useStripe } from '@stripe/stripe-react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const CartItem = ({ item, quantity }) => {
-  const { updateQuantity } = useCart();
+const CartItem = ({ item, quantity }) => (
+  <View style={styles.orderItem}>
+    <View style={styles.itemInfo}>
+      <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>
+        {quantity}x {item.name}
+      </Text>
+      <Text style={[typography.bodySmall, { color: colors.text.secondary }]}>
+        ${item.cost} each
+      </Text>
+    </View>
+    <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>
+      ${(item.cost * quantity).toFixed(2)}
+    </Text>
+  </View>
+);
 
-  return (
-    <View style={styles.cartItem}>
-      <View style={styles.itemInfo}>
-        <Text style={[typography.labelLarge, { color: colors.text.primary }]}>
-          {quantity} x {item.name}
+const TotalRow = ({ label, value, isTotal, type }) => {
+  if (type === 'discount') {
+    return (
+      <View style={styles.totalRow}>
+        <Text style={[typography.bodyLarge, { color: colors.text.secondary }]}>
+          {label}
         </Text>
-        <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
-          ${item.cost} each
+        <Text style={[typography.bodyLarge, { color: colors.success }]}>
+          -${parseFloat(value || 0).toFixed(2)}
         </Text>
       </View>
-      <Text style={[typography.labelLarge, { color: colors.text.primary }]}>
-        ${(item.cost * quantity).toFixed(2)}
+    );
+  }
+
+  return (
+    <View style={styles.totalRow}>
+      <Text style={[typography.bodyLarge, { color: colors.text.secondary }]}>
+        {label}
       </Text>
+      {type === 'percentage' ? (
+        <Text style={[typography.bodyLarge, { color: colors.text.black }]}>
+          {value}%
+        </Text>
+      ) : (
+        <Text style={[typography.bodyLarge, isTotal && { color: colors.text.primary }]}>
+          ${parseFloat(value || 0).toFixed(2)}
+        </Text>
+      )}
     </View>
   );
 };
@@ -44,7 +82,6 @@ const CheckoutScreen = ({ navigation }) => {
   const [availablePromos, setAvailablePromos] = useState([]);
   const [selectedPromos, setSelectedPromos] = useState([]);
   const [showPromoDropdown, setShowPromoDropdown] = useState(false);
-  const scrollY = useSharedValue(0);
   const { initPaymentSheet, presentPaymentSheet, retrievePaymentIntent } = useStripe();
 
   const subtotal = getTotalCost() || 0;
@@ -237,205 +274,169 @@ const CheckoutScreen = ({ navigation }) => {
     }
   };
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
   if (!cart.restaurantId || Object.keys(cart.items).length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <TopNav 
           handleGoBack={() => navigation.goBack()} 
           title="Checkout" 
-          variant="solid" 
-          scrollY={scrollY}
+          variant="solid"
+          showBack={true}
         />
         <View style={styles.emptyCart}>
           <Text style={[typography.h3, { color: colors.text.secondary }]}>
             Your cart is empty
           </Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <TopNav 
         handleGoBack={() => navigation.goBack()} 
         title="Checkout" 
-        variant="solid" 
-        scrollY={scrollY}
+        variant="solid"
+        showBack={true}
       />
       
-      <Animated.ScrollView 
+      <ScrollView 
         style={styles.content}
-        contentContainerStyle={styles.scrollContent}
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={true}
+        contentContainerStyle={[styles.contentContainer, styles.contentPadding]}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.contentPadding}>
-          <View style={styles.section}>
-            <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
-              Restaurant Information
-            </Text>
-            
-            {restaurant && (
-              <View style={styles.restaurantCard}>
-                <Image
-                  source={{ uri: restaurant.image }}
-                  style={styles.restaurantImage}
-                />
-                <View style={styles.restaurantInfo}>
-                  <View style={styles.restaurantTextContainer}>
-                    <Text style={[typography.h3, { color: colors.text.primary }]}>
-                      {restaurant.name}
-                    </Text>
-                    <Text style={[typography.bodyMedium, { color: colors.text.secondary, marginTop: 4 }]}>
-                      {restaurant.location}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            )}
-          </View>
-
-          <View style={styles.promoSection}>
-            <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
-              Promos
-            </Text>
-            
-            {/* Selected Promos Tags */}
-            {selectedPromos.length > 0 && (
-              <View style={styles.promoList}>
-                {selectedPromos.map((promo) => (
-                  <View key={promo.id} style={styles.promoTag}>
-                    <Text style={[typography.bodyMedium, { color: colors.primary }]}>
-                      {promo.name} ({promo.discount_type === 'percentage' ? `${promo.discount}%` : `$${promo.discount}`} off)
-                    </Text>
-                    <TouchableOpacity 
-                      onPress={() => handlePromoSelect(promo)}
-                      style={styles.removePromo}
-                    >
-                      <Ionicons name="close-circle" size={20} color={colors.primary} />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {/* Promo Selector Dropdown */}
-            <TouchableOpacity
-              style={styles.promoSelector}
-              onPress={() => setShowPromoDropdown(!showPromoDropdown)}
-            >
-              <Text style={typography.bodyMedium}>
-                Select a promo
+        {/* Restaurant Information */}
+        <View style={styles.section}>
+          <View style={styles.restaurantHeader}>
+            <Ionicons name="location" size={24} color={colors.text.primary} />
+            <View style={styles.restaurantInfo}>
+              <Text style={[typography.titleMedium, { color: colors.text.primary }]}>
+                {restaurant?.name}
               </Text>
-              <Ionicons
-                name={showPromoDropdown ? 'chevron-up' : 'chevron-down'}
-                size={24}
-                color={colors.text.secondary}
-              />
-            </TouchableOpacity>
-
-            {showPromoDropdown && (
-              <View style={styles.promoDropdown}>
-                {availablePromos.length > 0 ? (
-                  availablePromos
-                    .filter(promo => !selectedPromos.some(p => p.id === promo.id))
-                    .map((promo) => (
-                      <TouchableOpacity
-                        key={promo.id}
-                        style={styles.promoOption}
-                        onPress={() => {
-                          handlePromoSelect(promo);
-                          setShowPromoDropdown(false);
-                        }}
-                      >
-                        <Text style={typography.bodyMedium}>
-                          {promo.name} ({promo.discount_type === 'percentage' ? `${promo.discount}%` : `$${promo.discount}`} off)
-                        </Text>
-                      </TouchableOpacity>
-                    ))
-                ) : (
-                  <Text style={[typography.bodyMedium, { textAlign: 'center', padding: 16 }]}>
-                    No promos available
-                  </Text>
-                )}
-              </View>
-            )}
-          </View>
-
-          <View style={styles.section}>
-            <Text style={[typography.h3, { color: colors.text.primary, marginBottom: 16 }]}>
-              Order Details
-            </Text>
-            
-            <Text style={[typography.bodyMedium, { color: colors.text.secondary, marginBottom: 16 }]}>
-              Payment will be linked to: {user?.email}
-            </Text>
-            
-
-            <View style={styles.detailsList}>
-              {Object.entries(cart.items).map(([id, { item, quantity }]) => (
-                <CartItem key={id} item={item} quantity={quantity} />
-              ))}
-              
-              {calculating ? (
-                <View style={styles.detailItem}>
-                  <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Calculating total...</Text>
-                </View>
-              ) : orderTotals && (
-                <>
-                  <View style={styles.detailItem}>
-                    <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Subtotal</Text>
-                    <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${orderTotals.order_total.toFixed(2)}</Text>
-                  </View>
-
-                  {orderTotals.tax_amount > 0 && (
-                    <View style={styles.detailItem}>
-                      <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Tax ({(orderTotals.tax_rate).toFixed(1)}%)</Text>
-                      <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${orderTotals.tax_amount.toFixed(2)}</Text>
-                    </View>
-                  )}
-
-                  {orderTotals.discount > 0 && (
-                    <View style={styles.detailItem}>
-                      <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Discount</Text>
-                      <Text style={[typography.bodyLarge, { color: colors.success }]}>-${orderTotals.discount.toFixed(2)}</Text>
-                    </View>
-                  )}
-
-                  {orderTotals.service_fee > 0 && (
-                    <View style={styles.detailItem}>
-                      <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Service Fee</Text>
-                      <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${orderTotals.service_fee.toFixed(2)}</Text>
-                    </View>
-                  )}
-
-                  {orderTotals.service_fee_tax > 0 && (
-                    <View style={styles.detailItem}>
-                      <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>Service Fee Tax</Text>
-                      <Text style={[typography.bodyLarge, { color: colors.text.primary }]}>${orderTotals.service_fee_tax.toFixed(2)}</Text>
-                    </View>
-                  )}
-                  
-                  <View style={[styles.detailItem, styles.totalItem]}>
-                    <Text style={[typography.h3, { color: colors.text.primary }]}>Total Price</Text>
-                    <Text style={[typography.h3, { color: colors.text.primary }]}>${orderTotals.total.toFixed(2)}</Text>
-                  </View>
-                </>
-              )}
+              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
+                {restaurant?.location}
+              </Text>
             </View>
           </View>
-
         </View>
-      </Animated.ScrollView>
-      
+
+        {/* Coupon Section */}
+        <View style={styles.section}>
+          <Text style={[typography.titleMedium, styles.sectionTitle]}>Promo Codes</Text>
+          
+          {/* Selected Promos */}
+          {selectedPromos.length > 0 && (
+            <View style={styles.promosContainer}>
+              {selectedPromos.map((promo) => (
+                <View key={promo.id} style={styles.promoTag}>
+                  <Text style={[typography.bodySmall, styles.promoText]}>
+                    {promo.name} ({promo.discount_type === 'percentage' ? `${promo.discount}%` : `$${promo.discount}`} off)
+                  </Text>
+                  <TouchableOpacity 
+                    onPress={() => handlePromoSelect(promo)}
+                    style={styles.removePromo}
+                  >
+                    <Ionicons name="close-circle" size={20} color={colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Promo Selector */}
+          <TouchableOpacity
+            style={styles.promoSelector}
+            onPress={() => setShowPromoDropdown(!showPromoDropdown)}
+          >
+            <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
+              Select a promo code
+            </Text>
+            <Ionicons
+              name={showPromoDropdown ? 'chevron-up' : 'chevron-down'}
+              size={24}
+              color={colors.text.secondary}
+            />
+          </TouchableOpacity>
+
+          {/* Promo Dropdown */}
+          {showPromoDropdown && (
+            <View style={styles.promoDropdown}>
+              {availablePromos.length > 0 ? (
+                availablePromos
+                  .filter(promo => !selectedPromos.some(p => p.id === promo.id))
+                  .map((promo) => (
+                    <TouchableOpacity
+                      key={promo.id}
+                      style={styles.promoOption}
+                      onPress={() => {
+                        handlePromoSelect(promo);
+                        setShowPromoDropdown(false);
+                      }}
+                    >
+                      <Text style={[typography.bodyMedium, { color: colors.text.primary }]}>
+                        {promo.name} ({promo.discount_type === 'percentage' ? `${promo.discount}%` : `$${promo.discount}`} off)
+                      </Text>
+                    </TouchableOpacity>
+                  ))
+              ) : (
+                <Text style={[typography.bodyMedium, styles.noPromos]}>
+                  No promos available
+                </Text>
+              )}
+            </View>
+          )}
+        </View>
+
+        {/* Order Summary */}
+        <View style={styles.section}>
+          <Text style={[typography.titleMedium, styles.sectionTitle]}>Order Summary</Text>
+          {Object.entries(cart.items).map(([id, { item, quantity }]) => (
+            <CartItem key={id} item={item} quantity={quantity} />
+          ))}
+          
+          <View style={styles.divider} />
+          
+          {calculating ? (
+            <ActivityIndicator size="small" color={colors.primary} style={{ marginVertical: 16 }} />
+          ) : orderTotals && (
+            <>
+              <TotalRow label="Subtotal" value={orderTotals.order_total} />
+              {orderTotals.discount > 0 && (
+                <TotalRow label="Discount" value={orderTotals.discount} type="discount" />
+              )}
+               {orderTotals.tax_rate > 0 && (
+              <TotalRow label="Tax Rate" value={orderTotals.tax_rate} type="percentage" />
+              )}
+             {orderTotals.tax_amount > 0 && (
+              <TotalRow label="Tax Amount" value={orderTotals.tax_amount} />
+              )}
+              {orderTotals.service_fee > 0 && (
+              <TotalRow label="Service Fee" value={orderTotals.service_fee} />
+              )}
+              {orderTotals.service_fee_tax > 0 && (
+              <TotalRow label="Service Fee Tax" value={orderTotals.service_fee_tax} />
+              )}
+              <View style={styles.divider} />
+              <TotalRow label="Total" value={orderTotals.total} isTotal />
+            </>
+          )}
+        </View>
+
+        {/* Payment Information */}
+        <View style={styles.section}>
+          <Text style={[typography.titleMedium, styles.sectionTitle]}>Payment Information</Text>
+          <View style={styles.paymentInfo}>
+            <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
+              Payment will be processed for:
+            </Text>
+            <Text style={[typography.bodyLarge, { color: colors.text.primary, marginTop: 4 }]}>
+              {user?.email}
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+
       <Footer>
         <LargeButton 
           title="Pay Now"
@@ -445,127 +446,128 @@ const CheckoutScreen = ({ navigation }) => {
           disabled={loading || calculating || isProcessing}
         />
       </Footer>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
   },
   content: {
     flex: 1,
   },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-    paddingTop: 0,
-    paddingBottom: 100,
+  contentContainer: {
+    padding: 16,
+    paddingBottom: 120,
   },
   contentPadding: {
-    paddingTop: Platform.OS === 'ios' ? 70 : 120,
+    paddingTop: Platform.OS === 'ios' ? 140 : 140,
   },
   section: {
-    marginBottom: 12,
-  },
-  emptyCart: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  restaurantCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    overflow: 'hidden',
+    backgroundColor: colors.white,
     padding: 16,
-  },
-  restaurantImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
     marginBottom: 16,
+    borderRadius: 12,
+  },
+  sectionTitle: {
+    marginBottom: 16,
+    color: colors.text.primary,
+  },
+  restaurantHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
   },
   restaurantInfo: {
     flex: 1,
   },
-  restaurantTextContainer: {
-    gap: 4,
+  orderItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
   },
-  detailsList: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
+  itemInfo: {
+    flex: 1,
+    marginRight: 16,
   },
-  cartItem: {
+  divider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginVertical: 16,
+  },
+  totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-    paddingVertical: 8,
-  },
-  detailItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  totalItem: {
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  promoSection: {
-    marginTop: 24,
-    marginBottom: 32,
-  },
-  promoList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 16,
-  },
-  promoTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primary + '10',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  removePromo: {
-    marginLeft: 4,
+    marginBottom: 8,
   },
   promoSelector: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: colors.white,
-    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: colors.border,
+    borderRadius: 8,
+    marginTop: 12,
   },
   promoDropdown: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 16,
+    marginTop: 8,
     borderWidth: 1,
     borderColor: colors.border,
-    marginTop: 8,
+    borderRadius: 8,
+    backgroundColor: colors.white,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   promoOption: {
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
+  promosContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  promoTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  promoText: {
+    color: colors.primary,
+    marginRight: 4,
+  },
+  removePromo: {
+    marginLeft: 4,
+  },
   noPromos: {
     padding: 16,
+    textAlign: 'center',
+    color: colors.text.secondary,
+  },
+  paymentInfo: {
+    backgroundColor: colors.background + '40',
+    padding: 16,
+    borderRadius: 8,
+  },
+  emptyCart: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

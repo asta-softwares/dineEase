@@ -169,7 +169,7 @@ const OrderDetailScreen = ({ route, navigation }) => {
                 {restaurant?.name}
               </Text>
               <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
-                {restaurant?.address}
+                {restaurant?.location}
               </Text>
             </View>
             <Badge 
