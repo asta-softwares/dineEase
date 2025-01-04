@@ -29,7 +29,8 @@ import OrderDetailScreen from './app/OrderDetail';
 import OrdersScreen from './app/Orders';
 import { useUserStore } from './stores/userStore';
 import { STRIPE_PUBLISHABLE_KEY, MERCHANT_IDENTIFIER } from '@env';
-import { setupNotificationListeners } from './utils/notificationService';
+import { setupNotificationListeners, registerForPushNotificationsAsync } from './utils/notificationService';
+import authService from './api/services/authService';
 
 // Initialize reanimated
 import 'react-native-reanimated';
@@ -49,7 +50,7 @@ Notifications.setNotificationHandler({
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const initialize = useUserStore(state => state.initialize);
+  const initializeAuth = useUserStore(state => state.initializeAuth);
   const clearUser = useUserStore(state => state.clearUser);
   const user = useUserStore(state => state.user);
 
@@ -57,7 +58,7 @@ const App = () => {
     const initApp = async () => {
       try {
         // Initialize user state from storage
-        await initialize();
+        await initializeAuth();
         
         // Register for push notifications if user is logged in
         if (useUserStore.getState().user) {
@@ -68,6 +69,25 @@ const App = () => {
             });
           }
         }
+
+        // Setup notification listeners
+        const subscription = setupNotificationListeners(
+          (notification) => {
+            // Handle received notification while app is foregrounded
+            console.log('Notification received:', notification);
+          },
+          (response) => {
+            // Handle notification response (user tapped notification)
+            console.log('Notification response:', response);
+          }
+        );
+
+        return () => {
+          // Cleanup notification subscription when component unmounts
+          if (subscription) {
+            subscription.remove();
+          }
+        };
       } catch (error) {
         console.error('Error initializing app:', error);
       } finally {
@@ -76,7 +96,7 @@ const App = () => {
     };
 
     initApp();
-  }, [initialize]);
+  }, [initializeAuth]);
 
   useEffect(() => {
     const handleLogout = async () => {
