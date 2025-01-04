@@ -123,9 +123,8 @@ const EditProfile = ({ route }) => {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          <Text style={[typography.bodyLarge, styles.sectionTitle]}>Personal Information</Text>
           <View style={styles.section}>
-            <Text style={[typography.bodyLarge, styles.sectionTitle]}>Personal Information</Text>
-            
             <View style={styles.inputGroup}>
               <Text style={[typography.labelMedium, styles.label]}>First Name</Text>
               <TextInput
@@ -162,9 +161,8 @@ const EditProfile = ({ route }) => {
             </View>
           </View>
 
+          <Text style={[typography.bodyLarge, styles.sectionTitle]}>Address</Text>
           <View style={styles.section}>
-            <Text style={[typography.bodyLarge, styles.sectionTitle]}>Address</Text>
-            
             <View style={styles.inputGroup}>
               <Text style={[typography.labelMedium, styles.label]}>Street Address</Text>
               <TextInput
@@ -199,9 +197,8 @@ const EditProfile = ({ route }) => {
             </View>
           </View>
 
+          <Text style={[typography.bodyLarge, styles.sectionTitle]}>Change Password</Text>
           <View style={styles.section}>
-            <Text style={[typography.bodyLarge, styles.sectionTitle]}>Change Password</Text>
-            
             <View style={styles.inputGroup}>
               <Text style={[typography.labelMedium, styles.label]}>Current Password</Text>
               <TextInput
@@ -268,15 +265,19 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   contentPadding: {
-    paddingTop: Platform.OS === 'ios' ? 120 : 120,
+    paddingTop: Platform.OS === 'ios' ? 140 : 120,
   },
   section: {
-    paddingVertical: layout.spacing.sm,
-    marginBottom: layout.spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   sectionTitle: {
     color: colors.text.black,
-    marginBottom: layout.spacing.md,
+    marginBottom: 12,
   },
   inputGroup: {
     marginBottom: layout.spacing.md,
