@@ -283,6 +283,7 @@ const authService = {
   logout: async () => {
     try {
       const authToken = useUserStore.getState().authToken;
+      const refreshToken = useUserStore.getState().refreshToken;
       
       // Clear notification token first
       await authService.updateUser({
@@ -290,7 +291,9 @@ const authService = {
       });
 
       // Logout from server
-      const response = await apiClient.post('/token/logout/', {}, {
+      const response = await apiClient.post('/token/logout/', {
+        refresh: refreshToken
+      }, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${authToken}`,
