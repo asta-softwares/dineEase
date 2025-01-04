@@ -14,7 +14,8 @@ const RestaurantCard = ({
   imageUrl, 
   price,
   promos = [], 
-  style = {} 
+  style = {},
+  isOpen = true 
 }) => {
   const firstPromo = promos?.[0];
   const additionalPromos = promos?.length > 1 ? promos.length - 1 : 0;
@@ -31,7 +32,11 @@ const RestaurantCard = ({
   };
 
   return (
-    <View style={[styles.cardWrapper, style]}>
+    <View style={[
+      styles.cardWrapper, 
+      style, 
+      !isOpen && styles.closedRestaurant
+    ]}>
       <View style={styles.restaurantCard}>
         <View style={styles.imageContainer}>
           <Image source={{ uri: imageUrl }} style={styles.restaurantImage} />
@@ -99,13 +104,17 @@ RestaurantCard.propTypes = {
   imageUrl: PropTypes.string.isRequired,
   price: PropTypes.string,
   promos: PropTypes.array,
-  style: PropTypes.object
+  style: PropTypes.object,
+  isOpen: PropTypes.bool
 };
 
 const styles = StyleSheet.create({
   cardWrapper: {
     width: '100%',
     marginBottom: layout.spacing.md,
+  },
+  closedRestaurant: {
+    opacity: 0.5
   },
   restaurantCard: {
     backgroundColor: colors.background,

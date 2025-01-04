@@ -417,7 +417,8 @@ export default function HomeScreen({ navigation }) {
                 restaurants.map((restaurant) => (
                   <TouchableOpacity 
                     key={restaurant.id} 
-                    onPress={() => handleDetail(restaurant)}
+                    onPress={() => restaurant.is_open && handleDetail(restaurant)}
+                    disabled={!restaurant.is_open}
                     style={styles.restaurantCardWrapper}
                   >
                     <RestaurantCard
@@ -426,6 +427,7 @@ export default function HomeScreen({ navigation }) {
                       address={restaurant.location}
                       imageUrl={restaurant.image}
                       promos={restaurant.promos}
+                      isOpen={restaurant.is_open}
                     />
                   </TouchableOpacity>
                 ))

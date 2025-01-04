@@ -155,6 +155,13 @@ const CheckoutScreen = ({ route, navigation }) => {
       setIsProcessing(true);
       setLoading(true);
 
+      // Check if restaurant is still open
+      const currentRestaurant = await restaurantService.getRestaurantById(cart.restaurantId);
+      if (!currentRestaurant.is_open) {
+        Alert.alert('Restaurant Closed', 'This restaurant is currently closed and cannot accept orders.');
+        return;
+      }
+
       if (subtotal <= 0) {
         Alert.alert('Error', 'Your cart is empty');
         return;
@@ -447,12 +454,17 @@ const CheckoutScreen = ({ route, navigation }) => {
       </ScrollView>
 
       <Footer>
+        {!restaurant?.is_open && (
+          <Text style={[typography.bodyMedium, { color: colors.error, textAlign: 'center', marginBottom: 8 }]}>
+            This restaurant is currently closed
+          </Text>
+        )}
         <LargeButton 
           title="Pay Now"
           price={orderTotals ? `$${orderTotals.total.toFixed(2)}` : `$${subtotal.toFixed(2)}`}
           onPress={handlePayment}
           loading={loading || calculating || isProcessing}
-          disabled={loading || calculating || isProcessing}
+          disabled={loading || calculating || isProcessing || !restaurant?.is_open}
         />
       </Footer>
     </View>
