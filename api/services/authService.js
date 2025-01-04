@@ -18,7 +18,32 @@ const authService = {
       useUserStore.getState().setTokens(access, refresh);
       return response.data;
     } catch (error) {
-      throw error;
+      // Log the complete error object for debugging
+      console.log('Auth service error:', {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: error?.message,
+        originalError: error
+      });
+      
+      // Handle 401 Unauthorized
+      if (error?.response?.status === 401) {
+        const errorMessage = error?.response?.data?.detail || 'Invalid credentials';
+        throw new Error(errorMessage);
+      }
+      
+      // Handle network errors
+      if (error?.message === 'Network Error') {
+        throw new Error('No response from server. Please check your internet connection.');
+      }
+      
+      // Handle other errors with detail
+      if (error?.response?.data?.detail) {
+        throw new Error(error.response.data.detail);
+      }
+      
+      // Fallback error
+      throw new Error(error?.message || 'An unexpected error occurred. Please try again later.');
     }
   },
 
@@ -45,20 +70,32 @@ const authService = {
         user: userData
       };
     } catch (error) {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        if (error.response.status === 401) {
-          throw new Error('Invalid email or password');
-        } else if (error.response.data && error.response.data.detail) {
-          throw new Error(error.response.data.detail);
-        }
-      } else if (error.request) {
-        // The request was made but no response was received
+      // Log the complete error object for debugging
+      console.log('Auth service error:', {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: error?.message,
+        originalError: error
+      });
+      
+      // Handle 401 Unauthorized
+      if (error?.response?.status === 401) {
+        const errorMessage = 'Invalid credentials';
+        throw new Error(errorMessage);
+      }
+      
+      // Handle network errors
+      if (error?.message === 'Network Error') {
         throw new Error('No response from server. Please check your internet connection.');
       }
-      // Something happened in setting up the request that triggered an Error
-      throw new Error('An unexpected error occurred. Please try again later.');
+      
+      // Handle other errors with detail
+      if (error?.response?.data?.detail) {
+        throw new Error(error.response.data.detail);
+      }
+      
+      // Fallback error
+      throw new Error(error?.message || 'An unexpected error occurred. Please try again later.');
     }
   },
 
@@ -74,7 +111,32 @@ const authService = {
       useUserStore.getState().setUser(userData);
       return userData;
     } catch (error) {
-      throw error;
+      // Log the complete error object for debugging
+      console.log('Auth service error:', {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: error?.message,
+        originalError: error
+      });
+      
+      // Handle 401 Unauthorized
+      if (error?.response?.status === 401) {
+        const errorMessage = error?.response?.data?.detail || 'Invalid credentials';
+        throw new Error(errorMessage);
+      }
+      
+      // Handle network errors
+      if (error?.message === 'Network Error') {
+        throw new Error('No response from server. Please check your internet connection.');
+      }
+      
+      // Handle other errors with detail
+      if (error?.response?.data?.detail) {
+        throw new Error(error.response.data.detail);
+      }
+      
+      // Fallback error
+      throw new Error(error?.message || 'An unexpected error occurred. Please try again later.');
     }
   },
 
@@ -91,7 +153,32 @@ const authService = {
       });
       return response.data;
     } catch (error) {
-      throw error;
+      // Log the complete error object for debugging
+      console.log('Auth service error:', {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: error?.message,
+        originalError: error
+      });
+      
+      // Handle 401 Unauthorized
+      if (error?.response?.status === 401) {
+        const errorMessage = error?.response?.data?.detail || 'Invalid credentials';
+        throw new Error(errorMessage);
+      }
+      
+      // Handle network errors
+      if (error?.message === 'Network Error') {
+        throw new Error('No response from server. Please check your internet connection.');
+      }
+      
+      // Handle other errors with detail
+      if (error?.response?.data?.detail) {
+        throw new Error(error.response.data.detail);
+      }
+      
+      // Fallback error
+      throw new Error(error?.message || 'An unexpected error occurred. Please try again later.');
     }
   },
 
@@ -117,7 +204,14 @@ const authService = {
 
       return response.data;
     } catch (error) {
-      console.error('Error logging out:', error);
+      // Log the complete error object for debugging
+      console.log('Auth service error:', {
+        status: error?.response?.status,
+        data: error?.response?.data,
+        message: error?.message,
+        originalError: error
+      });
+      
       // Still clear local data even if server logout fails
       await useUserStore.getState().clearUser();
       return { success: true };

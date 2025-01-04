@@ -83,9 +83,9 @@ apiClient.interceptors.response.use(
       processQueue(refreshError, null);
       // Clear tokens and user state
       await useUserStore.getState().clearUser();
-      // Emit an event instead of navigating
-      globalThis.dispatchEvent(new CustomEvent('tokenExpired'));
-      return Promise.reject(refreshError);
+      
+      // Pass through the original 401 error instead of the refresh error
+      return Promise.reject(error);
     } finally {
       isRefreshing = false;
     }

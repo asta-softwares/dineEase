@@ -59,12 +59,13 @@ export default function LoginScreen({ navigation }) {
       navigation.replace('Home'); // Replace login screen with home screen
     } catch (error) {
       console.error('Login error:', error);
+      console.log('Error response:', error.response);
+      console.log('Error response data:', error.response?.data);
+      console.log('Error response status:', error.response?.status);
       let errorMessage = 'An error occurred during login';
       
-      if (error.response?.status === 401) {
-        errorMessage = 'Invalid email or password';
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
+      if (error.message) {
+        errorMessage = error.message;
       }
       
       Alert.alert('Login Failed', errorMessage);
