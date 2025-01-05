@@ -60,7 +60,7 @@ export default function RegisterScreen({ navigation }) {
         [
           {
             text: 'OK',
-            onPress: () => navigation.replace('VerifyEmail')
+            onPress: () => navigation.replace('VerifyEmail', { email })
           }
         ]
       );
