@@ -132,7 +132,7 @@ const CheckoutScreen = ({ route, navigation }) => {
       try {
         const promos = await restaurantService.getOrderPromos(
           restaurantId,
-          orderTotals
+          orderTotals.total.toFixed(0)
         );
         setAvailablePromos(promos);
       } catch (error) {
@@ -140,7 +140,7 @@ const CheckoutScreen = ({ route, navigation }) => {
       }
     };
     fetchAvailablePromos();
-  }, [orderTotals, restaurantId]);
+  }, [orderTotals.total.toFixed(0), restaurantId]);
 
   const handlePromoSelect = (promo) => {
     if (selectedPromos.some(p => p.id === promo.id)) {
