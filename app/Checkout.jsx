@@ -140,7 +140,7 @@ const CheckoutScreen = ({ route, navigation }) => {
       }
     };
     fetchAvailablePromos();
-  }, [orderTotals.total.toFixed(0), restaurantId]);
+  }, [orderTotals, restaurantId]);
 
   const handlePromoSelect = (promo) => {
     if (selectedPromos.some(p => p.id === promo.id)) {
@@ -322,7 +322,6 @@ const CheckoutScreen = ({ route, navigation }) => {
         {/* Restaurant Information */}
         <View style={styles.section}>
           <View style={styles.restaurantHeader}>
-            <Ionicons name="location" size={24} color={colors.text.primary} />
             <View style={styles.restaurantInfo}>
               <Text style={[typography.titleMedium, { color: colors.text.primary }]}>
                 {restaurant?.name}
@@ -572,6 +571,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: colors.primary,
+    backgroundColor: colors.primary + '10',
   },
   promoText: {
     color: colors.primary,

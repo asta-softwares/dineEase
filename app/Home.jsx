@@ -55,27 +55,31 @@ export default function HomeScreen({ navigation }) {
   const [locationPermission, setLocationPermission] = useState(null);
 
   const searchHeight = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [50, 0],
-    extrapolate: 'clamp'
+    inputRange: [0, 50, 100],
+    outputRange: [50, 25, 0],
+    extrapolate: 'clamp',
+    useNativeDriver: true,
   });
 
   const searchOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [1, 0],
-    extrapolate: 'clamp'
+    inputRange: [0, 50, 100],
+    outputRange: [1, 0.5, 0],
+    extrapolate: 'clamp',
+    useNativeDriver: true,
   });
 
   const searchMargin = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [16, 0],
-    extrapolate: 'clamp'
+    inputRange: [0, 50, 100],
+    outputRange: [16, 8, 0],
+    extrapolate: 'clamp',
+    useNativeDriver: true,
   });
 
   const serviceTypeMargin = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [Platform.OS === 'ios' ? 120 : 70, 0],
+    inputRange: [0, 50, 100],
+    outputRange: [Platform.OS === 'ios' ? 120 : 70, Platform.OS === 'ios' ? 60 : 35, 0],
     extrapolate: 'clamp',
+    useNativeDriver: true,
   });
 
   const handleDetail = (restaurant) => {

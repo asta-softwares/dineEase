@@ -34,6 +34,19 @@ const getCardIcon = (brand) => {
   }
 };
 
+const getOrderTypeIcon = (type) => {
+  switch (type?.toLowerCase()) {
+    case 'dine_in':
+      return 'restaurant-outline';
+    case 'takeaway':
+      return 'bag-handle-outline';
+    case 'delivery':
+      return 'bicycle-outline';
+    default:
+      return 'restaurant-outline';
+  }
+};
+
 const OrderDetailScreen = ({ route, navigation }) => {
   const { order, restaurant, fromCheckout } = route.params;
   const [orderDetails, setOrderDetails] = useState(null);
@@ -163,19 +176,46 @@ const OrderDetailScreen = ({ route, navigation }) => {
         {/* Restaurant Information */}
         <View style={styles.section}>
           <View style={styles.restaurantHeader}>
-            <Ionicons name="location" size={24} color={colors.text.primary} />
-            <View style={styles.restaurantInfo}>
-              <Text style={[typography.titleMedium, { color: colors.text.primary }]}>
-                {restaurant?.name}
-              </Text>
-              <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
-                {restaurant?.location}
-              </Text>
+            <View style={styles.leftContent}>
+              <View style={styles.restaurantInfo}>
+                <View style={styles.nameAndType}>
+                  <View style={styles.nameContainer}>
+                    <Text style={[typography.titleMedium, { color: colors.text.primary }]}>
+                      {restaurant?.name}
+                    </Text>
+                  </View>
+                  <View style={styles.orderTypeContainer}>
+                    <Ionicons 
+                      name={getOrderTypeIcon(orderDetails?.order_type)} 
+                      size={18} 
+                      color={colors.text.primary}
+                    />
+                    <Text style={[typography.bodySmall, { color: colors.text.primary, marginLeft: 4 }]}>
+                      {orderDetails?.order_type?.replace('_', ' ').split(' ').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                      ).join(' ')}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={[typography.bodyMedium, { color: colors.text.secondary }]}>
+                  {restaurant?.location}
+                </Text>
+              </View>
             </View>
-            <Badge 
-              text={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-              type={order.status.toLowerCase()}
-            />
+            <View style={styles.rightContent}>
+              <Text style={[typography.bodySmall, { color: colors.text.secondary, marginBottom: 4, textAlign: 'right' }]}>
+                {new Date(orderDetails?.order_time).toLocaleString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </Text>
+              <Badge 
+                text={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                type={order.status.toLowerCase()}
+              />
+            </View>
           </View>
           
           {orderDetails?.verification_code && order.status.toLowerCase() !== 'completed' && (
@@ -212,11 +252,11 @@ const OrderDetailScreen = ({ route, navigation }) => {
           
           <View style={styles.divider} />
           <TotalRow label="Subtotal" value={orderDetails?.order_total} />
-          {orderDetails?.discount && <TotalRow label="Discount" value={orderDetails.discount} />}
-          {orderDetails?.tax_rate && <TotalRow label="Tax Rate" type="percentage" value={orderDetails.tax_rate} />}
-          {orderDetails?.tax_amount && <TotalRow label="Tax Amount" value={orderDetails.tax_amount} />}
-          {orderDetails?.service_fee && <TotalRow label="Service Fee" value={orderDetails.service_fee} />}
-          {orderDetails?.service_fee_tax && <TotalRow label="Service Fee Tax" value={orderDetails.service_fee_tax} />}
+          {orderDetails?.discount > 0 && <TotalRow label="Discount" value={orderDetails.discount} />}
+          {orderDetails?.tax_rate > 0 && <TotalRow label="Tax Rate" type="percentage" value={orderDetails.tax_rate} />}
+          {orderDetails?.tax_amount > 0 && <TotalRow label="Tax Amount" value={orderDetails.tax_amount} />}
+          {orderDetails?.service_fee > 0 && <TotalRow label="Service Fee" value={orderDetails.service_fee} />}
+          {orderDetails?.service_fee_tax > 0 && <TotalRow label="Service Fee Tax" value={orderDetails.service_fee_tax} />}
           <View style={styles.divider} />
           <TotalRow label="Total" value={orderDetails?.total} isTotal />
         </View>
@@ -226,8 +266,15 @@ const OrderDetailScreen = ({ route, navigation }) => {
           <Text style={[typography.titleMedium, styles.sectionTitle]}>Payment Details</Text>
           <TotalRow label="Payment Status" value={orderDetails?.payment?.payment_status} type="status" />
           <TotalRow label="Payment Method" value={orderDetails?.payment?.card_last4} type="payment_method" />
-          <TotalRow label="Transaction ID" value={orderDetails?.payment?.transaction_id} type="transaction" />
           <TotalRow label="Payment Date" value={orderDetails?.payment?.payment_date} type="date" />
+          <View style={styles.transactionIdContainer}>
+            <Text style={[typography.bodySmall, { color: colors.text.primary, marginBottom: 4 }]}>
+              Transaction ID
+            </Text>
+            <Text style={[typography.bodySmall, { color: colors.text.secondary }]}>
+              {orderDetails?.payment?.transaction_id}
+            </Text>
+          </View>
         </View>
       </ScrollView>
 
@@ -254,7 +301,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
     paddingTop: Platform.OS === 'ios' ? 140 : 140,
-    paddingBottom: 32,
+    paddingBottom: 92,
   },
   section: {
     backgroundColor: colors.white,
@@ -265,17 +312,34 @@ const styles = StyleSheet.create({
     borderWidth: 1,
    borderRadius: 12,
   },
-  sectionTitle: {
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 16,
+  },
+  sectionTitle: {
     color: colors.text.primary,
+    marginBottom: 0,
   },
   restaurantHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'flex-start',
-    gap: 12,
+  },
+  leftContent: {
+    flex: 1,
+  },
+  rightContent: {
+    alignItems: 'flex-end',
   },
   restaurantInfo: {
     flex: 1,
+    marginLeft: 12,
+  },
+  nameAndType: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   verificationContainer: {
     marginTop: 16,
@@ -342,6 +406,19 @@ const styles = StyleSheet.create({
   },
   promoText: {
     color: colors.primary,
+  },
+  transactionIdContainer: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  orderTypeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 

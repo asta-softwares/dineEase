@@ -18,11 +18,13 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ca.dineease.app",
+      "buildNumber": "2",
       "icon": "./assets/logo-ios.png",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         },
+        "NSCameraUsageDescription": "This app includes the ability to scan credit cards for payment, though this feature is not currently in use.",
         "config": {
           "usesNonExemptEncryption": false
         }
@@ -34,6 +36,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "ca.dineease.app",
+      "versionCode": 5,
       "permissions": ["INTERNET"],
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",

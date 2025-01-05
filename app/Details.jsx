@@ -29,20 +29,9 @@ import LargeButton from '../Components/Buttons/LargeButton';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCart } from '../context/CartContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Platform } from 'react-native';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
-
-const CustomHeader = ({ onClose }) => (
-  <SafeAreaView edges={['top']} style={styles.customHeaderContainer}>
-    <TouchableOpacity
-      style={styles.closeButton}
-      onPress={onClose}
-      activeOpacity={0.7}
-    >
-      <Ionicons name="close" size={24} color="#FFFFFF" />
-    </TouchableOpacity>
-  </SafeAreaView>
-);
 
 export default function DetailScreen({ route, navigation }) {
   const { restaurantId, isDineIn } = route.params;
@@ -329,9 +318,6 @@ export default function DetailScreen({ route, navigation }) {
         imageIndex={0}
         visible={imageViewerVisible}
         onRequestClose={handleImageViewerClose}
-        HeaderComponent={({ onClose }) => (
-          <CustomHeader onClose={onClose} />
-        )}
       />
       
       <Animated.View style={[styles.footer, footerAnimatedStyle]}>
@@ -380,22 +366,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderColor: colors.border,
     borderWidth: 1,
-  },
-  customHeaderContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1,
-    padding: 16,
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   header: {
     flexDirection: "row",
@@ -532,11 +502,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginRight: 12,
-    elevation: 2,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     position: 'relative',
     overflow: 'hidden',
     borderColor: colors.border,
